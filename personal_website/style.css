@@ -2,6 +2,7 @@
   box-sizing: border-box;
 }
 
+/* colorgroup */
 .color-1 {
   color: rgb(255, 182, 193);
 }
@@ -140,4 +141,82 @@ main .content {
 
 .works-preview img:hover {
   transform: scale(1.1);
+}
+
+/* ABOUT */
+.about-modern {
+  padding: 100px 60px;
+  position: relative;
+  font-family: 'Helvetica Neue', sans-serif;
+  background: white;
+}
+
+.about-big-title {
+  font-size: 120px;
+  font-family: 'Playfair Display', serif;
+  font-weight: 700;
+  color: rgb(13, 88, 13);
+  line-height: 0.9;
+  margin-bottom: -60px;
+  position: relative;
+  z-index: 2;
+}
+
+.about-columns {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 40px;
+  margin-top: 100px;
+  z-index: 1;
+}
+
+.right-column {
+  margin-top: -50px;  /* 你可以试着调成 -60px 或 -30px，直到满意为止 */
+}
+
+.about-block h2 {
+  font-size: 20px;
+  color: rgb(34,139,34);
+  text-transform: uppercase;
+  margin-bottom: 10px;
+  letter-spacing: 0.5px;
+}
+
+.about-block p {
+  font-size: 16px;
+  color: rgb(34, 139, 34);
+  line-height: 1.6;
+}
+
+.about-image {
+  position: relative;
+  z-index: 1;
+}
+
+.about-image img {
+  width: 100%;
+  max-width: 100%;
+  border-radius: 6px;
+  margin-top: -190px; /* 创建视觉重叠 */
+}
+
+
+/* footer */
+.site-footer {
+  text-align: center;
+  font-size: 14px;
+  color: #999;
+  margin-top: 80px;
+  padding: 20px 0;
+  border-top: 1px solid #eee;
+}
+
+.site-footer a {
+  color: #999;
+  text-decoration: none;
+  margin: 0 8px;
+}
+
+.site-footer a:hover {
+  color: #666;
 }
