@@ -1,6 +1,6 @@
 document.querySelector('header').innerHTML = `
   <div class="content">
-    <div class="logo">IRIS</div>
+    <div class="logo" >IRIS</div>
     <div class="menu-list">
       <div class="menu-item color-2" onclick="toPage('index.html')">HOME</div>
       <div class="menu-item color-4" onclick="toPage('about.html')">About Me</div>
