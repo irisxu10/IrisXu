@@ -1,0 +1,42 @@
+body, html {
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  font-family: 'Helvetica Neue', sans-serif;
+  background: #fefefe;
+}
+
+.title {
+  position: absolute;
+  top: 20px;
+  left: 30px;
+  font-size: 28px;
+  font-weight: bold;
+  z-index: 10;
+  color: #111;
+}
+
+.menu-links {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  align-items: center;
+}
+
+.menu-links a {
+  font-size: 22px;
+  font-weight: bold;
+  text-decoration: none;
+  color: #333;
+  transition: all 0.3s ease;
+}
+
+.menu-links a:hover {
+  color: #ff4d6d;
+  transform: scale(1.1);
+}
