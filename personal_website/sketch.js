@@ -66,7 +66,7 @@ function initBorder() {
 
 function initMenuData() {
   menuData = []
-  let menuTexts = ['WORKS', 'MENU2', 'MENU3', 'MENU4', 'MENU5'];
+  let menuTexts = ['About Me', 'MDP Works', '	Writings', 'Projects', 'Artworks'];
   let menuTs = canvasHeight * 0.03;
   textSize(menuTs);
   let menuWidth = 0;
@@ -320,11 +320,11 @@ function draw() {
 
 function mousePressed() {
   let htmls = [
-    'page1.html',
-    'page2.html',
-    'page3.html',
-    'page4.html',
-    'page5.html',
+    'about.html',
+    'mdp.html',
+    'writings.html',
+    'projects.html',
+    'artworks.html',
   ]
   for (let i = 0; i < menuData.length; i++) {
     let menu = menuData[i];
