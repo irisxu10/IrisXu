@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CONO Project</title>
+  <link rel="stylesheet" href="../style.css" />
+  <style>
+    body {
+      background-color: #faf8f9;
+      font-family: 'Urbanist', sans-serif;
+      color: #3f2b4c;
+    }
+
+    .cono-section {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 60px 20px;
+    }
+
+    /* 第一排：图 + 文排版 */
+    .cono-row-1 {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: flex-start;
+      gap: 40px;
+      margin-bottom: 60px;
+    }
+
+    .cono-row-1 img {
+      max-width: 400px;
+      width: 100%;
+      height: auto;
+      border-radius: 12px;
+      flex: 1;
+    }
+
+    .cono-text {
+      flex: 1;
+      min-width: 300px;
+    }
+
+    .cono-text h1 {
+      font-size: 28px;
+      margin-bottom: 16px;
+    }
+
+    .cono-text p {
+      font-size: 16px;
+      line-height: 1.7;
+      margin-bottom: 12px;
+    }
+
+    /* 第二排开始：每张图单独一行展示 */
+    .cono-image-full {
+      display: block;
+      margin: 40px auto;
+      max-width: 90%;
+      height: auto;
+      border-radius: 8px;
+    }
+  </style>
+</head>
+
+<body>
+  <header></header>
+
+  <main class="cono-section">
+
+    <!-- 第一排：图 + 文字 -->
+    <div class="cono-row-1">
+      <img src="../assets/cono.png" alt="Overview Image" />
+      <div class="cono-text">
+        <h1>CONO</h1>
+        <p>
+          CONO is a thoughtfully crafted app for coffee lovers and professionals — a place to belong, for those whose days begin with coffee and stories. Inspired by friends who see brewing coffee not just as a daily habit but as a personal ritual, CONO provides a space to log, reflect, and share.
+        </p>
+        <p>
+          Whether you’re behind the bar or at home, CONO helps you document your brews and revisit your journey — not just through data, but through memories, visuals, and emotions. It’s designed for those who care about the quiet details: the flavor of a single origin, the method of brewing, the feeling behind a cup.
+        </p>
+        <p>
+          By combining flexible journaling tools, a searchable log system, and a welcoming community space, CONO turns fragmented notes into meaningful reflections. It honors both the routine and the creative expression behind every brew — and offers a space to grow, one cup at a time.
+        </p>
+      </div>
+    </div>
+
+    <!-- 第二排开始的图片 CN1 - CN17 -->
+    <img class="cono-image-full" src="../assets/CN1.jpg" alt="CONO Panel 1" />
+    <img class="cono-image-full" src="../assets/CN2.jpg" alt="CONO Panel 2" />
+    <img class="cono-image-full" src="../assets/CN3.jpg" alt="CONO Panel 3" />
+    <img class="cono-image-full" src="../assets/CN4.jpg" alt="CONO Panel 4" />
+    <img class="cono-image-full" src="../assets/CN5.jpg" alt="CONO Panel 5" />
+    <img class="cono-image-full" src="../assets/CN6.jpg" alt="CONO Panel 6" />
+    <img class="cono-image-full" src="../assets/CN7.jpg" alt="CONO Panel 7" />
+    <img class="cono-image-full" src="../assets/CN8.jpg" alt="CONO Panel 8" />
+    <img class="cono-image-full" src="../assets/CN9.jpg" alt="CONO Panel 9" />
+    <img class="cono-image-full" src="../assets/CN10.jpg" alt="CONO Panel 10" />
+    <img class="cono-image-full" src="../assets/CN11.jpg" alt="CONO Panel 11" />
+    <img class="cono-image-full" src="../assets/CN12.jpg" alt="CONO Panel 12" />
+    <img class="cono-image-full" src="../assets/CN13.jpg" alt="CONO Panel 13" />
+    <img class="cono-image-full" src="../assets/CN14.jpg" alt="CONO Panel 14" />
+    <img class="cono-image-full" src="../assets/CN15.jpg" alt="CONO Panel 15" />
+    <img class="cono-image-full" src="../assets/CN16.jpg" alt="CONO Panel 16" />
+    <img class="cono-image-full" src="../assets/CN17.jpg" alt="CONO Panel 17" />
+
+  </main>
+
+  <script src="../header.js"></script>
+</body>
+</html>
