@@ -299,8 +299,135 @@ main .content {
   font-weight: bold;
 }
 
+/* 长曝光 专属样式 长曝光 专属样式 长曝光 专属样式 长曝光 专属样式 */
+.exposure-color .works-item-title,
+.exposure-color .work-subtitle,
+.exposure-color .works-time,
+.exposure-color .works-paragraph {
+  color: #b8733b; /* 深土橘色 */
+}
+
+.exposure-button {
+  background-color: #f1d6b7; 
+  color: #5e3c1b; 
+  border: none;
+  padding: 10px 18px;
+  border-radius: 6px;
+  font-weight: bold;
+  font-size: 14px;
+  text-decoration: none;
+  display: inline-block;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.exposure-button:hover {
+  background-color: #b8733b;
+  color: white;
+}
+
+/* Cat Letter Cat Letter Cat Letter Cat Letter Cat Letter */
+.catstar-button {
+  background-color: #a8b8ff; 
+  color: #101f5d; 
+  border: none;
+  padding: 10px 18px;
+  border-radius: 6px;
+  font-weight: bold;
+  font-size: 14px;
+  text-decoration: none;
+  display: inline-block;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.catstar-button:hover {
+  background-color: #2e3e99; 
+  color: white;
+}
+
+.catstar-color .works-paragraph,
+.catstar-color .work-subtitle,
+.catstar-color .works-item-title {
+  color: #101f5d; 
+}
+
+.catstar-time {
+  color: #2a3378; 
+}
+
+/* Playground 色系：橘棕+暗绿科技感 */
+.tech-button {
+  background-color: #bcc680; 
+  color: #243c1e;            
+  border: none;
+  padding: 10px 18px;
+  border-radius: 6px;
+  font-weight: bold;
+  font-size: 14px;
+  text-decoration: none;
+  display: inline-block;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.tech-button:hover {
+  background-color: #243c1e;
+  color: white;
+}
+
+.tech-color .works-paragraph,
+.tech-color .work-subtitle,
+.tech-color .works-item-title {
+  color: #243c1e;
+}
+
+.tech-time {
+  color: #243c1e; 
+}
 
 
+/* project-directory project-directory project-directory project-directory */
+.floor-directory {
+  margin-top: 20px;
+  border-left: 2px solid rgb(66, 34, 10);
+  padding-left: 12px;
+  max-width: 350px;
+}
+
+.floor-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 20px;
+  position: relative;
+}
+
+.floor-number {
+  font-size: 24px;
+  font-weight: bold;
+  font-family: 'Arial Black', sans-serif;
+  min-width: 30px;
+}
+
+.floor-label a {
+  font-size: 12px;
+  text-decoration: none;
+  color: rgb(66, 34, 10);
+  font-family: 'Helvetica Neue', sans-serif;
+}
+
+.floor-label a:hover {
+  text-decoration: underline;
+}
+
+/* 分隔线效果 */
+.floor-item::after {
+  content: "";
+  position: absolute;
+  bottom: -10px;
+  left: 0;
+  width: 100%;
+  height: 1px;
+  background-color: rgb(66, 34, 10);
+}
 
 
 
