@@ -6,39 +6,30 @@
 .color-1 {
   color: rgb(255, 182, 193);
 }
-
 .color-2 {
   color: rgb(255, 99, 71);
 }
-
 .color-3 {
   color: rgb(255, 215, 0);
 }
-
 .color-4 {
   color: rgb(34, 139, 34);
 }
-
 .color-5 {
   color: rgb(0, 191, 255);
 }
-
 .color-6 {
   color: rgb(139, 69, 19);
 }
-
 .color-7 {
   color: rgb(210, 105, 30);
 }
-
 .color-8 {
   color: rgb(160, 82, 45);
 }
-
 .color-9 {
   color: rgb(255, 140, 0);
 }
-
 .color-10 {
   color: rgb(165, 42, 42);
 }
@@ -94,6 +85,8 @@ main .content {
 }
 
 /* MDP INTRO MDP INTRO MDP INTRO MDP INTRO MDP INTRO MDP INTRO MDP INTRO MDP INTRO MDP INTRO */
+/* MDP INTRO MDP INTRO MDP INTRO MDP INTRO MDP INTRO MDP INTRO MDP INTRO MDP INTRO MDP INTRO */
+/* MDP INTRO MDP INTRO MDP INTRO MDP INTRO MDP INTRO MDP INTRO MDP INTRO MDP INTRO MDP INTRO */
 .mdp-intro-wrapper {
   display: flex;
   justify-content: space-between;
@@ -140,11 +133,13 @@ main .content {
 
 .thanks-text {
   font-style: italic;
-  color: rgb(139, 69, 19);
+  color: rgb(255, 99, 71);
 }
 
 
 
+/* WORKS ITEM WORKS ITEM WORKS ITEM WORKS ITEM WORKS ITEM WORKS ITEM WORKS ITEM WORKS ITEM WORKS ITEM */
+/* WORKS ITEM WORKS ITEM WORKS ITEM WORKS ITEM WORKS ITEM WORKS ITEM WORKS ITEM WORKS ITEM WORKS ITEM */
 /* WORKS ITEM WORKS ITEM WORKS ITEM WORKS ITEM WORKS ITEM WORKS ITEM WORKS ITEM WORKS ITEM WORKS ITEM */
 .works-item {
   display: flex;
@@ -188,7 +183,7 @@ main .content {
 .works-preview img {
   width: 100%;
   height: auto;
-  object-fit: cover; /* 可选，看你想裁切还是完整显示 */
+  object-fit: cover; 
   transform-origin: center center;
   transform: scale(1);
   transition: transform 0.3s ease-in-out;
@@ -210,12 +205,21 @@ main .content {
   margin-bottom: 16px;
 }
 
+.works-paragraph a {
+  color: inherit;
+  text-decoration: underline; 
+}
+
+.works-paragraph a:hover {
+  color: rgb(200, 100, 30);
+}
+
 .detail-button {
   display: inline-block;
   margin-top: 10px;
   padding: 6px 12px;
   font-size: 14px;
-  background-color: rgb(204, 144, 101);
+  background-color: rgb(200, 145, 100);
   color: #fff;
   font-weight: bold;
   text-decoration: none;
@@ -227,8 +231,81 @@ main .content {
   background-color: rgb(139, 69, 19);
 }
 
+/* CONO 专属样式 CONO 专属样式 CONO 专属样式*/
+.cono-button {
+  background-color: #d5c3df; 
+  color: #3f2b4c;      
+  border: none;
+  padding: 10px 18px;
+  border-radius: 6px;
+  font-weight: bold;
+  font-size: 14px;
+  text-decoration: none;
+  display: inline-block;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.cono-button:hover {
+  background-color: #503b5e; 
+  color: #ffffff;            
+}
+
+.cono-color {
+  color: #3f2b4c;
+}
+
+.cono-color .works-item-title,
+.cono-color .work-subtitle,
+.cono-color .works-paragraph,
+.cono-color .works-time {
+  color: #3f2b4c;
+}
+
+.cono-color .works-item-title {
+  font-weight: bold;
+}
+
+/* Getty 专属样式 Getty 专属样式 Getty 专属样式*/
+.getty-button {
+  background-color: #cfd8ef;  
+  color: #2a3659;             
+  border: none;
+  padding: 10px 18px;
+  border-radius: 6px;
+  font-weight: bold;
+  font-size: 14px;
+  text-decoration: none;
+  display: inline-block;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.getty-button:hover {
+  background-color: #2a3659; 
+  color: #ffffff;            
+}
+
+.getty-color {
+  color: #2a3659;
+}
+
+.getty-color .works-item-title,
+.getty-color .work-subtitle,
+.getty-color .works-paragraph,
+.getty-color .works-time {
+  color: #2a3659;
+}
+
+.getty-color .works-item-title {
+  font-weight: bold;
+}
 
 
+
+
+
+
+/* ABOUT ABOUT ABOUT ABOUT ABOUT ABOUT ABOUT ABOUT ABOUT ABOUT ABOUT ABOUT ABOUT ABOUT ABOUT ABOUT*/
+/* ABOUT ABOUT ABOUT ABOUT ABOUT ABOUT ABOUT ABOUT ABOUT ABOUT ABOUT ABOUT ABOUT ABOUT ABOUT ABOUT*/
 /* ABOUT ABOUT ABOUT ABOUT ABOUT ABOUT ABOUT ABOUT ABOUT ABOUT ABOUT ABOUT ABOUT ABOUT ABOUT ABOUT*/
 .about-modern {
   padding: 100px 60px;
@@ -257,7 +334,7 @@ main .content {
 }
 
 .right-column {
-  margin-top: -50px;  /* 你可以试着调成 -60px 或 -30px，直到满意为止 */
+  margin-top: -50px;  /* 试着调成 -60px 或 -30px，直到满意为止 */
 }
 
 .about-block h2 {
@@ -287,7 +364,7 @@ main .content {
 }
 
 
-/* footer */
+/* footer footer footer footer footer footer footer footer footer footer footer footer footer */
 .site-footer {
   text-align: center;
   font-size: 14px;
@@ -308,6 +385,9 @@ main .content {
 }
 
 /* MAIN MAIN MAIN MAIN MAIN MAIN MAIN MAIN MAIN MAIN MAIN MAIN MAIN MAIN MAIN MAIN MAIN MAIN  */
+/* MAIN MAIN MAIN MAIN MAIN MAIN MAIN MAIN MAIN MAIN MAIN MAIN MAIN MAIN MAIN MAIN MAIN MAIN  */
+/* MAIN MAIN MAIN MAIN MAIN MAIN MAIN MAIN MAIN MAIN MAIN MAIN MAIN MAIN MAIN MAIN MAIN MAIN  */
+
 html, body {
   height: 100%;
   margin: 0;
