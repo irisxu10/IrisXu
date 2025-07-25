@@ -1,26 +1,115 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>IrisXu_Long Exoposure Self-Portrait</title>
-  <link rel="stylesheet" href="../style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Long Exposure Portrait</title>
+  <link rel="stylesheet" href="../style.css" />
+  <style>
+    body {
+      background-color: #faf8f9;
+      font-family: 'Urbanist', sans-serif;
+      color: #3f2b4c;
+    }
 
+    .long-section {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 60px 20px;
+      padding-top: 100px;
+    }
+
+    .long-row-1 {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: flex-start;
+      gap: 40px;
+      margin-bottom: 60px;
+    }
+
+    .long-row-1 img {
+      max-width: 400px;
+      width: 100%;
+      height: auto;
+      border-radius: 12px;
+      flex: 1;
+    }
+
+    .long-text {
+      flex: 1;
+      min-width: 300px;
+    }
+
+    .long-text h1 {
+      font-size: 28px;
+      margin-bottom: 16px;
+    }
+
+    .long-text p {
+      font-size: 16px;
+      line-height: 1.7;
+      margin-bottom: 12px;
+    }
+
+    .long-image-full {
+      display: block;
+      margin: 40px auto;
+      max-width: 90%;
+      height: auto;
+      border-radius: 8px;
+    }
+
+    .image-row-2 {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 40px;
+      margin-top: 40px;
+    }
+
+    .image-row-2 img {
+      max-width: 45%;
+      width: 100%;
+      height: auto;
+      border-radius: 10px;
+    }
+  </style>
 </head>
 
 <body>
   <header></header>
 
-  <main>
-    <p style="text-align: center; margin-top: 100px; font-size: 18px; color: #555;">
-  More exciting content coming soon — Stay Tuned!
-</p>
+  <main class="long-section">
+    <!-- 第一排：图 + 文 -->
+    <div class="long-row-1">
+      <img src="../assets/S0.jpg" alt="Long Exposure Intro Image" />
+      <div class="long-text">
+        <h1>Long Exposure Portrait</h1>
+        <p>
+          This portrait series was created through numerous experiments with long exposure techniques. I began by researching how camera exposure works — the relationship between shutter speed, aperture, and ISO. Understanding these foundations helped me control the way motion appears in the frame.
+        </p>
+        <p>
+          I tested a variety of settings, lighting conditions, and movements — from quick gestures to slow head turns — in order to explore different levels of blur, contrast, and ghostly presence. Some images emphasized clarity fading into fog, while others captured layered time and gesture.
+        </p>
+        <p>
+          After many iterations, I found a visual language that felt right to me: expressive, temporal, and slightly surreal — a reflection of memory in motion. The resulting images are not just portraits, but traces of embodied time.
+        </p>
+      </div>
+    </div>
 
+    <!-- 第二排单张图 S1 -->
+    <img class="long-image-full" src="../assets/S1.jpg" alt="Long Exposure Image S1" />
+
+    <!-- 后排两张一行 S2 - S6 -->
+    <div class="image-row-2">
+      <img src="../assets/S2.jpg" alt="Long Exposure Image S2" />
+      <img src="../assets/S3.jpg" alt="Long Exposure Image S3" />
+      <img src="../assets/S4.jpg" alt="Long Exposure Image S4" />
+      <img src="../assets/S5.jpg" alt="Long Exposure Image S5" />
+      <img src="../assets/S6.jpg" alt="Long Exposure Image S6" />
+    </div>
   </main>
-
 
   <script src="../header.js"></script>
 </body>
-
 </html>
