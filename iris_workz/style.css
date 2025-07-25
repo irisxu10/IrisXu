@@ -354,7 +354,7 @@ main .content {
   color: #2a3378; 
 }
 
-/* Playground 色系：橘棕+暗绿科技感 */
+/* Playground  Playground Playground Playground Playground Playground Playground Playground*/
 .tech-button {
   background-color: #bcc680; 
   color: #243c1e;            
@@ -418,7 +418,6 @@ main .content {
   text-decoration: underline;
 }
 
-/* 分隔线效果 */
 .floor-item::after {
   content: "";
   position: absolute;
@@ -461,7 +460,7 @@ main .content {
 }
 
 .right-column {
-  margin-top: -50px;  /* 试着调成 -60px 或 -30px，直到满意为止 */
+  margin-top: -50px;  
 }
 
 .about-block h2 {
@@ -487,7 +486,7 @@ main .content {
   width: 100%;
   max-width: 100%;
   border-radius: 6px;
-  margin-top: -190px; /* 创建视觉重叠 */
+  margin-top: -190px; /* 视觉重叠 */
 }
 
 
