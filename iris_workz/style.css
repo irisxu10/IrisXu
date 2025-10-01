@@ -63,6 +63,7 @@ header .content {
 .logo {
   font-size: 48px;
   font-weight: bold;
+  color: rgb(255, 99, 71);
 }
 
 .menu-list {
