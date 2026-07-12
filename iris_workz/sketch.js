@@ -109,39 +109,38 @@ function initBorder() {
 }
 
 function initMenuData() {
-  menuData = []
-  let menuTexts = ['About Me', 'MDP Works', 'Writings', 'Projects', 'Artworks'];
-  let menuTs = canvasHeight * 0.04;
-  textSize(menuTs);
-  let menuWidth = 0;
-  let space = 88;
-  for (let i = 0; i < menuTexts.length; i++) {
-    let menuTw = textWidth(menuTexts[i]);
-    menuWidth += menuTw + space;
+  menuData = [];
+
+  const items = window.SITE_NAVIGATION;
+  if (!Array.isArray(items)) {
+    console.error('sketch.js: window.SITE_NAVIGATION is missing or invalid. Expected an array from nav-data.js. Canvas menu will be empty.');
+    return;
   }
 
-  let startX = canvasWidth / 2 - menuWidth / 2 + space / 2;
-  for (let i = 0; i < menuTexts.length; i++) {
-    let menuTw = textWidth(menuTexts[i]);
-    if (i == 0) {
-      menuData.push({
-        text: menuTexts[i],
-        w: menuTw,
-        h: menuTs,
-        x: startX,
-        y: canvasHeight - 100,
-        scale: 1,
-      })
-    } else {
-      menuData.push({
-        text: menuTexts[i],
-        w: menuTw,
-        h: menuTs,
-        x: menuData[i - 1].x + menuData[i - 1].w + space,
-        y: canvasHeight - 100,
-        scale: 1,
-      })
-    }
+  let menuTs = canvasHeight * 0.04;
+  textSize(menuTs);
+
+  // Three items distributed evenly across the centered middle 65% of the
+  // canvas, each label centered within its own slot — computed from
+  // canvasWidth rather than the old fixed per-item gap (tuned for five
+  // items stacked left-to-right).
+  let regionWidth = canvasWidth * 0.65;
+  let regionStart = (canvasWidth - regionWidth) / 2;
+  let slotWidth = regionWidth / items.length;
+
+  for (let i = 0; i < items.length; i++) {
+    let label = items[i].label;
+    let labelWidth = textWidth(label);
+    let slotCenterX = regionStart + slotWidth * (i + 0.5);
+    menuData.push({
+      text: label,
+      path: items[i].path,
+      w: labelWidth,
+      h: menuTs,
+      x: slotCenterX - labelWidth / 2,
+      y: canvasHeight - 100,
+      scale: 1,
+    })
   }
 
   for (let i = 0; i < menuData.length; i++) {
@@ -532,18 +531,11 @@ function draw() {
 function mousePressed() {
   if (!simulationActive) return;
 
-  let htmls = [
-    'about.html',
-    'mdp.html',
-    'writings.html',
-    'projects.html',
-    'artworks.html',
-  ]
   for (let i = 0; i < menuData.length; i++) {
     let menu = menuData[i];
     if (mx > menu.x && mx < menu.x + menu.w && my > menu.y && my < menu.y + menu.h) {
-      window.location.href = htmls[i];
+      window.location.href = menu.path;
       break;
-    } 
+    }
   }
 }

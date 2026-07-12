@@ -64,6 +64,12 @@ header .content {
   font-size: 48px;
   font-weight: bold;
   color: rgb(255, 99, 71);
+  text-decoration: none;
+}
+
+.logo:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
 }
 
 .menu-list {
@@ -83,6 +89,11 @@ header .content {
 .menu-item:focus-visible {
   outline: 2px solid currentColor;
   outline-offset: 2px;
+}
+
+.menu-item[aria-current="page"],
+.menu-item.is-section-current {
+  border-bottom: 2px solid currentColor;
 }
 
 main .content {
@@ -731,6 +742,50 @@ body.home-page .home-main {
   margin: 0;
   font-size: clamp(15px, 2vw, 17px);
   line-height: 1.7;
+}
+
+/* Restrained "Archive / About / Writings" row — quiet and editorial,
+   not a commercial nav bar. Wraps naturally at narrow widths instead of
+   needing a dedicated breakpoint. */
+.archive-site-navigation {
+  margin: clamp(24px, 4vw, 40px) 0 clamp(32px, 5vw, 56px);
+}
+
+.archive-site-navigation-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 4px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  font-size: clamp(14px, 2vw, 16px);
+}
+
+.archive-site-navigation-list li:not(:last-child)::after {
+  content: "/";
+  margin-left: 8px;
+  color: rgb(255, 99, 71);
+}
+
+.archive-site-navigation-link {
+  display: inline-block;
+  padding: 6px 4px;
+  color: rgb(66, 34, 10);
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+}
+
+.archive-site-navigation-link:hover {
+  border-bottom-color: rgb(66, 34, 10);
+}
+
+.archive-site-navigation-link:focus-visible {
+  outline: 2px solid rgb(66, 34, 10);
+  outline-offset: 2px;
+}
+
+.archive-site-navigation-link[aria-current="location"] {
+  color: rgb(255, 99, 71);
 }
 
 .project-archive-root {

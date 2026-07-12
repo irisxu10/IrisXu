@@ -181,9 +181,50 @@
     root.appendChild(list);
   }
 
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", renderArchive);
-  } else {
+  // Renders the semantic Archive / About / Writings row inside the
+  // Floating Archive section, from window.SITE_NAVIGATION (see
+  // nav-data.js). Kept independent of renderArchive() above — a failure
+  // here must never prevent the project archive from rendering.
+  function renderSiteNavigation() {
+    var nav = document.getElementById("archive-site-navigation");
+    if (!nav) {
+      console.error("home.js: #archive-site-navigation was not found in the document. Skipping site navigation render.");
+      return;
+    }
+
+    var items = window.SITE_NAVIGATION;
+    if (!Array.isArray(items)) {
+      console.error("home.js: window.SITE_NAVIGATION is missing or invalid. Expected an array (see nav-data.js). Skipping site navigation render.");
+      return;
+    }
+
+    var list = document.createElement("ul");
+    list.className = "archive-site-navigation-list";
+
+    items.forEach(function (item) {
+      var li = document.createElement("li");
+      var link = document.createElement("a");
+      link.className = "archive-site-navigation-link";
+      link.href = item.path;
+      link.textContent = item.label;
+      if (item.id === "archive") {
+        link.setAttribute("aria-current", "location");
+      }
+      li.appendChild(link);
+      list.appendChild(li);
+    });
+
+    nav.appendChild(list);
+  }
+
+  function renderHomepage() {
     renderArchive();
+    renderSiteNavigation();
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", renderHomepage);
+  } else {
+    renderHomepage();
   }
 })();
