@@ -28,8 +28,16 @@ let ballStartFallbackTimeoutId = null;
 let ballsStarted = false;
 
 const LETTER_CHARS = ['I', 'R', 'I', 'S'];
-const LETTER_SPAWN_STAGGER_MS = 400;     // within the requested 300-500ms range
+const LETTER_SPAWN_STAGGER_MS = 260;     // continuous-motion timing refinement
 const LETTER_SETTLE_FALLBACK_MS = 4000;  // within the requested 3-5s range, measured from the last letter's spawn
+
+// --- Sequencing refinement: small ball batch -> letters -> main ball rain ---
+const PRE_LETTER_BALL_COUNT = 320;
+const LETTER_START_BALL_COUNT = 280; // letters begin as soon as balls[] first reaches this, overlapping with the pre-letter batch
+let preLetterBallInterval = null;
+let postLetterBallDelayTimer = null;
+let preLetterLettersStarted = false; // guards spawnLetterSequence() from firing twice while preLetterBallInterval keeps running to PRE_LETTER_BALL_COUNT
+let mainRainRequested = false;       // set when the post-S timer fires before preLetterBallInterval has naturally finished
 
 // Small-screen / reduced-motion visitors get the readable HTML archive
 // only — the p5/Matter simulation never initializes for them.
@@ -260,8 +268,12 @@ function initLetterAnchors() {
   }
 }
 
-// Spawns I, R, I, S one after another (staggered), then hands off to
-// beginWaitingForLettersToSettle() once the last letter has entered.
+// Spawns I, R, I, S one after another (staggered). The main ball rain now
+// resumes a short delay after the final letter enters (see
+// postLetterBallDelayTimer below) rather than waiting on
+// beginWaitingForLettersToSettle() — the letters still settle
+// independently via their own update(), this only changes when the
+// balls resume.
 function spawnLetterSequence() {
   letters = [];
   ballsStarted = false;
@@ -272,16 +284,28 @@ function spawnLetterSequence() {
     let spawnTimeoutId = setTimeout(() => {
       letters.push(new IrisLetter(anchor.char, anchor.x, anchor.y, i));
       if (isLastLetter) {
-        beginWaitingForLettersToSettle();
+        postLetterBallDelayTimer = setTimeout(() => {
+          postLetterBallDelayTimer = null;
+          // If the pre-letter batch is still topping up to 150, defer to
+          // its own completion instead of starting a second concurrent
+          // interval — startPreLetterBalls() will call initBall() itself
+          // as soon as it clears.
+          if (preLetterBallInterval) {
+            mainRainRequested = true;
+          } else {
+            initBall();
+          }
+        }, 100);
       }
     }, i * LETTER_SPAWN_STAGGER_MS);
     letterSpawnTimeouts.push(spawnTimeoutId);
   }
 }
 
-// Lets the letters settle naturally before the ball rain begins, with a
-// fallback so the simulation can never get stuck waiting on a letter
-// that never satisfies the settle check.
+// UNUSED in this sequencing refinement: settle-triggered ball start has
+// been disconnected in favor of postLetterBallDelayTimer above. Left in
+// place rather than deleted — the letters' own settle detection
+// (IrisLetter.checkSettled()) is unrelated and still runs independently.
 function beginWaitingForLettersToSettle() {
   ballStartFallbackTimeoutId = setTimeout(startBallRainOnce, LETTER_SETTLE_FALLBACK_MS);
 
@@ -323,19 +347,63 @@ function clearLetterSequenceTimers() {
     clearTimeout(ballStartFallbackTimeoutId);
     ballStartFallbackTimeoutId = null;
   }
+  if (preLetterBallInterval) {
+    clearInterval(preLetterBallInterval);
+    preLetterBallInterval = null;
+  }
+  if (postLetterBallDelayTimer) {
+    clearTimeout(postLetterBallDelayTimer);
+    postLetterBallDelayTimer = null;
+  }
+}
+
+// The one existing ball-creation expression, extracted so the pre-letter
+// batch and the main rain both spawn balls the same way.
+function spawnOneBall() {
+  balls.push(new Ball(random(canvasWidth), random(-canvasHeight, 0)));
+}
+
+// Spawns a small initial batch (same rate/colors/size as the main rain)
+// into the existing balls[] array. Letters start as soon as the batch
+// first reaches LETTER_START_BALL_COUNT, while this same interval keeps
+// spawning until PRE_LETTER_BALL_COUNT — the pre-letter balls and the
+// letter entrance overlap instead of happening as separate blocks. Does
+// not reset the world, boundaries, menu bodies, or the balls spawned.
+function startPreLetterBalls() {
+  preLetterLettersStarted = false;
+  mainRainRequested = false;
+
+  preLetterBallInterval = setInterval(() => {
+    if (balls.length < PRE_LETTER_BALL_COUNT) {
+      for (let i = 0; i < 100; i++) {
+        spawnOneBall();
+      }
+    }
+
+    if (!preLetterLettersStarted && balls.length >= LETTER_START_BALL_COUNT) {
+      preLetterLettersStarted = true;
+      spawnLetterSequence();
+    }
+
+    if (balls.length >= PRE_LETTER_BALL_COUNT) {
+      clearInterval(preLetterBallInterval);
+      preLetterBallInterval = null;
+      if (mainRainRequested) {
+        mainRainRequested = false;
+        initBall();
+      }
+    }
+  }, 1000);
 }
 
 function initBall() {
-  if (intervalId) {
-    clearInterval(intervalId);
-    intervalId = null;
-  }
+  if (intervalId) return;
+
   if (timeoutId) {
     clearTimeout(timeoutId);
     timeoutId = null;
   }
 
-  balls = []
   intervalId = setInterval(() => {
     if (balls.length >= 1000) {
       if (intervalId) {
@@ -350,8 +418,7 @@ function initBall() {
       }, 5000);
     } else {
       for (let i = 0; i < 100; i++) {
-        balls.push(new Ball(random(canvasWidth), random(-canvasHeight, 0)));
-        // balls.push(new Ball(random(canvasWidth / 2 - 300, canvasWidth / 2 + 300), random(-300, 100)));
+        spawnOneBall();
       }
     }
   }, 1000);
@@ -386,10 +453,11 @@ function windowResized() {
   // definition. The falling IrisLetter bodies replace the old fixed,
   // invisible IRIS collision geometry.
   initLetterAnchors();
-  spawnLetterSequence();
-  // initBall() is no longer called directly here — it now runs once the
-  // letters have settled (or the fallback timer fires), from within
-  // startBallRainOnce().
+  balls = [];
+  startPreLetterBalls();
+  // spawnLetterSequence() and initBall() are no longer called directly
+  // here — startPreLetterBalls() spawns the small initial batch, then
+  // calls spawnLetterSequence() itself once that batch is done.
 
   let canvasDom = canvas.elt;
   let miniWidth = max(windowWidth, 1280);
