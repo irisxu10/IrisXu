@@ -66,7 +66,7 @@ function initBorder() {
 
 function initMenuData() {
   menuData = []
-  let menuTexts = ['About Me', 'MDP Works', '	Writings', 'Projects', 'Artworks'];
+  let menuTexts = ['About Me', 'MDP Works', 'Writings', 'Projects', 'Artworks'];
   let menuTs = canvasHeight * 0.04;
   textSize(menuTs);
   let menuWidth = 0;

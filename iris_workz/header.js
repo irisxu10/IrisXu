@@ -1,21 +1,3 @@
-// document.querySelector('header').innerHTML = `
-//   <div class="content">
-//     <div class="logo" >IRIS</div>
-//     <div class="menu-list">
-//       <div class="menu-item color-2" onclick="toPage('index.html')">HOME</div>
-//       <div class="menu-item color-4" onclick="toPage('about.html')">About Me</div>
-//       <div class="menu-item color-6" onclick="toPage('mdp.html')">MDP Works</div>
-//       <div class="menu-item color-7" onclick="toPage('writings.html')">Writings</div>
-//       <div class="menu-item color-5" onclick="toPage('projects.html')">Projects</div>
-//       <div class="menu-item color-9" onclick="toPage('artworks.html')">Artworks</div>
-//     </div>
-//   </div>
-// `
-
-// function toPage(page) {
-//   window.location.href = page;
-// }
-
 // 动态判断当前路径是否在子目录中
 function getPathPrefix() {
   const path = window.location.pathname;
@@ -31,17 +13,13 @@ const prefix = getPathPrefix();
 document.querySelector('header').innerHTML = `
   <div class="content">
     <div class="logo">IRIS</div>
-    <div class="menu-list">
-      <div class="menu-item color-2" onclick="toPage('${prefix}index.html')">HOME</div>
-      <div class="menu-item color-4" onclick="toPage('${prefix}about.html')">About Me</div>
-      <div class="menu-item color-6" onclick="toPage('${prefix}mdp.html')">ArtCenter_MDP</div>
-      <div class="menu-item color-7" onclick="toPage('${prefix}writings.html')">Writings</div>
-      <div class="menu-item color-5" onclick="toPage('${prefix}projects.html')">Projects</div>
-      <div class="menu-item color-9" onclick="toPage('${prefix}artworks.html')">Artworks</div>
-    </div>
+    <nav class="menu-list" aria-label="Primary">
+      <a class="menu-item color-2" href="${prefix}index.html">HOME</a>
+      <a class="menu-item color-4" href="${prefix}about.html">About Me</a>
+      <a class="menu-item color-6" href="${prefix}mdp.html">ArtCenter_MDP</a>
+      <a class="menu-item color-7" href="${prefix}writings.html">Writings</a>
+      <a class="menu-item color-5" href="${prefix}projects.html">Projects</a>
+      <a class="menu-item color-9" href="${prefix}artworks.html">Artworks</a>
+    </nav>
   </div>
 `;
-
-function toPage(page) {
-  window.location.href = page;
-}
