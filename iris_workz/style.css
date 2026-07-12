@@ -2,6 +2,27 @@
   box-sizing: border-box;
 }
 
+/* =========================
+   RESPONSIVE INNER-PAGE SHELL
+   ========================= */
+:root {
+  --site-max-width: 1366px;               /* matches the existing desktop content width */
+  --site-gutter: clamp(16px, 4vw, 60px);   /* 16px matches the header's existing side padding; 60px matches .about-modern's existing side padding */
+  --inner-header-height: 80px;             /* matches the existing header .content height */
+  --inner-header-height-mobile: 100px;     /* matches the top clearance mdp/*.html detail pages already hardcode inline, so their un-editable inline padding stays sufficient */
+}
+
+/* Baseline safety net so no inner-page image or video can force page-wide
+   overflow. Existing rules that already set width/height explicitly
+   (.works-preview img, .about-image img, .tech-video video, and the
+   mdp/*.html inline classes) take precedence over this via specificity
+   or source order — this only protects anything left unstyled. */
+img,
+video {
+  max-width: 100%;
+  height: auto;
+}
+
 /* colorgroup colorgroup colorgroup colorgroup colorgroup colorgroup colorgroup */
 .color-1 {
   color: rgb(255, 182, 193);
@@ -51,11 +72,13 @@ header {
 }
 
 header .content {
-  width: 1366px;
-  height: 80px;
+  width: min(calc(100% - (2 * var(--site-gutter))), var(--site-max-width));
+  min-height: var(--inner-header-height);
   display: flex;
   align-items: center;
-  padding: 0 16px;
+  flex-wrap: wrap;
+  row-gap: 6px;
+  padding: 10px 16px;
   justify-content: space-between;
   margin: 0 auto;
 }
@@ -97,9 +120,9 @@ header .content {
 }
 
 main .content {
-  width: 1366px;
+  width: min(calc(100% - (2 * var(--site-gutter))), var(--site-max-width));
   margin: 0 auto;
-  padding-top: 80px;
+  padding-top: var(--inner-header-height);
 }
 
 /* MDP INTRO MDP INTRO MDP INTRO MDP INTRO MDP INTRO MDP INTRO MDP INTRO MDP INTRO MDP INTRO */
@@ -121,7 +144,7 @@ main .content {
 }
 
 .mdp-intro-title {
-  font-size: 36px;
+  font-size: clamp(28px, 5vw, 36px);
   font-weight: bold;
   color: rgb(66, 34, 10);
   line-height: 1.2;
@@ -161,22 +184,25 @@ main .content {
 /* WORKS ITEM WORKS ITEM WORKS ITEM WORKS ITEM WORKS ITEM WORKS ITEM WORKS ITEM WORKS ITEM WORKS ITEM */
 .works-item {
   display: flex;
+  flex-wrap: wrap;
   padding: 32px 0;
   position: relative;
 }
 
 .works-item-title {
-  font-size: 32px;
+  font-size: clamp(24px, 4vw, 32px);
   font-weight: bold;
   margin-bottom: 8px;
 }
 
 .works-detail {
   padding: 0 32px;
+  min-width: 260px;
 }
 
 .works-item-desc {
   flex: 1;
+  min-width: 0;
 }
 
 .works-time {
@@ -192,9 +218,11 @@ main .content {
 }
 
 .works-preview {
-  width: 500px;
-  min-width: 500px;
-  height: 665px;
+  flex: 1 1 320px;
+  width: auto;
+  max-width: 500px;
+  height: auto;
+  aspect-ratio: 500 / 665;
   overflow: hidden;
 }
 
@@ -452,14 +480,14 @@ main .content {
 /* ABOUT ABOUT ABOUT ABOUT ABOUT ABOUT ABOUT ABOUT ABOUT ABOUT ABOUT ABOUT ABOUT ABOUT ABOUT ABOUT*/
 /* ABOUT ABOUT ABOUT ABOUT ABOUT ABOUT ABOUT ABOUT ABOUT ABOUT ABOUT ABOUT ABOUT ABOUT ABOUT ABOUT*/
 .about-modern {
-  padding: 100px 60px;
+  padding: 100px var(--site-gutter);
   position: relative;
   font-family: 'Helvetica Neue', sans-serif;
   background: white;
 }
 
 .about-big-title {
-  font-size: 120px;
+  font-size: clamp(48px, 12vw, 120px);
   font-family: 'Playfair Display', serif;
   font-weight: 700;
   color: rgb(13, 88, 13);
@@ -570,8 +598,8 @@ html, body {
 
 .coffee-section {
   max-width: 1200px;
-  margin: 80px auto;
-  padding: 0 20px;
+  margin: var(--inner-header-height) auto;
+  padding: 0 var(--site-gutter);
 }
 
 .coffee-header {
@@ -919,6 +947,64 @@ html {
 
   .canvas-hero {
     display: none;
+  }
+}
+
+/* =========================
+   RESPONSIVE INNER-PAGE SHELL — MOBILE (≤767px)
+   ========================= */
+@media (max-width: 767px) {
+  .logo {
+    font-size: clamp(24px, 7vw, 32px);
+  }
+
+  .menu-list {
+    flex-wrap: wrap;
+    gap: 4px 16px;
+  }
+
+  .menu-item {
+    margin-left: 0;
+    font-size: clamp(13px, 3.2vw, 15px);
+    padding: 4px 2px;
+  }
+
+  main .content {
+    padding-top: var(--inner-header-height-mobile);
+  }
+
+  .coffee-section {
+    margin-top: var(--inner-header-height-mobile);
+  }
+
+  /* .works-item already wraps via flex-wrap (base rule); once a project
+     entry stacks into one column, the preview's absolutely-positioned
+     time label no longer has a tall image to sit against, so it returns
+     to normal document flow instead of floating over empty space. */
+  .works-time {
+    position: static;
+    margin-top: 8px;
+  }
+
+  .about-columns {
+    grid-template-columns: 1fr;
+  }
+
+  /* .about-big-title / .about-image / .right-column use negative margins
+     to create a deliberate desktop-only visual overlap. That composition
+     doesn't translate to a single stacked column, so it's neutralized
+     here rather than rescaled — flagged in the final report as a
+     trade-off worth a visual check. */
+  .about-big-title {
+    margin-bottom: 0;
+  }
+
+  .right-column {
+    margin-top: 0;
+  }
+
+  .about-image img {
+    margin-top: 24px;
   }
 }
 
