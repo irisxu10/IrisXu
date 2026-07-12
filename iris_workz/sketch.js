@@ -19,6 +19,18 @@ let menuData = []
 let intervalId;
 let timeoutId;
 
+// --- Falling IRIS letters (experiment/falling-iris-letters) ---
+let letters = [];
+let letterAnchors = [];
+let letterSpawnTimeouts = [];
+let letterSettleCheckIntervalId = null;
+let ballStartFallbackTimeoutId = null;
+let ballsStarted = false;
+
+const LETTER_CHARS = ['I', 'R', 'I', 'S'];
+const LETTER_SPAWN_STAGGER_MS = 400;     // within the requested 300-500ms range
+const LETTER_SETTLE_FALLBACK_MS = 4000;  // within the requested 3-5s range, measured from the last letter's spawn
+
 // Small-screen / reduced-motion visitors get the readable HTML archive
 // only — the p5/Matter simulation never initializes for them.
 function shouldRunCanvasSimulation() {
@@ -132,6 +144,10 @@ function initMenuData() {
   }
 }
 
+// UNUSED during the falling-iris-letters experiment: this function built
+// the old permanently-fixed, invisible IRIS-shaped collision geometry.
+// It is intentionally left in place for comparison but is no longer
+// called from windowResized() — the falling IrisLetter bodies replace it.
 function initIRISData() {
   let ts = canvasHeight / 3;
   textSize(ts);
@@ -218,6 +234,97 @@ function initIRISData() {
   }
 }
 
+// Computes each letter's left-to-right horizontal anchor from the same
+// text metrics the old fixed "I R I S" title used, so the falling
+// letters read as the same word, just spaced out via textWidth instead
+// of hand-tuned rectangles.
+function initLetterAnchors() {
+  let ts = canvasHeight / 3;
+  textFont(font);
+  textSize(ts);
+
+  let fullWidth = textWidth(LETTER_CHARS.join(' '));
+  let spaceWidth = textWidth(' ');
+  let cursorX = canvasWidth / 2 - fullWidth / 2;
+
+  letterAnchors = [];
+  for (let i = 0; i < LETTER_CHARS.length; i++) {
+    let ch = LETTER_CHARS[i];
+    let charWidth = textWidth(ch);
+    letterAnchors.push({
+      char: ch,
+      x: cursorX + charWidth / 2,
+      y: canvasHeight * 0.4
+    });
+    cursorX += charWidth + spaceWidth;
+  }
+}
+
+// Spawns I, R, I, S one after another (staggered), then hands off to
+// beginWaitingForLettersToSettle() once the last letter has entered.
+function spawnLetterSequence() {
+  letters = [];
+  ballsStarted = false;
+
+  for (let i = 0; i < letterAnchors.length; i++) {
+    let anchor = letterAnchors[i];
+    let isLastLetter = i === letterAnchors.length - 1;
+    let spawnTimeoutId = setTimeout(() => {
+      letters.push(new IrisLetter(anchor.char, anchor.x, anchor.y, i));
+      if (isLastLetter) {
+        beginWaitingForLettersToSettle();
+      }
+    }, i * LETTER_SPAWN_STAGGER_MS);
+    letterSpawnTimeouts.push(spawnTimeoutId);
+  }
+}
+
+// Lets the letters settle naturally before the ball rain begins, with a
+// fallback so the simulation can never get stuck waiting on a letter
+// that never satisfies the settle check.
+function beginWaitingForLettersToSettle() {
+  ballStartFallbackTimeoutId = setTimeout(startBallRainOnce, LETTER_SETTLE_FALLBACK_MS);
+
+  letterSettleCheckIntervalId = setInterval(() => {
+    let allSettled = letters.length === letterAnchors.length && letters.every(letter => letter.isStatic);
+    if (allSettled) {
+      startBallRainOnce();
+    }
+  }, 200);
+}
+
+function startBallRainOnce() {
+  if (ballsStarted) return;
+  ballsStarted = true;
+
+  if (letterSettleCheckIntervalId) {
+    clearInterval(letterSettleCheckIntervalId);
+    letterSettleCheckIntervalId = null;
+  }
+  if (ballStartFallbackTimeoutId) {
+    clearTimeout(ballStartFallbackTimeoutId);
+    ballStartFallbackTimeoutId = null;
+  }
+
+  initBall();
+}
+
+// Clears every letter-related timer so a reset can never leave a
+// duplicate spawn/settle/fallback timer running behind the new cycle.
+function clearLetterSequenceTimers() {
+  letterSpawnTimeouts.forEach(id => clearTimeout(id));
+  letterSpawnTimeouts = [];
+
+  if (letterSettleCheckIntervalId) {
+    clearInterval(letterSettleCheckIntervalId);
+    letterSettleCheckIntervalId = null;
+  }
+  if (ballStartFallbackTimeoutId) {
+    clearTimeout(ballStartFallbackTimeoutId);
+    ballStartFallbackTimeoutId = null;
+  }
+}
+
 function initBall() {
   if (intervalId) {
     clearInterval(intervalId);
@@ -264,11 +371,25 @@ function windowResized() {
 
   resizeCanvas(canvasWidth, canvasHeight);
 
+  // Tear down any letters/timers from a previous cycle before rebuilding,
+  // so a reset can never leave orphaned bodies or duplicate timers behind.
+  clearLetterSequenceTimers();
+  for (let i = letters.length - 1; i >= 0; i--) {
+    letters[i].removeBody();
+  }
+  letters = [];
+
   resetMatter();
   initBorder();
-  initIRISData();
   initMenuData();
-  initBall();
+  // initIRISData() intentionally not called — see the comment above its
+  // definition. The falling IrisLetter bodies replace the old fixed,
+  // invisible IRIS collision geometry.
+  initLetterAnchors();
+  spawnLetterSequence();
+  // initBall() is no longer called directly here — it now runs once the
+  // letters have settled (or the fallback timer fires), from within
+  // startBallRainOnce().
 
   let canvasDom = canvas.elt;
   let miniWidth = max(windowWidth, 1280);
@@ -289,15 +410,10 @@ function draw() {
     balls[i].update();
   }
 
-  textAlign(CENTER, CENTER);
-  fill(colors[1]);
-  let ts = canvasHeight / 3;
-  textSize(ts);
-  push();
-  translate(canvasWidth / 2, canvasHeight * 0.4);
-  scale(irisAllRect.scale);
-  text("I R I S", 0, 0);
-  pop();
+  for (let i = 0; i < letters.length; i++) {
+    letters[i].show();
+    letters[i].update();
+  }
 
   let menuTs = canvasHeight * 0.03;
   textSize(menuTs);
@@ -327,11 +443,10 @@ function draw() {
     }
   }
 
-  if (mx > irisAllRect.x && mx < irisAllRect.x + irisAllRect.w && my > irisAllRect.y && my < irisAllRect.y + irisAllRect.h) {
-    irisAllRect.scale = lerp(irisAllRect.scale, 1.1, 0.1);
-  } else {
-    irisAllRect.scale = lerp(irisAllRect.scale, 1, 0.1);
-  }
+  // The old hover-to-enlarge interaction lived here, keyed off
+  // irisAllRect from initIRISData() (unused in this experiment — see
+  // above). It has no per-letter equivalent yet; not part of this
+  // falling-letters prototype.
 
   for (let i = 0; i < menuData.length; i++) {
     let menu = menuData[i];
