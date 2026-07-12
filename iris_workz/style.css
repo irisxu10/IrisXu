@@ -643,3 +643,227 @@ html, body {
   margin-bottom: 12px;
 }
 
+/* =========================
+   HOMEPAGE REDESIGN — PHASE 2A (canvas-first hero)
+   ========================= */
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.skip-link {
+  position: absolute;
+  top: -60px;
+  left: 8px;
+  z-index: 100;
+  padding: 10px 16px;
+  background: #fff;
+  color: rgb(255, 99, 71);
+  border: 2px solid rgb(255, 99, 71);
+  text-decoration: none;
+  transition: top 0.2s ease;
+}
+
+.skip-link:focus {
+  top: 8px;
+}
+
+body.home-page .home-main {
+  flex: 1;
+}
+
+/* Canvas hero: the first viewport belongs entirely to the interactive
+   canvas. No content max-width, no top offset — it starts at the very
+   top of the document, the way the original homepage did. */
+.canvas-hero {
+  position: relative;
+  width: 100%;
+  min-height: 100vh;
+  min-height: 100svh;
+  margin: 0;
+  padding: 0;
+  background: #fff;
+  overflow: hidden;
+}
+
+.canvas-stage {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.floating-archive {
+  max-width: min(64rem, 92vw);
+  margin: 0 auto;
+  padding: clamp(56px, 10vw, 120px) 0 clamp(64px, 8vw, 96px);
+  color: rgb(66, 34, 10);
+}
+
+.archive-introduction {
+  max-width: 42rem;
+  margin-bottom: clamp(32px, 5vw, 56px);
+}
+
+.archive-eyebrow {
+  margin: 0 0 12px;
+  font-size: clamp(14px, 2vw, 16px);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgb(255, 99, 71);
+}
+
+#archive-title {
+  margin: 0 0 16px;
+  font-size: clamp(28px, 5vw, 40px);
+  line-height: 1.2;
+}
+
+.archive-description {
+  margin: 0;
+  font-size: clamp(15px, 2vw, 17px);
+  line-height: 1.7;
+}
+
+.project-archive-root {
+  max-width: 46rem;
+}
+
+.project-archive-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.project-archive-item {
+  border-top: 1px solid rgb(66, 34, 10);
+}
+
+.project-archive-item:last-child {
+  border-bottom: 1px solid rgb(66, 34, 10);
+}
+
+.project-entry {
+  display: flex;
+  flex-direction: column;
+  padding: 28px 0;
+  position: relative;
+}
+
+.project-entry-preview {
+  width: 100%;
+  max-width: 420px;
+  margin: 0;
+}
+
+.project-entry-preview img,
+.project-entry-preview video {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.project-entry-preview-caption {
+  margin-top: 6px;
+  font-size: 13px;
+  font-style: italic;
+  color: rgb(66, 34, 10);
+}
+
+.project-entry-index {
+  margin: 0;
+  font-size: 14px;
+  color: rgb(255, 99, 71);
+}
+
+.project-entry-year {
+  margin: 4px 0 0;
+  font-size: 14px;
+}
+
+.project-entry-title {
+  margin: 8px 0 0;
+  font-size: clamp(20px, 3vw, 26px);
+}
+
+.project-entry-link {
+  color: rgb(66, 34, 10);
+  text-decoration: none;
+}
+
+.project-entry-link:hover {
+  text-decoration: underline;
+}
+
+.project-entry-description {
+  margin: 8px 0 0;
+  font-size: 16px;
+  line-height: 1.7;
+  max-width: 40rem;
+}
+
+.project-entry-lenses {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+  margin: 12px 0 0;
+  padding: 0;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: rgb(255, 99, 71);
+}
+
+.project-entry-secondary-links {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+  margin: 12px 0 0;
+  padding: 0;
+}
+
+.project-entry-secondary-links a {
+  color: rgb(66, 34, 10);
+}
+
+.skip-link:focus-visible,
+.project-entry-link:focus-visible,
+.project-entry-secondary-links a:focus-visible {
+  outline: 2px solid rgb(66, 34, 10);
+  outline-offset: 2px;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+@media (max-width: 767px) {
+  .canvas-hero {
+    display: none;
+  }
+
+  .floating-archive {
+    padding: 40px 0 56px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  .canvas-hero {
+    display: none;
+  }
+}
+

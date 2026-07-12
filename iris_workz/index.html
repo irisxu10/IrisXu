@@ -25,15 +25,28 @@
 
 </head>
 
-<body>
-    <div class="page-wrapper">
-  <main>
-  </main>
-  <script src="ball.js"></script>
-  <script src="sketch.js"></script>
-    </div>
+<body class="home-page">
+  <a class="skip-link" href="#floating-archive">Skip to project archive</a>
 
-<footer class="main-footer">
+  <main id="main-content" class="home-main">
+
+    <section id="canvas-hero" class="canvas-hero" aria-label="Interactive IRIS homepage">
+      <div id="canvas-stage" class="canvas-stage" aria-hidden="true"></div>
+    </section>
+
+    <section id="floating-archive" class="floating-archive" aria-labelledby="archive-title">
+      <div class="archive-introduction">
+        <p class="archive-eyebrow">Iris Xiaomeng Xu</p>
+        <h1 id="archive-title">Floating Archive</h1>
+        <p class="archive-description">Projects are connected through overlapping ways of thinking, rather than fixed disciplines.</p>
+      </div>
+
+      <div id="project-archive-root" class="project-archive-root"></div>
+    </section>
+
+  </main>
+
+  <footer class="main-footer">
     <p>Designed & Built by Iris Xiaomeng Xu</p>
     <p>
       <a href="mailto:iris000414@gmail.com">iris000414@gmail.com</a> |
@@ -41,7 +54,10 @@
     </p>
   </footer>
 
-
+  <script src="project-data.js"></script>
+  <script src="home.js"></script>
+  <script src="ball.js"></script>
+  <script src="sketch.js"></script>
 </body>
 
 </html>

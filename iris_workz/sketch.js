@@ -19,12 +19,36 @@ let menuData = []
 let intervalId;
 let timeoutId;
 
+// Small-screen / reduced-motion visitors get the readable HTML archive
+// only — the p5/Matter simulation never initializes for them.
+function shouldRunCanvasSimulation() {
+  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const isSmallViewport = window.innerWidth <= 767;
+  return !prefersReducedMotion && !isSmallViewport;
+}
+
+let simulationActive = shouldRunCanvasSimulation();
+
 function preload() {
+  if (!simulationActive) return;
   font = loadFont("assets/Poppins-Bold.ttf");
 }
 
 function setup() {
+  if (!simulationActive) {
+    noCanvas();
+    noLoop();
+    return;
+  }
+
   canvas = createCanvas(canvasWidth, canvasHeight);
+
+  const canvasStage = document.getElementById('canvas-stage');
+  if (canvasStage) {
+    canvas.parent(canvasStage);
+  } else {
+    console.warn('sketch.js: #canvas-stage not found; canvas was appended to the default location.');
+  }
 
   colors = [
     color(255, 182, 193),
@@ -236,6 +260,8 @@ function resetMatter() {
 }
 
 function windowResized() {
+  if (!simulationActive) return;
+
   resizeCanvas(canvasWidth, canvasHeight);
 
   resetMatter();
@@ -251,6 +277,8 @@ function windowResized() {
 }
 
 function draw() {
+  if (!simulationActive) return;
+
   mx = mouseX / scaleX;
   my = mouseY / scaleX;
 
@@ -319,6 +347,8 @@ function draw() {
 }
 
 function mousePressed() {
+  if (!simulationActive) return;
+
   let htmls = [
     'about.html',
     'mdp.html',
