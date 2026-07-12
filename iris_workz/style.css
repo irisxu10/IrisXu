@@ -702,15 +702,15 @@ body.home-page .home-main {
 }
 
 .floating-archive {
-  max-width: min(64rem, 92vw);
+  max-width: min(72rem, 92vw);
   margin: 0 auto;
   padding: clamp(56px, 10vw, 120px) 0 clamp(64px, 8vw, 96px);
   color: rgb(66, 34, 10);
 }
 
 .archive-introduction {
-  max-width: 42rem;
-  margin-bottom: clamp(32px, 5vw, 56px);
+  max-width: 38rem;
+  margin-bottom: clamp(40px, 6vw, 72px);
 }
 
 .archive-eyebrow {
@@ -722,13 +722,14 @@ body.home-page .home-main {
 }
 
 #archive-title {
-  margin: 0 0 16px;
-  font-size: clamp(28px, 5vw, 40px);
-  line-height: 1.2;
+  margin: 0 0 18px;
+  font-size: clamp(32px, 6vw, 56px);
+  line-height: 1.05;
 }
 
 .archive-description {
   margin: 0;
+  max-width: 30rem;
   font-size: clamp(15px, 2vw, 17px);
   line-height: 1.7;
 }
@@ -777,8 +778,12 @@ body.home-page .home-main {
   color: rgb(255, 99, 71);
 }
 
+/* =========================
+   FLOATING ARCHIVE — PHASE 4A
+   ========================= */
+
 .project-archive-root {
-  max-width: 46rem;
+  max-width: none;
 }
 
 .project-archive-list {
@@ -788,24 +793,69 @@ body.home-page .home-main {
 }
 
 .project-archive-item {
-  border-top: 1px solid rgb(66, 34, 10);
+  border-top: 1px solid rgba(66, 34, 10, 0.35);
+  padding: clamp(48px, 7vw, 96px) 0;
+}
+
+.project-archive-item:first-child {
+  border-top: 1px solid rgba(66, 34, 10, 0.6);
 }
 
 .project-archive-item:last-child {
-  border-bottom: 1px solid rgb(66, 34, 10);
+  border-bottom: 1px solid rgba(66, 34, 10, 0.6);
 }
 
+/* Each project is an editorial spread, not a card: a 12-column grid with
+   the preview explicitly placed and every text child auto-placed into
+   the remaining column track, so no wrapper element is needed around
+   the text group. Odd/even entries mirror the split for alternation. */
 .project-entry {
-  display: flex;
-  flex-direction: column;
-  padding: 28px 0;
+  --project-accent: rgb(66, 34, 10);
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  column-gap: clamp(20px, 4vw, 48px);
+  row-gap: 10px;
+  align-items: start;
   position: relative;
 }
 
+.project-entry[data-accent="coffee"]   { --project-accent: #8b4513; }
+.project-entry[data-accent="cono"]     { --project-accent: #3f2b4c; }
+.project-entry[data-accent="getty"]    { --project-accent: #2a3659; }
+.project-entry[data-accent="exposure"] { --project-accent: #b8733b; }
+.project-entry[data-accent="catstar"]  { --project-accent: #101f5d; }
+.project-entry[data-accent="tech"]     { --project-accent: #243c1e; }
+
 .project-entry-preview {
-  width: 100%;
-  max-width: 420px;
+  grid-column: 1 / 7;
+  grid-row: 1 / -1;
+  align-self: start;
   margin: 0;
+  padding-bottom: 12px;
+  border-bottom: 2px solid var(--project-accent);
+}
+
+.project-archive-item:nth-child(even) .project-entry-preview {
+  grid-column: 8 / 13;
+  margin-top: clamp(16px, 3vw, 32px); /* small static offset — a floating, not-quite-aligned feel */
+}
+
+.project-entry-index,
+.project-entry-year,
+.project-entry-title,
+.project-entry-description,
+.project-entry-lenses,
+.project-entry-secondary-links {
+  grid-column: 8 / 13;
+}
+
+.project-archive-item:nth-child(even) .project-entry-index,
+.project-archive-item:nth-child(even) .project-entry-year,
+.project-archive-item:nth-child(even) .project-entry-title,
+.project-archive-item:nth-child(even) .project-entry-description,
+.project-archive-item:nth-child(even) .project-entry-lenses,
+.project-archive-item:nth-child(even) .project-entry-secondary-links {
+  grid-column: 1 / 6;
 }
 
 .project-entry-preview img,
@@ -813,6 +863,14 @@ body.home-page .home-main {
   display: block;
   width: 100%;
   height: auto;
+  transition: transform 0.4s ease;
+}
+
+.project-entry:hover .project-entry-preview img,
+.project-entry:hover .project-entry-preview video,
+.project-entry:focus-within .project-entry-preview img,
+.project-entry:focus-within .project-entry-preview video {
+  transform: scale(1.02);
 }
 
 .project-entry-preview-caption {
@@ -824,47 +882,68 @@ body.home-page .home-main {
 
 .project-entry-index {
   margin: 0;
-  font-size: 14px;
-  color: rgb(255, 99, 71);
+  font-size: clamp(15px, 2.4vw, 20px);
+  font-weight: bold;
+  letter-spacing: 0.04em;
+  color: var(--project-accent);
 }
 
 .project-entry-year {
   margin: 4px 0 0;
   font-size: 14px;
+  color: rgb(66, 34, 10);
+  opacity: 0.75;
 }
 
 .project-entry-title {
-  margin: 8px 0 0;
-  font-size: clamp(20px, 3vw, 26px);
+  margin: 10px 0 0;
+  font-size: clamp(22px, 3.4vw, 32px);
+  line-height: 1.15;
 }
 
 .project-entry-link {
   color: rgb(66, 34, 10);
   text-decoration: none;
+  padding-bottom: 2px;
+  background-image: linear-gradient(var(--project-accent), var(--project-accent));
+  background-repeat: no-repeat;
+  background-position: 0 100%;
+  background-size: 0% 2px;
+  transition: background-size 0.3s ease;
 }
 
-.project-entry-link:hover {
-  text-decoration: underline;
+.project-entry:hover .project-entry-link,
+.project-entry:focus-within .project-entry-link,
+.project-entry-link:hover,
+.project-entry-link:focus-visible {
+  background-size: 100% 2px;
 }
 
 .project-entry-description {
-  margin: 8px 0 0;
+  margin: 14px 0 0;
   font-size: 16px;
   line-height: 1.7;
-  max-width: 40rem;
+  max-width: 34rem;
 }
 
 .project-entry-lenses {
   list-style: none;
   display: flex;
   flex-wrap: wrap;
-  gap: 8px 16px;
-  margin: 12px 0 0;
+  gap: 6px 0;
+  margin: 16px 0 0;
   padding: 0;
   font-size: 13px;
   text-transform: uppercase;
   letter-spacing: 0.04em;
-  color: rgb(255, 99, 71);
+  color: var(--project-accent);
+}
+
+.project-entry-lenses li:not(:last-child)::after {
+  content: "\00b7";
+  margin: 0 8px;
+  color: rgb(66, 34, 10);
+  opacity: 0.5;
 }
 
 .project-entry-secondary-links {
@@ -872,12 +951,18 @@ body.home-page .home-main {
   display: flex;
   flex-wrap: wrap;
   gap: 8px 16px;
-  margin: 12px 0 0;
+  margin: 14px 0 0;
   padding: 0;
 }
 
 .project-entry-secondary-links a {
   color: rgb(66, 34, 10);
+  text-decoration: none;
+  border-bottom: 1px solid var(--project-accent);
+}
+
+.project-entry-secondary-links a:hover {
+  color: var(--project-accent);
 }
 
 .skip-link:focus-visible,
@@ -885,6 +970,62 @@ body.home-page .home-main {
 .project-entry-secondary-links a:focus-visible {
   outline: 2px solid rgb(66, 34, 10);
   outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .project-entry-preview img,
+  .project-entry-preview video,
+  .project-entry-link {
+    transition: none;
+  }
+}
+
+/* Tablet: simpler, less extreme spans — asymmetry stays but the split
+   is gentler, and media never shrinks into an awkward narrow column. */
+@media (max-width: 1024px) {
+  .project-entry {
+    grid-template-columns: repeat(8, 1fr);
+  }
+
+  .project-entry-preview,
+  .project-archive-item:nth-child(even) .project-entry-preview {
+    grid-column: 1 / 5;
+    margin-top: 0;
+  }
+
+  .project-entry-index,
+  .project-entry-year,
+  .project-entry-title,
+  .project-entry-description,
+  .project-entry-lenses,
+  .project-entry-secondary-links,
+  .project-archive-item:nth-child(even) .project-entry-index,
+  .project-archive-item:nth-child(even) .project-entry-year,
+  .project-archive-item:nth-child(even) .project-entry-title,
+  .project-archive-item:nth-child(even) .project-entry-description,
+  .project-archive-item:nth-child(even) .project-entry-lenses,
+  .project-archive-item:nth-child(even) .project-entry-secondary-links {
+    grid-column: 5 / 9;
+  }
+}
+
+/* Mobile: a deliberate single-column sequence — decorative offsets and
+   grid asymmetry are removed entirely rather than just shrunk. */
+@media (max-width: 767px) {
+  .project-entry {
+    display: block;
+  }
+
+  .project-entry-preview,
+  .project-archive-item:nth-child(even) .project-entry-preview {
+    margin: 0 0 20px;
+    padding-bottom: 8px;
+  }
+
+  .project-entry-description,
+  .project-entry-secondary-links {
+    max-width: none;
+  }
 }
 
 html {
