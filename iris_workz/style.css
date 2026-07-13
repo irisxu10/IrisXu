@@ -14,7 +14,7 @@
 
 /* Baseline safety net so no inner-page image or video can force page-wide
    overflow. Existing rules that already set width/height explicitly
-   (.works-preview img, .about-image img, .tech-video video, and the
+   (.works-preview img, .about-portrait img, .tech-video video, and the
    mdp/*.html inline classes) take precedence over this via specificity
    or source order — this only protects anything left unstyled. */
 img,
@@ -476,63 +476,261 @@ main .content {
 
 
 
-/* ABOUT ABOUT ABOUT ABOUT ABOUT ABOUT ABOUT ABOUT ABOUT ABOUT ABOUT ABOUT ABOUT ABOUT ABOUT ABOUT*/
-/* ABOUT ABOUT ABOUT ABOUT ABOUT ABOUT ABOUT ABOUT ABOUT ABOUT ABOUT ABOUT ABOUT ABOUT ABOUT ABOUT*/
-/* ABOUT ABOUT ABOUT ABOUT ABOUT ABOUT ABOUT ABOUT ABOUT ABOUT ABOUT ABOUT ABOUT ABOUT ABOUT ABOUT*/
-.about-modern {
-  padding: 100px var(--site-gutter);
-  position: relative;
+/* =========================
+   ABOUT PAGE — PROFESSIONAL PROFILE
+   ========================= */
+
+.about-page {
+  --about-accent: rgb(34, 139, 34); /* preserved from the previous About page's green */
+}
+
+.about-main {
+  width: min(calc(100% - (2 * var(--site-gutter))), var(--site-max-width));
+  margin: 0 auto;
+  padding-top: var(--inner-header-height);
+  padding-bottom: clamp(64px, 8vw, 96px);
   font-family: 'Helvetica Neue', sans-serif;
-  background: white;
+  color: rgb(51, 51, 51);
 }
 
-.about-big-title {
-  font-size: clamp(48px, 12vw, 120px);
-  font-family: 'Playfair Display', serif;
-  font-weight: 700;
-  color: rgb(13, 88, 13);
-  line-height: 0.9;
-  margin-bottom: -60px;
-  position: relative;
-  z-index: 2;
-}
-
-.about-columns {
+/* Hero: restrained two-column split (~58% copy / ~42% portrait on desktop),
+   collapsing to one column on mobile with copy before portrait (source
+   order already does this — no explicit reordering needed). */
+.about-hero {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 40px;
-  margin-top: 100px;
-  z-index: 1;
+  grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+  align-items: start;
+  gap: clamp(32px, 5vw, 64px);
+  padding: clamp(48px, 8vw, 88px) 0 clamp(56px, 8vw, 96px);
 }
 
-.right-column {
-  margin-top: -50px;  
-}
-
-.about-block h2 {
-  font-size: 20px;
-  color: rgb(34,139,34);
+.about-eyebrow {
+  margin: 0 0 12px;
+  font-size: 14px;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
-  margin-bottom: 10px;
-  letter-spacing: 0.7px;
+  color: var(--about-accent);
 }
 
-.about-block p {
-  font-size: 16px;
-  color: rgb(34, 139, 34);
-  line-height: 2;
+.about-title {
+  margin: 0 0 16px;
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(36px, 5.5vw, 56px);
+  line-height: 1.05;
+  color: rgb(20, 20, 20);
 }
 
-.about-image {
-  position: relative;
-  z-index: 1;
+.about-role {
+  margin: 0 0 20px;
+  font-size: clamp(17px, 2vw, 20px);
+  font-weight: 600;
+  color: rgb(30, 30, 30);
 }
 
-.about-image img {
+.about-introduction {
+  max-width: 34rem;
+  margin: 0 0 24px;
+  font-size: clamp(16px, 1.6vw, 18px);
+  line-height: 1.7;
+  color: rgb(51, 51, 51);
+}
+
+.about-context {
+  max-width: 30rem;
+  padding-top: 16px;
+  border-top: 1px solid rgba(34, 139, 34, 0.3);
+}
+
+.about-context p {
+  margin: 0 0 6px;
+  font-size: 14px;
+  color: rgb(85, 85, 85);
+}
+
+.about-context p:last-child {
+  margin-bottom: 0;
+}
+
+.about-portrait {
+  margin: 0;
+  justify-self: end;
+  width: min(100%, 440px);
+}
+
+.about-portrait img {
+  display: block;
   width: 100%;
-  max-width: 100%;
-  border-radius: 6px;
-  margin-top: -190px; /* 视觉重叠 */
+  height: auto;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+}
+
+/* Capabilities — the professional center of the page: thin top rule,
+   title, one short paragraph per entry. No cards, no icons, no bars. */
+.about-capabilities {
+  padding: clamp(40px, 6vw, 64px) 0;
+  border-top: 1px solid rgba(34, 139, 34, 0.25);
+}
+
+.about-capabilities h2 {
+  margin: 0 0 clamp(24px, 4vw, 40px);
+  font-size: clamp(22px, 3vw, 28px);
+  color: rgb(20, 20, 20);
+}
+
+.about-capability-list {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: clamp(24px, 3vw, 32px);
+}
+
+.about-capability {
+  padding-top: 14px;
+  border-top: 1px solid var(--about-accent);
+}
+
+.about-capability h3 {
+  margin: 0 0 8px;
+  font-size: 16px;
+  font-weight: 700;
+  color: rgb(20, 20, 20);
+}
+
+.about-capability p {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.6;
+  color: rgb(85, 85, 85);
+}
+
+/* Approach / Background — visually secondary to the hero and Capabilities,
+   a balanced two-column split on desktop, stacking Approach before
+   Background on mobile (source order already does this). */
+.about-practice {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: clamp(32px, 5vw, 64px);
+  padding: clamp(40px, 6vw, 64px) 0;
+  border-top: 1px solid rgba(34, 139, 34, 0.25);
+}
+
+.about-approach h2,
+.about-background h2 {
+  margin: 0 0 16px;
+  font-size: clamp(19px, 2.4vw, 22px);
+  color: rgb(20, 20, 20);
+}
+
+.about-approach p,
+.about-background p {
+  margin: 0;
+  max-width: 34rem;
+  font-size: 16px;
+  line-height: 1.7;
+  color: rgb(51, 51, 51);
+}
+
+.about-principles {
+  list-style: none;
+  margin: 16px 0 0;
+  padding: 0;
+}
+
+.about-principles li {
+  position: relative;
+  margin-bottom: 8px;
+  padding-left: 18px;
+  font-size: 15px;
+  color: rgb(51, 51, 51);
+}
+
+.about-principles li::before {
+  content: "";
+  position: absolute;
+  top: 9px;
+  left: 0;
+  width: 6px;
+  height: 1px;
+  background: var(--about-accent);
+}
+
+/* Contact — a concise professional endpoint, distinct from but not a
+   duplicate of the shared Footer. */
+.about-contact {
+  padding: clamp(40px, 6vw, 64px) 0 0;
+  border-top: 1px solid rgba(34, 139, 34, 0.25);
+}
+
+.about-contact h2 {
+  margin: 0 0 12px;
+  font-size: clamp(24px, 3.4vw, 32px);
+  color: rgb(20, 20, 20);
+}
+
+.about-contact p {
+  max-width: 34rem;
+  margin: 0 0 20px;
+  font-size: 16px;
+  line-height: 1.7;
+  color: rgb(51, 51, 51);
+}
+
+.about-contact-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 24px;
+}
+
+.about-contact-links a {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--about-accent);
+  text-decoration: none;
+  border-bottom: 1px solid var(--about-accent);
+}
+
+.about-contact-links a:hover {
+  opacity: 0.7;
+}
+
+.about-contact-links a:focus-visible {
+  outline: 2px solid var(--about-accent);
+  outline-offset: 2px;
+}
+
+@media (min-width: 768px) and (max-width: 1024px) {
+  .about-hero {
+    grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.9fr);
+  }
+
+  .about-capability-list {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 767px) {
+  .about-main {
+    padding-top: var(--inner-header-height-mobile);
+  }
+
+  .about-hero {
+    grid-template-columns: 1fr;
+  }
+
+  .about-portrait {
+    justify-self: center;
+    width: min(100%, 320px);
+  }
+
+  .about-capability-list {
+    grid-template-columns: 1fr;
+    gap: 28px;
+  }
+
+  .about-practice {
+    grid-template-columns: 1fr;
+    gap: 32px;
+  }
 }
 
 
@@ -1051,27 +1249,6 @@ html {
   .works-time {
     position: static;
     margin-top: 8px;
-  }
-
-  .about-columns {
-    grid-template-columns: 1fr;
-  }
-
-  /* .about-big-title / .about-image / .right-column use negative margins
-     to create a deliberate desktop-only visual overlap. That composition
-     doesn't translate to a single stacked column, so it's neutralized
-     here rather than rescaled — flagged in the final report as a
-     trade-off worth a visual check. */
-  .about-big-title {
-    margin-bottom: 0;
-  }
-
-  .right-column {
-    margin-top: 0;
-  }
-
-  .about-image img {
-    margin-top: 24px;
   }
 }
 
