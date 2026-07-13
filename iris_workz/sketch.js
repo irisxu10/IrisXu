@@ -482,17 +482,14 @@ function draw() {
     letters[i].update();
   }
 
-  let menuTs = canvasHeight * 0.03;
-  textSize(menuTs);
-  textAlign(LEFT, TOP);
-  for (let i = 0; i < menuData.length; i++) {
-    push();
-    translate(menuData[i].x + menuData[i].w / 2, menuData[i].y + menuData[i].h / 2);
-    scale(menuData[i].scale);
-    text(menuData[i].text, -menuData[i].w / 2, -menuData[i].h / 2);
-    pop();
-  }
-
+  // Canvas-drawn Archive/About/Writings text rendering disabled (Phase
+  // H1): real HTML navigation bubbles (home.js's renderPrimaryNavigation,
+  // in the new .home-primary-bubbles layer) replace it — those are
+  // keyboard-reachable, which this canvas text never was. initMenuData()
+  // still runs in windowResized() and menuData[] is still populated, so
+  // the static Matter bodies it creates keep occupying the same physics
+  // space and ordinary-ball collision behavior is unchanged; only the
+  // text drawing below is skipped.
   if (debug) {
 
     fill(25, 255, 5);
@@ -515,27 +512,15 @@ function draw() {
   // above). It has no per-letter equivalent yet; not part of this
   // falling-letters prototype.
 
-  for (let i = 0; i < menuData.length; i++) {
-    let menu = menuData[i];
-    if (mx > menu.x && mx < menu.x + menu.w && my > menu.y && my < menu.y + menu.h) {
-      menu.scale = lerp(menu.scale, 1.2, 0.1);
-      cursor(HAND);
-      break;
-    } else {
-      menu.scale = lerp(menu.scale, 1, 0.1);
-      cursor(ARROW);
-    }
-  }
+  // Canvas menu hover-scale/cursor-change disabled alongside the text
+  // rendering above (Phase H1) — there is no more canvas-drawn menu text
+  // for a hover state to apply to. cursor() is left at its default.
 }
 
+// Canvas menu click-to-navigate disabled (Phase H1): the real HTML
+// navigation bubbles handle clicks/Enter natively now. menuData[] and its
+// static Matter bodies are untouched, so this intentionally does nothing
+// rather than being deleted outright — see the comment in draw().
 function mousePressed() {
   if (!simulationActive) return;
-
-  for (let i = 0; i < menuData.length; i++) {
-    let menu = menuData[i];
-    if (mx > menu.x && mx < menu.x + menu.w && my > menu.y && my < menu.y + menu.h) {
-      window.location.href = menu.path;
-      break;
-    }
-  }
 }
