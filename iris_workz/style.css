@@ -1048,12 +1048,23 @@ body.home-page .home-main {
 /* A negative top margin pulls the corridor up to overlap the hero's
    lower edge instead of butting against it, so the two visually blend
    rather than meet at a hard seam. Purely decorative: no pointer
-   events, aria-hidden in the markup, no text content. */
+   events, aria-hidden in the markup, no text content.
+   H2.1R: increased from -6vh to -9vh so the overlap reads more clearly
+   — still restrained (a few extra vh of a 480-820px-tall corridor),
+   and left clear of the perimeter identity's own corners since the new
+   bridge bubbles this overlap now exposes sit inside x:12-86, not at
+   the extreme edges where the perimeter statement/nav live.
+   H2.1R.1: height compressed from clamp(480px, 90vh, 820px) to
+   clamp(420px, 58vh, 600px) — the corridor height, not the archive's
+   own padding or the bubble data, was by far the dominant contributor
+   to the excessive gap before real Archive content (roughly 600-800px
+   of the previous height vs. ~48px of Archive top padding). The -9vh
+   overlap is unchanged; only the corridor's own length shrinks. */
 .home-transition-corridor {
   position: relative;
   z-index: 1;
-  height: clamp(480px, 90vh, 820px);
-  margin-top: -6vh;
+  height: clamp(420px, 58vh, 600px);
+  margin-top: -9vh;
   overflow: hidden;
   pointer-events: none;
 }
@@ -1084,11 +1095,16 @@ body.home-page .home-main {
    now-much-shorter identity stack. Fewer bubbles, shorter corridor. */
 @media (max-width: 767px), (prefers-reduced-motion: reduce) {
   .home-transition-corridor {
-    height: 46vh;
+    height: clamp(260px, 38vh, 340px);
     margin-top: 0;
   }
 
-  .home-transition-bubble:nth-child(n + 14) {
+  /* n+20, not n+14: H2.1R prepended 6 new bridge bubbles to
+     TRANSITION_BUBBLES, shifting every later bubble's nth-child index
+     by +6 — this keeps the exact same mobile cutoff point (all bridge
+     bubbles, all of the original hero-boundary group, and the first 3
+     of the dissolving-stage group) rather than silently showing less. */
+  .home-transition-bubble:nth-child(n + 20) {
     display: none;
   }
 }
@@ -1118,6 +1134,25 @@ body.home-page .home-main {
     --corridor-shift-middle: 0px;
     --corridor-shift-near: 0px;
   }
+}
+
+/* Threshold depth/softness hierarchy (H2.1R)
+   Reuses the existing near/middle/far data-depth attribute purely as a
+   visual crispness cue — these are new, separate rules and do not
+   modify the H2.3 transform block above (scroll behavior is untouched).
+   near (the new bridge bubbles plus the existing nearest tier) stays
+   fully crisp with no filter at all; softness increases toward the
+   back, kept just barely perceptible so the corridor still reads as
+   clean circles, not fog.
+   H2.1R.1: both values roughly halved (0.4px→0.2px, 0.9px→0.55px) —
+   the dissolving-stage bubbles were too soft to read as a legible
+   trail; opacity per bubble is unchanged, only the blur softening. */
+.home-transition-bubble[data-depth="middle"] {
+  filter: blur(0.2px);
+}
+
+.home-transition-bubble[data-depth="far"] {
+  filter: blur(0.55px);
 }
 
 .floating-archive {
