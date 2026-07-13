@@ -294,11 +294,85 @@
     });
   }
 
+  // Progressive enhancement only: the archive is fully visible and usable
+  // without this. It opts into a one-time reveal (introduction, then the
+  // six project entries in reading order) only once all entries exist,
+  // reduced motion is not requested, and IntersectionObserver exists.
+  // Entrance transforms live on .project-archive-item (the <li> wrapper),
+  // never on .project-bubble itself, since the bubble already owns its
+  // own hover/focus transform (see style.css) and a second transform on
+  // the same element would overwrite rather than compose with it.
+  function setupProjectEcosystemReveal() {
+    var archive = document.getElementById("floating-archive");
+    var items = archive ? archive.querySelectorAll(".project-archive-item") : null;
+
+    if (!archive || !items || items.length === 0) {
+      return;
+    }
+
+    if (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      return;
+    }
+
+    if (typeof IntersectionObserver !== "function") {
+      return;
+    }
+
+    var observeTarget = archive.querySelector(".archive-introduction") || archive;
+    var revealed = false;
+    var observer = null;
+
+    function reveal() {
+      if (revealed) {
+        return;
+      }
+      revealed = true;
+      archive.classList.add("is-project-ecosystem-visible");
+      if (observer) {
+        observer.disconnect();
+      }
+      archive.removeEventListener("focusin", reveal);
+    }
+
+    archive.classList.add("is-reveal-ready");
+    archive.addEventListener("focusin", reveal);
+
+    // Direct #floating-archive navigation (link click, reload, back/
+    // forward) must not land on six invisible bubbles.
+    if (window.location.hash === "#floating-archive") {
+      reveal();
+      return;
+    }
+
+    // Already-in-view at load (e.g. a tall/short viewport landing mid-
+    // page) gets revealed immediately rather than waiting on a scroll
+    // that may never come.
+    var viewportHeight = window.innerHeight || document.documentElement.clientHeight;
+    if (observeTarget.getBoundingClientRect().top < viewportHeight) {
+      reveal();
+      return;
+    }
+
+    observer = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (entry.isIntersecting) {
+          reveal();
+        }
+      });
+    }, {
+      threshold: 0.15,
+      rootMargin: "0px 0px -10% 0px"
+    });
+
+    observer.observe(observeTarget);
+  }
+
   function renderHomepage() {
     renderPrimaryNavigation();
     renderArchive();
     renderSiteNavigation();
     renderTransitionCorridor();
+    setupProjectEcosystemReveal();
   }
 
   if (document.readyState === "loading") {

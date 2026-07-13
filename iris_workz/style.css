@@ -1100,6 +1100,60 @@ body.home-page .home-main {
   color: rgb(66, 34, 10);
 }
 
+/* Project ecosystem emergence
+   Progressive enhancement only — without .is-reveal-ready (no JS, no
+   IntersectionObserver support, reduced motion requested) everything
+   below stays at its normal, fully visible cascade default. The hidden
+   state exists only once JavaScript has added .is-reveal-ready, and is
+   lifted once .is-project-ecosystem-visible follows (see home.js). */
+.floating-archive.is-reveal-ready .archive-introduction {
+  transition: opacity 0.45s ease-out, transform 0.45s ease-out;
+}
+
+.floating-archive.is-reveal-ready:not(.is-project-ecosystem-visible) .archive-introduction {
+  opacity: 0;
+  transform: translateY(18px);
+}
+
+.floating-archive.is-reveal-ready .project-archive-item {
+  transition: opacity 0.4s ease-out, transform 0.4s ease-out;
+}
+
+.floating-archive.is-reveal-ready:not(.is-project-ecosystem-visible) .project-archive-item {
+  opacity: 0;
+  transform: translateY(32px) scale(0.98);
+}
+
+/* Restrained reading-order stagger — six fixed delays, ~70ms apart. */
+.floating-archive.is-reveal-ready .project-archive-item:nth-child(1) { transition-delay: 0ms; }
+.floating-archive.is-reveal-ready .project-archive-item:nth-child(2) { transition-delay: 70ms; }
+.floating-archive.is-reveal-ready .project-archive-item:nth-child(3) { transition-delay: 140ms; }
+.floating-archive.is-reveal-ready .project-archive-item:nth-child(4) { transition-delay: 210ms; }
+.floating-archive.is-reveal-ready .project-archive-item:nth-child(5) { transition-delay: 280ms; }
+.floating-archive.is-reveal-ready .project-archive-item:nth-child(6) { transition-delay: 350ms; }
+
+@media (prefers-reduced-motion: reduce) {
+  .floating-archive.is-reveal-ready:not(.is-project-ecosystem-visible) .archive-introduction,
+  .floating-archive.is-reveal-ready:not(.is-project-ecosystem-visible) .project-archive-item {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Mobile: shorter entrance distance, shorter overall stagger span. */
+@media (max-width: 767px) {
+  .floating-archive.is-reveal-ready:not(.is-project-ecosystem-visible) .project-archive-item {
+    transform: translateY(16px) scale(0.99);
+  }
+
+  .floating-archive.is-reveal-ready .project-archive-item:nth-child(1) { transition-delay: 0ms; }
+  .floating-archive.is-reveal-ready .project-archive-item:nth-child(2) { transition-delay: 30ms; }
+  .floating-archive.is-reveal-ready .project-archive-item:nth-child(3) { transition-delay: 60ms; }
+  .floating-archive.is-reveal-ready .project-archive-item:nth-child(4) { transition-delay: 90ms; }
+  .floating-archive.is-reveal-ready .project-archive-item:nth-child(5) { transition-delay: 120ms; }
+  .floating-archive.is-reveal-ready .project-archive-item:nth-child(6) { transition-delay: 150ms; }
+}
+
 .archive-introduction {
   max-width: 38rem;
   margin-bottom: clamp(40px, 6vw, 72px);
