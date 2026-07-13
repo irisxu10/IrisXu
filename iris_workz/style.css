@@ -845,54 +845,99 @@ body.home-page .home-main {
 
 /* Layer order (back to front): .canvas-hero background (white) →
    #canvas-stage z-index:1 (the p5/Matter simulation) →
-   .home-identity-layer z-index:2 (identity copy + nav bubbles). The
-   layer itself is pointer-events:none so empty space within it never
-   blocks canvas interaction; only the nav bubbles opt back into
-   pointer-events:auto so they stay clickable. */
+   .home-identity-layer z-index:2, a thin full-bleed wrapper holding
+   z-index/pointer-events:none plus the top/bottom edge washes (below) →
+   the four perimeter zones (name, role, statement, navigation), each
+   independently positioned at its own corner rather than grouped into
+   one block. Only the navigation opts back into pointer-events:auto. */
 .home-identity-layer {
   position: absolute;
   inset: 0;
   z-index: 2;
-  display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
-  gap: clamp(24px, 4vw, 64px);
-  padding: clamp(24px, 5vw, 64px);
   pointer-events: none;
 }
 
-.home-identity-copy {
-  max-width: 26rem;
+/* One top-edge wash and one bottom-edge wash — not four per-corner
+   halos — sitting behind all perimeter text. Soft linear gradients,
+   no rectangle, no border, fading completely to transparent well
+   before the vertical center where the physical IRIS letters live. */
+.home-identity-layer::before,
+.home-identity-layer::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  z-index: 0;
+  pointer-events: none;
 }
 
-.home-identity-title {
-  margin: 0 0 8px;
-  font-family: 'Playfair Display', serif;
-  font-size: clamp(24px, 3.2vw, 34px);
-  font-weight: 700;
-  line-height: 1.1;
-  color: rgb(66, 34, 10);
+.home-identity-layer::before {
+  top: 0;
+  height: 26%;
+  background: linear-gradient(to bottom, rgba(255, 255, 255, 0.55) 0%, rgba(255, 255, 255, 0) 100%);
 }
 
-.home-identity-role {
-  margin: 0 0 10px;
-  font-family: 'Helvetica Neue', sans-serif;
-  font-size: clamp(14px, 1.6vw, 16px);
-  font-weight: 600;
-  letter-spacing: 0.02em;
-  color: rgb(255, 99, 71);
+.home-identity-layer::after {
+  bottom: 0;
+  height: 30%;
+  background: linear-gradient(to top, rgba(255, 255, 255, 0.55) 0%, rgba(255, 255, 255, 0) 100%);
 }
 
-.home-identity-statement {
+/* Shared corner-label typography. Each zone sits above the wash
+   (z-index:1, inside .home-identity-layer's own stacking context). */
+.home-perimeter-name,
+.home-perimeter-role,
+.home-perimeter-statement {
+  position: absolute;
+  z-index: 1;
   margin: 0;
-  max-width: 32ch;
   font-family: 'Helvetica Neue', sans-serif;
-  font-size: clamp(14px, 1.5vw, 16px);
-  line-height: 1.6;
   color: rgb(66, 34, 10);
 }
 
-.home-primary-bubbles {
+/* Top-left: the maker signature — small, confident, sans-serif, well
+   under the Canvas IRIS letters' scale. Not a second display title. */
+.home-perimeter-name {
+  left: clamp(24px, 5vw, 64px);
+  top: clamp(24px, 5vw, 56px);
+  max-width: 15rem;
+  font-size: clamp(20px, 2.4vw, 26px);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  line-height: 1.1;
+}
+
+/* Top-right: a quiet interface label, not a badge — plain text,
+   right-aligned so it reads as anchored to that corner. */
+.home-perimeter-role {
+  right: clamp(24px, 5vw, 64px);
+  top: clamp(24px, 5vw, 56px);
+  max-width: 13rem;
+  text-align: right;
+  font-size: clamp(13px, 1.4vw, 15px);
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+/* Bottom-left: one clean sentence, no keyword bubbles, no badge
+   fragmentation — a short editorial line, not a paragraph block. */
+.home-perimeter-statement {
+  left: clamp(24px, 5vw, 64px);
+  bottom: clamp(24px, 5vw, 64px);
+  max-width: 24rem;
+  font-size: clamp(13px, 1.4vw, 15px);
+  line-height: 1.6;
+}
+
+/* Bottom-right: the existing bubble/capsule navigation, repositioned to
+   its own perimeter anchor — unchanged destinations, semantics, and
+   interaction, only its position moved from a shared flex row to its
+   own corner to match the other three zones. */
+.home-perimeter-navigation {
+  position: absolute;
+  z-index: 1;
+  right: clamp(24px, 5vw, 64px);
+  bottom: clamp(24px, 5vw, 64px);
   display: flex;
   align-items: center;
   gap: clamp(12px, 2vw, 20px);
@@ -955,28 +1000,37 @@ body.home-page .home-main {
 }
 
 /* Mobile and reduced-motion share the same fallback: the simulation
-   never runs, so the layer becomes a normal-flow, centered, stacked
-   composition instead of floating over an (empty) canvas area. */
+   never runs, so the four perimeter zones collapse into one clean,
+   centered, static stack (name → role → statement → navigation) rather
+   than keeping the four-corner desktop composition or the old dense
+   left-side block. The edge washes are dropped with it. */
 @media (max-width: 767px), (prefers-reduced-motion: reduce) {
   .home-identity-layer {
     position: static;
     inset: auto;
+    display: flex;
     flex-direction: column;
     align-items: center;
-    text-align: center;
+    gap: clamp(16px, 5vw, 28px);
     padding: clamp(48px, 12vw, 96px) var(--site-gutter) clamp(40px, 8vw, 64px);
+    pointer-events: auto;
   }
 
-  .home-identity-copy {
+  .home-identity-layer::before,
+  .home-identity-layer::after {
+    content: none;
+  }
+
+  .home-perimeter-name,
+  .home-perimeter-role,
+  .home-perimeter-statement,
+  .home-perimeter-navigation {
+    position: static;
     max-width: none;
+    text-align: center;
   }
 
-  .home-identity-statement {
-    max-width: 40ch;
-    margin: 0 auto;
-  }
-
-  .home-primary-bubbles {
+  .home-perimeter-navigation {
     flex-wrap: wrap;
     justify-content: center;
   }
