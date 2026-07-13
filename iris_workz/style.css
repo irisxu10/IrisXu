@@ -1378,6 +1378,16 @@ html {
   --project-detail-accent: #2a3659;
 }
 
+/* Reuses The Sofa and I's established accent from the Floating Archive
+   ([data-accent="exposure"]). No background override — the original
+   page's near-white body tint (#faf8f9) was barely distinguishable from
+   plain white and wasn't doing anything the photographs needed; omitting
+   it keeps this page consistent with Coffee and ArtQuest's precedent of
+   a selective accent rather than a tinted page. */
+.project-detail-page[data-project-accent="exposure"] {
+  --project-detail-accent: #b8733b;
+}
+
 .project-detail-main {
   width: min(calc(100% - (2 * var(--site-gutter))), 56rem);
   margin: 0 auto;
@@ -1445,6 +1455,17 @@ html {
   font-size: clamp(40px, 7vw, 72px);
   line-height: 1;
   color: rgb(66, 34, 10);
+}
+
+/* A restrained secondary line under the h1 — e.g. a prior project title
+   retained as a medium/series descriptor (The Sofa and I's "Long
+   Exposure Portrait"). Generic, not project-specific: any future page
+   with the same need (a title plus a quieter descriptor) can reuse it. */
+.project-detail-subtitle {
+  margin: -8px 0 28px;
+  font-size: clamp(15px, 1.8vw, 17px);
+  font-style: italic;
+  color: var(--project-detail-accent);
 }
 
 .project-detail-summary {
