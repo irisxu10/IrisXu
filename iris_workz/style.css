@@ -836,6 +836,150 @@ body.home-page .home-main {
   inset: 0;
   width: 100%;
   height: 100%;
+  z-index: 1;
+}
+
+/* =========================
+   HOMEPAGE — IDENTITY AND NAVIGATION LAYER
+   ========================= */
+
+/* Layer order (back to front): .canvas-hero background (white) →
+   #canvas-stage z-index:1 (the p5/Matter simulation) →
+   .home-identity-layer z-index:2 (identity copy + nav bubbles). The
+   layer itself is pointer-events:none so empty space within it never
+   blocks canvas interaction; only the nav bubbles opt back into
+   pointer-events:auto so they stay clickable. */
+.home-identity-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: clamp(24px, 4vw, 64px);
+  padding: clamp(24px, 5vw, 64px);
+  pointer-events: none;
+}
+
+.home-identity-copy {
+  max-width: 26rem;
+}
+
+.home-identity-title {
+  margin: 0 0 8px;
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(24px, 3.2vw, 34px);
+  font-weight: 700;
+  line-height: 1.1;
+  color: rgb(66, 34, 10);
+}
+
+.home-identity-role {
+  margin: 0 0 10px;
+  font-family: 'Helvetica Neue', sans-serif;
+  font-size: clamp(14px, 1.6vw, 16px);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: rgb(255, 99, 71);
+}
+
+.home-identity-statement {
+  margin: 0;
+  max-width: 32ch;
+  font-family: 'Helvetica Neue', sans-serif;
+  font-size: clamp(14px, 1.5vw, 16px);
+  line-height: 1.6;
+  color: rgb(66, 34, 10);
+}
+
+.home-primary-bubbles {
+  display: flex;
+  align-items: center;
+  gap: clamp(12px, 2vw, 20px);
+  pointer-events: auto;
+}
+
+/* One coherent bubble family — translucent center, restrained accent
+   edge — with two proportions within it (capsules for Archive/Writings,
+   a near-circle for About) rather than three identical pills. */
+.home-nav-bubble {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px;
+  padding: 12px 24px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.45);
+  border: 1.5px solid rgba(255, 99, 71, 0.55);
+  color: rgb(66, 34, 10);
+  font-family: 'Helvetica Neue', sans-serif;
+  font-size: clamp(14px, 1.6vw, 16px);
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: transform 0.2s ease, background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.home-nav-bubble:hover,
+.home-nav-bubble:focus-visible {
+  transform: scale(1.05);
+  background: rgba(255, 255, 255, 0.72);
+  border-color: rgb(255, 99, 71);
+}
+
+.home-nav-bubble:focus-visible {
+  outline: 2px solid rgb(255, 99, 71);
+  outline-offset: 3px;
+}
+
+.home-nav-bubble--archive {
+  padding: 16px 32px;
+  font-size: clamp(15px, 1.8vw, 18px);
+}
+
+.home-nav-bubble--about {
+  min-width: 92px;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  padding: 12px;
+}
+
+.home-nav-bubble--writings {
+  padding: 10px 26px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .home-nav-bubble {
+    transition: none;
+  }
+}
+
+/* Mobile and reduced-motion share the same fallback: the simulation
+   never runs, so the layer becomes a normal-flow, centered, stacked
+   composition instead of floating over an (empty) canvas area. */
+@media (max-width: 767px), (prefers-reduced-motion: reduce) {
+  .home-identity-layer {
+    position: static;
+    inset: auto;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: clamp(48px, 12vw, 96px) var(--site-gutter) clamp(40px, 8vw, 64px);
+  }
+
+  .home-identity-copy {
+    max-width: none;
+  }
+
+  .home-identity-statement {
+    max-width: 40ch;
+    margin: 0 auto;
+  }
+
+  .home-primary-bubbles {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
 }
 
 .floating-archive {
@@ -1200,8 +1344,18 @@ html {
 }
 
 @media (max-width: 767px) {
-  .canvas-hero {
+  /* The canvas simulation never initializes below this width (see
+     shouldRunCanvasSimulation() in sketch.js) — only #canvas-stage, the
+     empty p5 mount point, is hidden. .canvas-hero itself stays visible
+     so the identity/navigation layer added in it (Part 5) remains
+     available; see the combined mobile/reduced-motion rules further
+     below for how that layer restructures itself. */
+  #canvas-stage {
     display: none;
+  }
+
+  .canvas-hero {
+    min-height: auto;
   }
 
   .floating-archive {
@@ -1214,8 +1368,15 @@ html {
     scroll-behavior: auto;
   }
 
-  .canvas-hero {
+  /* Same reasoning as the mobile rule above — the simulation already
+     never starts under reduced motion, so only the canvas mount point is
+     hidden, not the identity/navigation content living alongside it. */
+  #canvas-stage {
     display: none;
+  }
+
+  .canvas-hero {
+    min-height: auto;
   }
 }
 
