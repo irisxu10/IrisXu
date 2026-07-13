@@ -231,19 +231,30 @@
   // corridor between the hero and the Floating Archive. Positions are
   // hand-authored, not generated with Math.random(), so the corridor
   // looks identical on every load/refresh. Density and opacity fall off
-  // in three unlabeled stages — near the hero boundary (denser, closer
-  // to the edges), the corridor middle (sparser), and the archive
-  // approach (sparse, larger, softer) — reusing the same ball palette
-  // as sketch.js. x/y are percentages of the corridor box; a broad
-  // central band (roughly x 32-66) is intentionally kept clear so the
-  // corridor reads as an open passage rather than a wall of circles.
+  // in three unlabeled stages — crossing/bridge (denser, clearer, closer
+  // to the hero edge — includes a small hand-authored group with
+  // negative/near-zero y so a couple of bubbles read as clipped by the
+  // corridor's own top edge, as if continuing from the hero above),
+  // dissolving (sparser, corridor middle), and archive approach (sparse,
+  // larger, softer) — reusing the same ball palette as sketch.js. x/y
+  // are percentages of the corridor box; a broad central band (roughly
+  // x 32-66) is intentionally kept clear so the corridor reads as an
+  // open passage rather than a wall of circles.
   // depth is a fixed, deterministic tier ("far" | "middle" | "near") used
-  // only by the corridor depth choreography (H2.3) to pick how far a
-  // bubble's CSS transform can travel on scroll — it is derived from each
-  // bubble's own existing size (larger circles sit "nearer" and move more)
-  // and carries no semantic/ARIA meaning. See setupCorridorDepthChoreography().
+  // both by the corridor depth choreography (H2.3, scroll transform) and
+  // by the H2.1R softness hierarchy (see the depth-keyed filter/blur
+  // rules in style.css) — it is derived from each bubble's own existing
+  // size (larger circles sit "nearer", move more on scroll, and stay
+  // crisp) and carries no semantic/ARIA meaning. See
+  // setupCorridorDepthChoreography().
   var TRANSITION_BUBBLES = [
-    // stage 1 — hero boundary
+    // stage 1 — crossing / bridge (hero boundary)
+    { x: 22, y: -2, size: 40, opacity: 0.58, color: "rgb(255, 99, 71)", depth: "near" },
+    { x: 78, y: 0, size: 44, opacity: 0.55, color: "rgb(0, 191, 255)", depth: "near" },
+    { x: 30, y: 6, size: 34, opacity: 0.52, color: "rgb(255, 215, 0)", depth: "near" },
+    { x: 70, y: 4, size: 36, opacity: 0.5, color: "rgb(34, 139, 34)", depth: "near" },
+    { x: 12, y: 9, size: 30, opacity: 0.48, color: "rgb(255, 182, 193)", depth: "near" },
+    { x: 86, y: 7, size: 32, opacity: 0.46, color: "rgb(160, 82, 45)", depth: "near" },
     { x: 6, y: 4, size: 46, opacity: 0.55, color: "rgb(255, 182, 193)", depth: "near" },
     { x: 14, y: 10, size: 30, opacity: 0.5, color: "rgb(255, 99, 71)", depth: "middle" },
     { x: 90, y: 6, size: 40, opacity: 0.5, color: "rgb(0, 191, 255)", depth: "near" },
@@ -255,7 +266,7 @@
     { x: 10, y: 12, size: 18, opacity: 0.35, color: "rgb(165, 42, 42)", depth: "far" },
     { x: 88, y: 18, size: 16, opacity: 0.3, color: "rgb(139, 69, 19)", depth: "far" },
 
-    // stage 2 — corridor middle
+    // stage 2 — dissolving (corridor middle)
     { x: 8, y: 36, size: 30, opacity: 0.3, color: "rgb(255, 99, 71)", depth: "middle" },
     { x: 92, y: 40, size: 28, opacity: 0.3, color: "rgb(0, 191, 255)", depth: "middle" },
     { x: 16, y: 52, size: 22, opacity: 0.25, color: "rgb(34, 139, 34)", depth: "far" },
@@ -267,13 +278,19 @@
     { x: 44, y: 56, size: 10, opacity: 0.16, color: "rgb(165, 42, 42)", depth: "far" },
 
     // stage 3 — archive approach
+    // H2.1R.1: y raised on 3 of the 7 bubbles below (88→84, 92→91,
+    // 96→95) — the smallest shift that keeps each one's bottom edge
+    // (its own radius plus its full H2.3 max scroll translateY) from
+    // overshooting the new, shorter clamp(420px, 58vh, 600px) corridor
+    // by more than ~12px at the 420px floor. x/size/opacity/color/depth
+    // are unchanged on every bubble; the other 4 already fit.
     { x: 12, y: 70, size: 54, opacity: 0.18, color: "rgb(0, 191, 255)", depth: "near" },
     { x: 88, y: 74, size: 60, opacity: 0.16, color: "rgb(255, 99, 71)", depth: "near" },
     { x: 24, y: 84, size: 38, opacity: 0.14, color: "rgb(34, 139, 34)", depth: "near" },
-    { x: 76, y: 88, size: 44, opacity: 0.14, color: "rgb(255, 215, 0)", depth: "near" },
-    { x: 50, y: 92, size: 26, opacity: 0.12, color: "rgb(160, 82, 45)", depth: "middle" },
+    { x: 76, y: 84, size: 44, opacity: 0.14, color: "rgb(255, 215, 0)", depth: "near" },
+    { x: 50, y: 91, size: 26, opacity: 0.12, color: "rgb(160, 82, 45)", depth: "middle" },
     { x: 6, y: 94, size: 20, opacity: 0.12, color: "rgb(255, 140, 0)", depth: "far" },
-    { x: 94, y: 96, size: 22, opacity: 0.1, color: "rgb(210, 105, 30)", depth: "far" }
+    { x: 94, y: 95, size: 22, opacity: 0.1, color: "rgb(210, 105, 30)", depth: "far" }
   ];
 
   // Purely decorative — renders into an aria-hidden container between
