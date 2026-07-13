@@ -1093,6 +1093,33 @@ body.home-page .home-main {
   }
 }
 
+/* Corridor depth choreography
+   Desktop/tablet-only progressive enhancement (see
+   setupCorridorDepthChoreography() in home.js): three root-level custom
+   properties, updated on scroll while the corridor is near the
+   viewport, are consumed here as a per-tier vertical transform. The
+   0px fallback means bubbles are simply static — at the declaration
+   level, not just visually — until JS decides otherwise. */
+.home-transition-bubble[data-depth="far"] {
+  transform: translate3d(0, var(--corridor-shift-far, 0px), 0);
+}
+
+.home-transition-bubble[data-depth="middle"] {
+  transform: translate3d(0, var(--corridor-shift-middle, 0px), 0);
+}
+
+.home-transition-bubble[data-depth="near"] {
+  transform: translate3d(0, var(--corridor-shift-near, 0px), 0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .home-transition-corridor {
+    --corridor-shift-far: 0px;
+    --corridor-shift-middle: 0px;
+    --corridor-shift-near: 0px;
+  }
+}
+
 .floating-archive {
   max-width: min(72rem, 92vw);
   margin: 0 auto;
