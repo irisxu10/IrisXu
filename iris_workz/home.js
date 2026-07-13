@@ -227,10 +227,78 @@
     nav.appendChild(list);
   }
 
+  // Fixed (not randomized) decorative bubble layout for the transition
+  // corridor between the hero and the Floating Archive. Positions are
+  // hand-authored, not generated with Math.random(), so the corridor
+  // looks identical on every load/refresh. Density and opacity fall off
+  // in three unlabeled stages — near the hero boundary (denser, closer
+  // to the edges), the corridor middle (sparser), and the archive
+  // approach (sparse, larger, softer) — reusing the same ball palette
+  // as sketch.js. x/y are percentages of the corridor box; a broad
+  // central band (roughly x 32-66) is intentionally kept clear so the
+  // corridor reads as an open passage rather than a wall of circles.
+  var TRANSITION_BUBBLES = [
+    // stage 1 — hero boundary
+    { x: 6, y: 4, size: 46, opacity: 0.55, color: "rgb(255, 182, 193)" },
+    { x: 14, y: 10, size: 30, opacity: 0.5, color: "rgb(255, 99, 71)" },
+    { x: 90, y: 6, size: 40, opacity: 0.5, color: "rgb(0, 191, 255)" },
+    { x: 82, y: 14, size: 26, opacity: 0.45, color: "rgb(255, 215, 0)" },
+    { x: 4, y: 20, size: 24, opacity: 0.4, color: "rgb(34, 139, 34)" },
+    { x: 95, y: 22, size: 34, opacity: 0.45, color: "rgb(160, 82, 45)" },
+    { x: 20, y: 26, size: 20, opacity: 0.35, color: "rgb(210, 105, 30)" },
+    { x: 76, y: 28, size: 22, opacity: 0.4, color: "rgb(255, 140, 0)" },
+    { x: 10, y: 12, size: 18, opacity: 0.35, color: "rgb(165, 42, 42)" },
+    { x: 88, y: 18, size: 16, opacity: 0.3, color: "rgb(139, 69, 19)" },
+
+    // stage 2 — corridor middle
+    { x: 8, y: 36, size: 30, opacity: 0.3, color: "rgb(255, 99, 71)" },
+    { x: 92, y: 40, size: 28, opacity: 0.3, color: "rgb(0, 191, 255)" },
+    { x: 16, y: 52, size: 22, opacity: 0.25, color: "rgb(34, 139, 34)" },
+    { x: 84, y: 50, size: 18, opacity: 0.22, color: "rgb(255, 182, 193)" },
+    { x: 6, y: 60, size: 24, opacity: 0.24, color: "rgb(160, 82, 45)" },
+    { x: 94, y: 62, size: 20, opacity: 0.22, color: "rgb(255, 140, 0)" },
+    { x: 30, y: 46, size: 14, opacity: 0.2, color: "rgb(255, 215, 0)" },
+    { x: 68, y: 58, size: 12, opacity: 0.18, color: "rgb(210, 105, 30)" },
+    { x: 44, y: 56, size: 10, opacity: 0.16, color: "rgb(165, 42, 42)" },
+
+    // stage 3 — archive approach
+    { x: 12, y: 70, size: 54, opacity: 0.18, color: "rgb(0, 191, 255)" },
+    { x: 88, y: 74, size: 60, opacity: 0.16, color: "rgb(255, 99, 71)" },
+    { x: 24, y: 84, size: 38, opacity: 0.14, color: "rgb(34, 139, 34)" },
+    { x: 76, y: 88, size: 44, opacity: 0.14, color: "rgb(255, 215, 0)" },
+    { x: 50, y: 92, size: 26, opacity: 0.12, color: "rgb(160, 82, 45)" },
+    { x: 6, y: 94, size: 20, opacity: 0.12, color: "rgb(255, 140, 0)" },
+    { x: 94, y: 96, size: 22, opacity: 0.1, color: "rgb(210, 105, 30)" }
+  ];
+
+  // Purely decorative — renders into an aria-hidden container between
+  // the hero and the Floating Archive, no links, no text, no physics,
+  // no per-frame animation loop. A failure here must never block the
+  // archive or navigation renders above.
+  function renderTransitionCorridor() {
+    var root = document.getElementById("home-transition-bubbles");
+    if (!root) {
+      console.error("home.js: #home-transition-bubbles was not found in the document. Skipping transition corridor render.");
+      return;
+    }
+
+    TRANSITION_BUBBLES.forEach(function (bubble) {
+      var span = document.createElement("span");
+      span.className = "home-transition-bubble";
+      span.style.setProperty("--x", bubble.x + "%");
+      span.style.setProperty("--y", bubble.y + "%");
+      span.style.setProperty("--size", bubble.size + "px");
+      span.style.setProperty("--opacity", bubble.opacity);
+      span.style.setProperty("--color", bubble.color);
+      root.appendChild(span);
+    });
+  }
+
   function renderHomepage() {
     renderPrimaryNavigation();
     renderArchive();
     renderSiteNavigation();
+    renderTransitionCorridor();
   }
 
   if (document.readyState === "loading") {

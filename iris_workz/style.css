@@ -1036,10 +1036,67 @@ body.home-page .home-main {
   }
 }
 
+/* =========================
+   HOMEPAGE — CONTINUOUS SCROLL CORRIDOR
+   ========================= */
+
+/* .home-main is also .home-scroll-world: hero, corridor, and archive
+   are direct children/siblings sharing one continuous white background
+   (.canvas-hero's own #fff and the page's default are already the same
+   color, so no new background rule is needed here for continuity). */
+
+/* A negative top margin pulls the corridor up to overlap the hero's
+   lower edge instead of butting against it, so the two visually blend
+   rather than meet at a hard seam. Purely decorative: no pointer
+   events, aria-hidden in the markup, no text content. */
+.home-transition-corridor {
+  position: relative;
+  z-index: 1;
+  height: clamp(480px, 90vh, 820px);
+  margin-top: -6vh;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.home-transition-visual {
+  position: absolute;
+  inset: 0;
+}
+
+/* Position/size/opacity/color are per-bubble CSS custom properties set
+   from home.js's fixed TRANSITION_BUBBLES data — the properties are
+   consumed entirely by this rule, not used as ad hoc inline styling. */
+.home-transition-bubble {
+  position: absolute;
+  left: var(--x);
+  top: var(--y);
+  width: var(--size);
+  height: var(--size);
+  border-radius: 50%;
+  background: radial-gradient(circle, var(--color) 0%, transparent 72%);
+  opacity: var(--opacity);
+  pointer-events: none;
+}
+
+/* Mobile and reduced-motion: the hero above collapses to its static,
+   content-height fallback (see the shared breakpoint further down), so
+   the overlap trick is reset to avoid pulling the corridor up into the
+   now-much-shorter identity stack. Fewer bubbles, shorter corridor. */
+@media (max-width: 767px), (prefers-reduced-motion: reduce) {
+  .home-transition-corridor {
+    height: 46vh;
+    margin-top: 0;
+  }
+
+  .home-transition-bubble:nth-child(n + 14) {
+    display: none;
+  }
+}
+
 .floating-archive {
   max-width: min(72rem, 92vw);
   margin: 0 auto;
-  padding: clamp(56px, 10vw, 120px) 0 clamp(64px, 8vw, 96px);
+  padding: clamp(24px, 4vw, 48px) 0 clamp(64px, 8vw, 96px);
   color: rgb(66, 34, 10);
 }
 
