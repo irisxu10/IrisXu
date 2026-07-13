@@ -40,15 +40,18 @@
     return mediaWrap;
   }
 
-  // The title/description are real headings/paragraphs (h2/p), not spans —
+  // The title/description are real headings/paragraphs (h3/p), not spans —
   // each project's stable id (from project-data.js) becomes its element
   // IDs, which createBubbleLink below wires to the anchor via
   // aria-labelledby/aria-describedby instead of a generic aria-label.
+  // h3 because the homepage's new identity layer (Part 5/6) introduced a
+  // page h1 and demoted "Floating Archive" to h2 — these titles are its
+  // subordinate project entries, not sibling sections.
   function createBubbleOverlay(project) {
     var overlay = document.createElement("span");
     overlay.className = "project-bubble-overlay";
 
-    var title = document.createElement("h2");
+    var title = document.createElement("h3");
     title.className = "project-bubble-title";
     title.id = "project-title-" + project.id;
     title.textContent = project.title;
@@ -157,6 +160,37 @@
     root.appendChild(list);
   }
 
+  // Renders the three primary navigation bubbles (Archive / About /
+  // Writings) into the first-viewport identity layer, from the same
+  // window.SITE_NAVIGATION used by renderSiteNavigation() below and by
+  // header.js/sketch.js — one content source, three renderers. This is
+  // real HTML navigation; the old Canvas-drawn menu text and its click
+  // hit-testing are disabled separately in sketch.js.
+  function renderPrimaryNavigation() {
+    var nav = document.getElementById("home-primary-bubbles");
+    if (!nav) {
+      console.error("home.js: #home-primary-bubbles was not found in the document. Skipping primary navigation render.");
+      return;
+    }
+
+    var items = window.SITE_NAVIGATION;
+    if (!Array.isArray(items)) {
+      console.error("home.js: window.SITE_NAVIGATION is missing or invalid. Expected an array (see nav-data.js). Skipping primary navigation render.");
+      return;
+    }
+
+    items.forEach(function (item) {
+      var link = document.createElement("a");
+      link.className = "home-nav-bubble home-nav-bubble--" + item.id;
+      link.href = item.path;
+      link.textContent = item.label;
+      if (item.id === "archive") {
+        link.setAttribute("aria-current", "location");
+      }
+      nav.appendChild(link);
+    });
+  }
+
   // Renders the semantic Archive / About / Writings row inside the
   // Floating Archive section, from window.SITE_NAVIGATION (see
   // nav-data.js). Kept independent of renderArchive() above — a failure
@@ -194,6 +228,7 @@
   }
 
   function renderHomepage() {
+    renderPrimaryNavigation();
     renderArchive();
     renderSiteNavigation();
   }
