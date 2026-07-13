@@ -553,67 +553,6 @@ html, body {
 }
 
 
-/* What's In Your Coffee Cup ? What's In Your Coffee Cup ? What's In Your Coffee Cup ? What's In Your Coffee Cup ?*/
-/* What's In Your Coffee Cup ? What's In Your Coffee Cup ? What's In Your Coffee Cup ? What's In Your Coffee Cup ?*/
-/* What's In Your Coffee Cup ? What's In Your Coffee Cup ? What's In Your Coffee Cup ? What's In Your Coffee Cup ?*/
-
-.coffee-section {
-  max-width: 1200px;
-  margin: var(--inner-header-height) auto;
-  padding: 0 var(--site-gutter);
-}
-
-.coffee-header {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 40px;
-  align-items: flex-start;
-  margin-bottom: 60px;
-}
-
-.coffee-header img {
-  flex: 1 1 600px;
-  max-width: 600px;
-  width: 100%;
-  border-radius: 8px;
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
-}
-
-.coffee-text {
-  flex: 1 1 400px;
-  max-width: 500px;
-}
-
-.coffee-text h1 {
-  font-size: 2em;
-  margin-bottom: 16px;
-  color: #604569;
-}
-
-.coffee-text p {
-  font-size: 1em;
-  line-height: 1.6;
-  color: #95899d;
-  margin-bottom: 12px;
-}
-
-
-.coffee-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 32px;
-  margin-bottom: 40px;
-}
-
-.coffee-grid img {
-  width: 100%;
-  height: auto;
-  border-radius: 6px;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
-}
-
-
-
 .tech-row {
   display: flex;
   flex-wrap: wrap;
@@ -1105,10 +1044,6 @@ html {
     padding-top: var(--inner-header-height-mobile);
   }
 
-  .coffee-section {
-    margin-top: var(--inner-header-height-mobile);
-  }
-
   /* .works-item already wraps via flex-wrap (base rule); once a project
      entry stacks into one column, the preview's absolutely-positioned
      time label no longer has a tall image to sit against, so it returns
@@ -1249,6 +1184,14 @@ html {
   background: #faf8f9;
 }
 
+/* Reuses Coffee's established accent from the Floating Archive
+   ([data-accent="coffee"], sourced from the legacy .color-6 palette).
+   No background override — Coffee's original page had none, and the
+   accent should stay selective rather than tinting the whole page. */
+.project-detail-page[data-project-accent="coffee"] {
+  --project-detail-accent: #8b4513;
+}
+
 .project-detail-main {
   width: min(calc(100% - (2 * var(--site-gutter))), 56rem);
   margin: 0 auto;
@@ -1272,6 +1215,29 @@ html {
 }
 
 .project-detail-back:focus-visible {
+  outline: 2px solid var(--project-detail-accent);
+  outline-offset: 2px;
+}
+
+/* Generic external-action link (e.g. a project's Live Demo) — CONO had
+   no external destination, so this is new, but it's project-agnostic
+   and reusable by any future project-detail page with one. */
+.project-detail-external-link {
+  display: inline-block;
+  margin-top: clamp(16px, 3vw, 24px);
+  font-size: 14px;
+  font-weight: bold;
+  color: var(--project-detail-accent);
+  text-decoration: none;
+  border-bottom: 1px solid var(--project-detail-accent);
+  transition: opacity 0.2s ease;
+}
+
+.project-detail-external-link:hover {
+  opacity: 0.7;
+}
+
+.project-detail-external-link:focus-visible {
   outline: 2px solid var(--project-detail-accent);
   outline-offset: 2px;
 }
@@ -1408,7 +1374,8 @@ html {
 @media (prefers-reduced-motion: reduce) {
   .project-detail-back,
   .project-detail-figure--hero img,
-  .project-detail-ending a {
+  .project-detail-ending a,
+  .project-detail-external-link {
     transition: none;
   }
 }
