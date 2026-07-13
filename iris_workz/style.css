@@ -1192,6 +1192,15 @@ html {
   --project-detail-accent: #8b4513;
 }
 
+/* Reuses ArtQuest/Getty's established accent from the Floating Archive
+   ([data-accent="getty"], also the source of the legacy .getty-color /
+   .getty-button palette on mdp.html). No background override — the
+   accent stays selective (kicker, rules, links) rather than tinting
+   every section blue. */
+.project-detail-page[data-project-accent="getty"] {
+  --project-detail-accent: #2a3659;
+}
+
 .project-detail-main {
   width: min(calc(100% - (2 * var(--site-gutter))), 56rem);
   margin: 0 auto;
@@ -1337,6 +1346,13 @@ html {
 }
 
 .project-detail-item .project-detail-figure {
+  margin-top: clamp(12px, 2vw, 20px);
+}
+
+/* Same spacing as .project-detail-item .project-detail-figure above, for
+   items whose content is text rather than an image — e.g. ArtQuest's
+   named game modes. Generic, not project-specific. */
+.project-detail-item .project-detail-summary {
   margin-top: clamp(12px, 2vw, 20px);
 }
 
