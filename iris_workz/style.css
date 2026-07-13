@@ -1388,6 +1388,14 @@ html {
   --project-detail-accent: #b8733b;
 }
 
+/* Reuses A Letter from Your Cat's established accent from the Floating
+   Archive ([data-accent="catstar"], also the source of the legacy
+   .catstar-color / .catstar-button palette on mdp.html). No background
+   override, consistent with Coffee/ArtQuest/Sofa's precedent. */
+.project-detail-page[data-project-accent="catstar"] {
+  --project-detail-accent: #101f5d;
+}
+
 .project-detail-main {
   width: min(calc(100% - (2 * var(--site-gutter))), 56rem);
   margin: 0 auto;
