@@ -6,25 +6,16 @@
 // behavior — that belongs to sketch.js / ball.js and later phases.
 
 (function () {
-  var LENS_LABELS = {
-    "systems": "Systems",
-    "interfaces": "Interfaces",
-    "materials": "Materials",
-    "speculative-worlds": "Speculative Worlds",
-    "playful-tools": "Playful Tools",
-    "nonhuman-perspectives": "Nonhuman Perspectives"
-  };
-
-  function createExternalIndicator() {
-    var span = document.createElement("span");
-    span.className = "visually-hidden";
-    span.textContent = " (opens in a new tab)";
-    return span;
-  }
-
-  function createPreview(project) {
-    var figure = document.createElement("figure");
-    figure.className = "project-entry-preview";
+  // Minimal bubble prototype (visibility-first rebuild). index/year/lenses/
+  // secondaryLinks are intentionally not rendered here at all — the prior
+  // attempt hid them with .visually-hidden and still left the project area
+  // looking blank because the bubble itself wasn't rendering; this pass
+  // has exactly one job, getting six real circular bubbles on screen, so
+  // there is nothing else in the markup to introduce ambiguity. Their data
+  // stays untouched in project-data.js.
+  function createBubbleMedia(project) {
+    var mediaWrap = document.createElement("span");
+    mediaWrap.className = "project-bubble-media";
 
     var preview = project.preview || {};
 
@@ -34,69 +25,86 @@
       video.muted = true;
       video.setAttribute("playsinline", "");
       video.setAttribute("preload", "metadata");
-      video.controls = true;
-      figure.appendChild(video);
-
-      var caption = document.createElement("figcaption");
-      caption.className = "project-entry-preview-caption";
-      caption.textContent = preview.alt || "";
-      figure.appendChild(caption);
+      if (preview.alt) {
+        video.setAttribute("aria-label", preview.alt);
+      }
+      mediaWrap.appendChild(video);
     } else if (preview.type === "image") {
       var img = document.createElement("img");
       img.src = preview.src;
       img.alt = preview.alt || "";
       img.loading = "lazy";
-      figure.appendChild(img);
+      mediaWrap.appendChild(img);
     }
 
-    return figure;
+    return mediaWrap;
   }
 
-  function createLensList(lenses) {
-    var list = document.createElement("ul");
-    list.className = "project-entry-lenses";
-    (lenses || []).forEach(function (lens) {
-      var item = document.createElement("li");
-      item.textContent = LENS_LABELS[lens] || lens;
-      list.appendChild(item);
-    });
-    return list;
+  // The title/description are real headings/paragraphs (h2/p), not spans —
+  // each project's stable id (from project-data.js) becomes its element
+  // IDs, which createBubbleLink below wires to the anchor via
+  // aria-labelledby/aria-describedby instead of a generic aria-label.
+  function createBubbleOverlay(project) {
+    var overlay = document.createElement("span");
+    overlay.className = "project-bubble-overlay";
+
+    var title = document.createElement("h2");
+    title.className = "project-bubble-title";
+    title.id = "project-title-" + project.id;
+    title.textContent = project.title;
+    overlay.appendChild(title);
+
+    if (project.description) {
+      var desc = document.createElement("p");
+      desc.className = "project-bubble-description";
+      desc.id = "project-description-" + project.id;
+      desc.textContent = project.description;
+      overlay.appendChild(desc);
+    }
+
+    return overlay;
   }
 
-  function createPrimaryLink(project) {
+  // The bubble anchor is the single primary link — shell, media, and
+  // overlay are its direct children, with no intermediate wrapper. (Two
+  // prior attempts collapsed to invisible because a wrapper between the
+  // link and its layers had no explicit size; see the style.css comment
+  // on .project-bubble for the full sizing-chain explanation.)
+  function createBubbleLink(project) {
     var destination = project.destination || {};
     var link = document.createElement("a");
-    link.className = "project-entry-link";
+    link.className = "project-bubble";
     link.href = destination.href;
-    link.textContent = project.title;
+
+    var describedBy = "project-description-" + project.id;
     if (destination.external) {
       link.target = "_blank";
       link.rel = "noopener noreferrer";
-      link.appendChild(createExternalIndicator());
-    }
-    return link;
-  }
 
-  function createSecondaryLinks(secondaryLinks) {
-    if (!secondaryLinks || secondaryLinks.length === 0) {
-      return null;
+      var externalId = "project-external-" + project.id;
+      var externalIndicator = document.createElement("span");
+      externalIndicator.className = "visually-hidden";
+      externalIndicator.id = externalId;
+      externalIndicator.textContent = "Opens in a new tab";
+      link.appendChild(externalIndicator);
+
+      describedBy += " " + externalId;
     }
-    var list = document.createElement("ul");
-    list.className = "project-entry-secondary-links";
-    secondaryLinks.forEach(function (linkData) {
-      var item = document.createElement("li");
-      var link = document.createElement("a");
-      link.href = linkData.href;
-      link.textContent = linkData.label;
-      if (linkData.external) {
-        link.target = "_blank";
-        link.rel = "noopener noreferrer";
-        link.appendChild(createExternalIndicator());
-      }
-      item.appendChild(link);
-      list.appendChild(item);
-    });
-    return list;
+
+    link.setAttribute("aria-labelledby", "project-title-" + project.id);
+    if (project.description) {
+      link.setAttribute("aria-describedby", describedBy);
+    }
+
+    var shell = document.createElement("span");
+    shell.className = "project-bubble-shell";
+    shell.setAttribute("aria-hidden", "true");
+    link.appendChild(shell);
+
+    link.appendChild(createBubbleMedia(project));
+    link.appendChild(createBubbleOverlay(project));
+
+    return link;
   }
 
   function createProjectEntry(project) {
@@ -108,39 +116,7 @@
     article.className = "project-entry";
     article.dataset.accent = project.accent || "";
 
-    article.appendChild(createPreview(project));
-
-    var index = document.createElement("p");
-    index.className = "project-entry-index";
-    index.setAttribute("aria-hidden", "true");
-    index.textContent = String(project.order).padStart(2, "0");
-    article.appendChild(index);
-
-    var year = document.createElement("p");
-    year.className = "project-entry-year";
-    year.textContent = project.year;
-    article.appendChild(year);
-
-    var heading = document.createElement("h3");
-    heading.className = "project-entry-title";
-    heading.appendChild(createPrimaryLink(project));
-    article.appendChild(heading);
-
-    if (project.description) {
-      var desc = document.createElement("p");
-      desc.className = "project-entry-description";
-      desc.textContent = project.description;
-      article.appendChild(desc);
-    }
-
-    if (project.lenses && project.lenses.length) {
-      article.appendChild(createLensList(project.lenses));
-    }
-
-    var secondary = createSecondaryLinks(project.secondaryLinks);
-    if (secondary) {
-      article.appendChild(secondary);
-    }
+    article.appendChild(createBubbleLink(project));
 
     li.appendChild(article);
     return li;
