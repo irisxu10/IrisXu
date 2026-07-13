@@ -779,23 +779,20 @@ body.home-page .home-main {
 }
 
 /* =========================
-   FLOATING ARCHIVE — MINIMAL BUBBLE PROTOTYPE
+   FLOATING ARCHIVE — BUBBLE VISUAL REFINEMENT
    ========================= */
 
 .project-archive-root {
   max-width: none;
 }
 
-/* Explicit sizing chain (traced in full in the Part 17 report):
+/* Explicit sizing chain — unchanged from the minimal prototype, only the
+   tier/offset *values* below are refined in this pass:
    grid column (concrete, from minmax(0,1fr)) → .project-archive-item
    (--bubble-size, width: min(100%, var(--bubble-size))) → .project-entry
    (width: 100%) → .project-bubble (width: 100%, aspect-ratio: 1).
-   Every level has an explicit, non-percentage-of-auto width. This is the
-   part two earlier passes got wrong: a percentage width only resolves
-   against a definite ancestor size, and a flex item with no explicit
-   width has an auto/shrink-to-fit size, not a definite one. CSS Grid's
-   minmax(0,1fr) tracks give .project-archive-item a definite, resolved
-   width to build on — that's why grid replaces flex for the field here. */
+   Every level has an explicit, non-percentage-of-auto width — this is
+   what two earlier flex-based attempts got wrong and grid fixes. */
 .project-archive-list {
   list-style: none;
   margin: 0;
@@ -809,7 +806,7 @@ body.home-page .home-main {
 }
 
 .project-archive-item {
-  --bubble-size: clamp(180px, 60vw, 240px);
+  --bubble-size: clamp(184px, 60vw, 244px);
   width: min(100%, var(--bubble-size));
   min-width: 0;
 }
@@ -827,7 +824,9 @@ body.home-page .home-main {
 .project-entry[data-accent="tech"]     { --project-accent: #243c1e; }
 
 /* The bubble itself: one anchor, real block-level geometry, no unsized
-   wrapper between it and its three layers. */
+   wrapper between it and its three layers (unchanged from the minimal
+   pass). isolation: isolate keeps the shell/media/overlay/highlight
+   stack self-contained. */
 .project-bubble {
   display: block;
   position: relative;
@@ -837,35 +836,71 @@ body.home-page .home-main {
   isolation: isolate;
   color: inherit;
   text-decoration: none;
+  transition: transform 0.25s ease;
+}
+
+.project-bubble:hover,
+.project-bubble:focus-visible,
+.project-bubble:focus {
+  transform: scale(1.035);
 }
 
 .project-bubble:focus-visible {
-  outline: 2px solid rgb(66, 34, 10);
+  outline: 2px solid var(--project-accent);
   outline-offset: 6px;
 }
 
-/* Layer 1 — shell: deliberately plain and unmistakably visible for this
-   pass — a visible accent border, one radial gradient with a transparent
-   center, and one restrained inset highlight. No pseudo-elements yet. */
+/* A single restrained highlight (Part 7) — generated content on the
+   anchor itself, painted above shell/media/overlay alike, suggesting a
+   curved glass surface rather than an opaque decoration. Off-center
+   toward the upper-left, soft white-to-transparent, no animation. */
+.project-bubble::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 24%, rgba(255, 255, 255, 0.38) 0%, rgba(255, 255, 255, 0) 36%);
+  pointer-events: none;
+}
+
+/* Layer 1 — shell: a membrane, not a solid ring. Transparent through the
+   center, the accent only gathers in the outer ~20% of the circle. A
+   hairline accent border stays as a geometry safeguard; the dominant
+   read comes from the gradient plus two restrained inset shadows (a
+   soft highlight from above, a soft shadow from below) for a slightly
+   dimensional, glass-like feel rather than a flat cartoon outline. */
 .project-bubble-shell {
   position: absolute;
   inset: 0;
   border-radius: 50%;
-  border: 2px solid var(--project-accent);
-  background: radial-gradient(circle, transparent 50%, var(--project-accent) 100%);
-  opacity: 0.85;
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.6);
+  border: 1px solid var(--project-accent);
+  background: radial-gradient(circle, transparent 0%, transparent 78%, var(--project-accent) 100%);
+  opacity: 0.6;
+  box-shadow:
+    inset 0 3px 8px rgba(255, 255, 255, 0.5),
+    inset 0 -6px 14px rgba(0, 0, 0, 0.06);
+  transition: opacity 0.25s ease;
 }
 
-/* Layer 2 — media: plain circular crop, fully visible at rest, no mask,
-   no filter, no blur. A very small scale suggests a lens crop without
-   distorting the image. */
+.project-bubble:hover .project-bubble-shell,
+.project-bubble:focus-visible .project-bubble-shell,
+.project-bubble:focus .project-bubble-shell {
+  opacity: 0.8;
+}
+
+/* Layer 2 — media: real img/video, circularly clipped, with a radial
+   mask so the outer edge fades toward transparency instead of ending in
+   a hard crop — the image reads as seen "through" the bubble rather
+   than pasted onto it. A small scale plus the mask/highlight together
+   suggest a gentle lens without any actual distortion. */
 .project-bubble-media {
   position: absolute;
   inset: 7%;
   display: block;
   border-radius: 50%;
   overflow: hidden;
+  -webkit-mask-image: radial-gradient(circle, #000 72%, transparent 99%);
+  mask-image: radial-gradient(circle, #000 72%, transparent 99%);
 }
 
 .project-bubble-media img,
@@ -874,12 +909,24 @@ body.home-page .home-main {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transform: scale(1.04);
+  transform: scale(1.06);
+  transition: transform 0.25s ease, filter 0.25s ease;
+}
+
+.project-bubble:hover .project-bubble-media img,
+.project-bubble:hover .project-bubble-media video,
+.project-bubble:focus-visible .project-bubble-media img,
+.project-bubble:focus-visible .project-bubble-media video,
+.project-bubble:focus .project-bubble-media img,
+.project-bubble:focus .project-bubble-media video {
+  transform: scale(1.1);
+  filter: brightness(0.96);
 }
 
 /* Layer 3 — hover/focus overlay: title + short description only. Its
    opacity is the only thing hidden at rest; it never controls the
-   shell's or media's visibility. */
+   shell's or media's visibility. A soft radial gradient (rather than a
+   flat white disk) keeps a faint impression of the image beneath it. */
 .project-bubble-overlay {
   position: absolute;
   inset: 0;
@@ -888,9 +935,9 @@ body.home-page .home-main {
   align-items: center;
   justify-content: center;
   text-align: center;
-  padding: 14%;
+  padding: 16%;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.88);
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.68) 100%);
   opacity: 0;
   transition: opacity 0.2s ease;
   pointer-events: none;
@@ -902,8 +949,17 @@ body.home-page .home-main {
   opacity: 1;
 }
 
+/* .project-bubble-title is an h2 and .project-bubble-description is a p
+   (see home.js) — both need their browser-default margins reset
+   explicitly, since neither had any UA-stylesheet margin to override
+   back when these were plain spans. */
 .project-bubble-title {
-  display: block;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  max-width: 100%;
+  margin: 0;
   font-weight: bold;
   font-size: clamp(14px, 1.8vw, 16px);
   line-height: 1.25;
@@ -915,55 +971,87 @@ body.home-page .home-main {
   -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
   overflow: hidden;
-  margin-top: 6px;
+  max-width: 100%;
+  margin: 6px 0 0;
   font-size: clamp(11px, 1.3vw, 13px);
   line-height: 1.4;
   color: rgba(66, 34, 10, 0.85);
 }
 
+/* Touch/no-hover devices: the overlay can't wait for a hover that will
+   never come, so it stays permanently present but restrained — a soft
+   gradient anchoring the title to the lower portion of the bubble
+   (Part 16), not a full opaque disk. The description is suppressed
+   visually (max-height/opacity, not display: none) so it stays out of
+   the way while remaining in the accessibility tree. Tapping anywhere
+   still activates the one real link immediately — nothing here
+   intercepts the tap. */
+@media (hover: none) {
+  .project-bubble-overlay {
+    opacity: 1;
+    justify-content: flex-end;
+    padding-bottom: 14%;
+    background: linear-gradient(to top, rgba(255, 255, 255, 0.92) 0%, rgba(255, 255, 255, 0.86) 26%, rgba(255, 255, 255, 0) 60%);
+  }
+
+  .project-bubble-description {
+    max-height: 0;
+    opacity: 0;
+    margin-top: 0;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
+  .project-bubble,
+  .project-bubble-shell,
+  .project-bubble-media img,
+  .project-bubble-media video,
   .project-bubble-overlay {
     transition: none;
   }
 }
 
-/* Tablet: two columns, a small alternating offset only once geometry is
-   confirmed working. */
+/* Tablet: two columns, one restrained size, a small alternating offset. */
 @media (min-width: 768px) and (max-width: 1024px) {
   .project-archive-list {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .project-archive-item {
-    --bubble-size: clamp(180px, 30vw, 220px);
+    --bubble-size: clamp(184px, 30vw, 224px);
   }
 
   .project-archive-item:nth-child(even) {
-    margin-top: clamp(16px, 3vw, 28px);
+    margin-top: clamp(14px, 2.5vw, 24px);
   }
 }
 
-/* Desktop: three columns / two rows for six projects, modest static
-   offsets, three restrained size tiers on a repeating 3-item rhythm so
-   no single project reads as "featured." Every tier value stays well
-   under a column's share of the shared 56rem content width, so bubbles
-   cannot outgrow their grid cell. */
+/* Desktop: three columns / two rows for six projects. Modest static
+   vertical offsets and horizontal nudges within the grid cell, plus
+   three restrained size tiers on a repeating 3-item rhythm, so the
+   field reads as spatial rather than a rigid product grid without any
+   single project reading as "featured." Every tier stays well under a
+   column's share of the grid, so hover scaling (1.035x) never risks
+   clipping into a neighboring cell. */
 @media (min-width: 1025px) {
   .project-archive-list {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
+
+  .project-archive-item:nth-child(1) { justify-self: end; }
+  .project-archive-item:nth-child(4) { justify-self: start; }
 
   .project-archive-item:nth-child(2) { margin-top: clamp(16px, 2vw, 28px); }
   .project-archive-item:nth-child(3) { margin-top: clamp(-12px, -1vw, 0px); }
   .project-archive-item:nth-child(5) { margin-top: clamp(20px, 2.5vw, 32px); }
   .project-archive-item:nth-child(6) { margin-top: clamp(-8px, -0.5vw, 0px); }
 
-  .project-archive-item:nth-child(3n+1) { --bubble-size: clamp(200px, 17vw, 232px); }
-  .project-archive-item:nth-child(3n+2) { --bubble-size: clamp(216px, 18vw, 252px); }
-  .project-archive-item:nth-child(3n)   { --bubble-size: clamp(184px, 15vw, 208px); }
+  .project-archive-item:nth-child(3n+1) { --bubble-size: clamp(216px, 18vw, 240px); }
+  .project-archive-item:nth-child(3n+2) { --bubble-size: clamp(232px, 19vw, 256px); }
+  .project-archive-item:nth-child(3n)   { --bubble-size: clamp(200px, 16vw, 216px); }
 }
 
-/* Mobile: single column, no offsets, per Part 7. */
+/* Mobile: single column, no offsets. */
 @media (max-width: 767px) {
   .project-archive-item {
     margin-top: 0;

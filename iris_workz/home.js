@@ -40,18 +40,24 @@
     return mediaWrap;
   }
 
+  // The title/description are real headings/paragraphs (h2/p), not spans —
+  // each project's stable id (from project-data.js) becomes its element
+  // IDs, which createBubbleLink below wires to the anchor via
+  // aria-labelledby/aria-describedby instead of a generic aria-label.
   function createBubbleOverlay(project) {
     var overlay = document.createElement("span");
     overlay.className = "project-bubble-overlay";
 
-    var title = document.createElement("span");
+    var title = document.createElement("h2");
     title.className = "project-bubble-title";
+    title.id = "project-title-" + project.id;
     title.textContent = project.title;
     overlay.appendChild(title);
 
     if (project.description) {
-      var desc = document.createElement("span");
+      var desc = document.createElement("p");
       desc.className = "project-bubble-description";
+      desc.id = "project-description-" + project.id;
       desc.textContent = project.description;
       overlay.appendChild(desc);
     }
@@ -70,13 +76,25 @@
     link.className = "project-bubble";
     link.href = destination.href;
 
-    var accessibleName = "View " + project.title;
+    var describedBy = "project-description-" + project.id;
     if (destination.external) {
       link.target = "_blank";
       link.rel = "noopener noreferrer";
-      accessibleName += " (opens in a new tab)";
+
+      var externalId = "project-external-" + project.id;
+      var externalIndicator = document.createElement("span");
+      externalIndicator.className = "visually-hidden";
+      externalIndicator.id = externalId;
+      externalIndicator.textContent = "Opens in a new tab";
+      link.appendChild(externalIndicator);
+
+      describedBy += " " + externalId;
     }
-    link.setAttribute("aria-label", accessibleName);
+
+    link.setAttribute("aria-labelledby", "project-title-" + project.id);
+    if (project.description) {
+      link.setAttribute("aria-describedby", describedBy);
+    }
 
     var shell = document.createElement("span");
     shell.className = "project-bubble-shell";
@@ -102,25 +120,6 @@
 
     li.appendChild(article);
     return li;
-  }
-
-  // Prototype diagnostics only (Part 15): confirms every bubble actually
-  // has visible geometry after render, since two prior passes silently
-  // collapsed to zero size. Safe to remove once Iris confirms the six
-  // bubbles render reliably — not part of the permanent implementation.
-  function checkBubbleGeometry() {
-    requestAnimationFrame(function () {
-      try {
-        document.querySelectorAll(".project-bubble").forEach(function (bubble) {
-          var rect = bubble.getBoundingClientRect();
-          if (rect.width < 50 || rect.height < 50) {
-            console.error("Bubble geometry failed:", bubble, rect);
-          }
-        });
-      } catch (err) {
-        console.error("home.js: bubble geometry diagnostic failed.", err);
-      }
-    });
   }
 
   function renderArchive() {
@@ -197,7 +196,6 @@
   function renderHomepage() {
     renderArchive();
     renderSiteNavigation();
-    checkBubbleGeometry();
   }
 
   if (document.readyState === "loading") {
