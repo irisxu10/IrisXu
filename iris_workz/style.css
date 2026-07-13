@@ -1158,7 +1158,7 @@ body.home-page .home-main {
 .floating-archive {
   max-width: min(72rem, 92vw);
   margin: 0 auto;
-  padding: clamp(24px, 4vw, 48px) 0 clamp(64px, 8vw, 96px);
+  padding: clamp(24px, 4vw, 48px) 0 clamp(32px, 5vw, 56px);
   color: rgb(66, 34, 10);
 }
 
@@ -1586,7 +1586,7 @@ html {
   }
 
   .floating-archive {
-    padding: 40px 0 56px;
+    padding: 40px 0 40px;
   }
 }
 
@@ -1638,6 +1638,266 @@ html {
     position: static;
     margin-top: 8px;
   }
+}
+
+/* =========================
+   HOMEPAGE — LOWER ORBIT
+   ========================= */
+
+/* Three stable typographic destinations after the project ecosystem —
+   deliberately quieter than the Archive: no media, no circular bubbles,
+   no card backgrounds. .lower-orbit is a flex column so the list can
+   flex:1 and actually stretch to fill min-height (a plain percentage
+   height on the list would not resolve against a min-height-only
+   parent), letting the 3-row grid spread its items across real
+   vertical space rather than clustering at the top.
+   H2.5.1: min-height reduced (440-680px → 380-520px) and top/bottom
+   padding reduced — the Archive already establishes its own breathing
+   room just above, so Lower Orbit no longer needs an equally large
+   independent frame of its own. */
+.lower-orbit {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  max-width: min(72rem, 92vw);
+  margin: 0 auto;
+  min-height: clamp(380px, 50vh, 520px);
+  padding-top: clamp(20px, 4vw, 40px);
+  padding-bottom: clamp(24px, 4vw, 48px);
+}
+
+/* Two faint fixed marks reusing the existing corridor palette at very
+   low opacity — not another bubble field, just enough to keep this
+   section feeling like the same spatial world as the corridor above. */
+.lower-orbit::before,
+.lower-orbit::after {
+  content: "";
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.lower-orbit::before {
+  top: 6%;
+  right: 20%;
+  width: 6px;
+  height: 6px;
+  background: rgb(0, 191, 255);
+  opacity: 0.16;
+}
+
+.lower-orbit::after {
+  bottom: 14%;
+  left: 14%;
+  width: 8px;
+  height: 8px;
+  background: rgb(255, 140, 0);
+  opacity: 0.14;
+}
+
+/* H2.5.1: rows are content-sized (auto) with the leftover space
+   distributed between them (align-content:space-between) rather than
+   split into three equal fractional rows — Writings, which has no
+   hint and is naturally shorter than About/Contact, no longer gets
+   stretched into an artificially tall, mostly-empty row. */
+.lower-orbit-list {
+  position: relative;
+  z-index: 1;
+  flex: 1;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  grid-template-rows: auto auto auto;
+  align-content: space-between;
+  column-gap: clamp(16px, 3vw, 32px);
+}
+
+/* Asymmetric placement — three distinct rows/regions, not one row and
+   not three equal columns, so About / Writings / Contact read as
+   separate coordinates rather than a conventional menu. */
+.lower-orbit-item--about {
+  grid-column: 1 / 7;
+  grid-row: 1;
+  align-self: start;
+}
+
+.lower-orbit-item--writings {
+  grid-column: 8 / 13;
+  grid-row: 2;
+  align-self: center;
+  justify-self: end;
+  text-align: right;
+}
+
+.lower-orbit-item--contact {
+  grid-column: 3 / 11;
+  grid-row: 3;
+  align-self: end;
+  justify-self: center;
+  text-align: center;
+}
+
+.lower-orbit-link {
+  display: inline-flex;
+  flex-direction: column;
+  gap: 6px;
+  text-decoration: none;
+  color: rgb(66, 34, 10);
+  transition: transform 0.25s ease;
+}
+
+.lower-orbit-item--writings .lower-orbit-link {
+  align-items: flex-end;
+}
+
+.lower-orbit-item--contact .lower-orbit-link {
+  align-items: center;
+}
+
+.lower-orbit-link:hover,
+.lower-orbit-link:focus-visible {
+  transform: translateY(-4px);
+}
+
+.lower-orbit-link:focus-visible {
+  outline: 2px solid rgb(255, 99, 71);
+  outline-offset: 6px;
+}
+
+.lower-orbit-index {
+  font-family: 'Helvetica Neue', sans-serif;
+  font-size: clamp(12px, 1vw, 13px);
+  letter-spacing: 0.08em;
+  color: rgba(66, 34, 10, 0.35);
+}
+
+.lower-orbit-label {
+  font-family: 'Helvetica Neue', sans-serif;
+  font-size: clamp(2.25rem, 4.8vw, 5rem);
+  font-weight: 700;
+  line-height: 1.05;
+  transition: color 0.25s ease;
+}
+
+.lower-orbit-link:hover .lower-orbit-label,
+.lower-orbit-link:focus-visible .lower-orbit-label {
+  color: rgb(255, 99, 71);
+}
+
+.lower-orbit-hint {
+  max-width: 28ch;
+  font-family: 'Helvetica Neue', sans-serif;
+  font-size: clamp(14px, 1.4vw, 16px);
+  color: rgba(66, 34, 10, 0.6);
+}
+
+/* A thin trace under each label rather than a full card border —
+   extends and brightens slightly on interaction. */
+.lower-orbit-link::after {
+  content: "";
+  display: block;
+  width: 2.5rem;
+  height: 1px;
+  margin-top: 4px;
+  background: currentColor;
+  opacity: 0.35;
+  transition: width 0.25s ease, opacity 0.25s ease;
+}
+
+.lower-orbit-link:hover::after,
+.lower-orbit-link:focus-visible::after {
+  width: 4rem;
+  opacity: 0.7;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lower-orbit-link,
+  .lower-orbit-link::after {
+    transition: none;
+  }
+}
+
+@media (max-width: 767px) {
+  .lower-orbit {
+    display: block;
+    min-height: auto;
+    padding: clamp(48px, 10vw, 72px) var(--site-gutter) clamp(40px, 8vw, 56px);
+  }
+
+  .lower-orbit-list {
+    display: flex;
+    flex-direction: column;
+    gap: clamp(40px, 10vw, 56px);
+  }
+
+  .lower-orbit-item--writings .lower-orbit-link,
+  .lower-orbit-item--contact .lower-orbit-link {
+    align-items: flex-start;
+  }
+
+  .lower-orbit-item--writings,
+  .lower-orbit-item--contact {
+    text-align: left;
+  }
+}
+
+/* Homepage footer integration
+   The Lower Orbit now supplies the "final navigation moment," so the
+   shared Footer's own Archive/About/Writings row would be immediate,
+   redundant clutter directly beneath it — hidden on the homepage only.
+   Identity/contact/credit stay, restyled from the shared gray utility
+   palette into the homepage's own warm-brown family so the Footer
+   reads as this world's ground layer rather than a bolted-on strip.
+   Inner pages (About, Writings, project details) never see any of
+   this — footer.js and its shared CSS above are untouched.
+   H2.5.1: margin-top increased slightly (8-24px → 16-32px) now that
+   Contact is the Lower Orbit's own email action — the Footer needs a
+   little more separation from it than it did when the gap above was
+   still doing most of the work. */
+body.home-page .site-footer {
+  margin-top: clamp(16px, 3vw, 32px);
+  border-top: none;
+  color: rgb(66, 34, 10);
+}
+
+body.home-page .site-footer-navigation {
+  display: none;
+}
+
+/* H2.5.1: Contact (with its email hint) is now the Lower Orbit's own
+   primary email action — the Footer's identical mailto link directly
+   beneath it would just be an immediate repeat, so it's hidden on the
+   homepage only. Instagram, identity, and credit are untouched and
+   stay visible; the contact wrapper itself is preserved, it just holds
+   one link instead of two. Inner pages never match this selector. */
+body.home-page .site-footer-contact-link[href^="mailto:"] {
+  display: none;
+}
+
+body.home-page .site-footer-home {
+  color: rgb(66, 34, 10);
+}
+
+body.home-page .site-footer-home:hover {
+  color: rgb(255, 99, 71);
+}
+
+body.home-page .site-footer-description {
+  color: rgba(66, 34, 10, 0.65);
+}
+
+body.home-page .site-footer-contact-link {
+  color: rgba(66, 34, 10, 0.75);
+}
+
+body.home-page .site-footer-contact-link:hover {
+  color: rgb(255, 99, 71);
+}
+
+body.home-page .site-footer-credit {
+  color: rgba(66, 34, 10, 0.55);
 }
 
 /* =========================
