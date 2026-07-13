@@ -284,7 +284,14 @@
     // overshooting the new, shorter clamp(420px, 58vh, 600px) corridor
     // by more than ~12px at the 420px floor. x/size/opacity/color/depth
     // are unchanged on every bubble; the other 4 already fit.
-    { x: 12, y: 70, size: 54, opacity: 0.18, color: "rgb(0, 191, 255)", depth: "near" },
+    // H2.1R.2: x moved 12→5 on the bubble below only — the Archive's
+    // new overlapping top edge (see .floating-archive in style.css)
+    // lands right around this bubble's own y:70, and x:12 sat inside
+    // the left-aligned .archive-introduction text column (up to 38rem
+    // wide from the container's left edge); x:5 keeps it in the outer
+    // margin as peripheral atmosphere instead. y/size/opacity/color/
+    // depth unchanged.
+    { x: 5, y: 70, size: 54, opacity: 0.18, color: "rgb(0, 191, 255)", depth: "near" },
     { x: 88, y: 74, size: 60, opacity: 0.16, color: "rgb(255, 99, 71)", depth: "near" },
     { x: 24, y: 84, size: 38, opacity: 0.14, color: "rgb(34, 139, 34)", depth: "near" },
     { x: 76, y: 84, size: 44, opacity: 0.14, color: "rgb(255, 215, 0)", depth: "near" },

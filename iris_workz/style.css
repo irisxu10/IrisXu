@@ -1155,10 +1155,24 @@ body.home-page .home-main {
   filter: blur(0.55px);
 }
 
+/* Archive content handoff (H2.1R.2)
+   Real document-flow overlap, not a transform: the Archive stays a
+   normal in-flow section (no position:absolute, no translateY on the
+   whole block), it just begins before the decorative Corridor's own
+   box visually ends. z-index:2 keeps it above the Corridor's bubbles
+   (z-index:1) wherever the two now overlap. The negative margin lands
+   the Archive's top edge at roughly corridor-y:69-70% at every
+   representative viewport height (900/800/700px) — right at the seam
+   between the "dissolving" stage (ends y:62) and "archive approach"
+   stage (starts y:70), comfortably clear of the bridge stage above
+   (y:-2 to 28) and the hero's own perimeter corners. */
 .floating-archive {
+  position: relative;
+  z-index: 2;
   max-width: min(72rem, 92vw);
   margin: 0 auto;
-  padding: clamp(24px, 4vw, 48px) 0 clamp(32px, 5vw, 56px);
+  margin-top: clamp(-180px, -18vh, -120px);
+  padding: clamp(16px, 3vw, 32px) 0 clamp(32px, 5vw, 56px);
   color: rgb(66, 34, 10);
 }
 
@@ -1216,9 +1230,16 @@ body.home-page .home-main {
   .floating-archive.is-reveal-ready .project-archive-item:nth-child(6) { transition-delay: 150ms; }
 }
 
+/* Above the Corridor layer (z-index:2, matching .floating-archive) so
+   the title/description read clearly over whatever bubbles now sit in
+   the overlap zone — no background, no card, no blur: the text itself
+   is the readability fix. margin-bottom shortened so the first project
+   row follows the introduction more promptly. */
 .archive-introduction {
+  position: relative;
+  z-index: 2;
   max-width: 38rem;
-  margin-bottom: clamp(40px, 6vw, 72px);
+  margin-bottom: clamp(24px, 4vw, 48px);
 }
 
 .archive-eyebrow {
@@ -1585,8 +1606,15 @@ html {
     min-height: auto;
   }
 
+  /* Mobile content handoff (H2.1R.2): a smaller overlap than desktop
+     since the mobile corridor itself is shorter and doesn't overlap
+     the hero (margin-top:0 above) — this only pulls the Archive up
+     into the corridor's own tail, not into the stacked identity
+     content, which sits well above with its own normal-flow spacing. */
   .floating-archive {
-    padding: 40px 0 40px;
+    margin-top: clamp(-88px, -10vh, -56px);
+    padding-top: clamp(16px, 4vw, 24px);
+    padding-bottom: 40px;
   }
 }
 
