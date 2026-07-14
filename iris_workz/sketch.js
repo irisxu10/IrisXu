@@ -7,7 +7,8 @@ let debug = false;
 
 let Engine = Matter.Engine,
   World = Matter.World,
-  Bodies = Matter.Bodies;
+  Bodies = Matter.Bodies,
+  Body = Matter.Body;
 
 let engine;
 let world;
@@ -18,6 +19,34 @@ let colors = [];
 let menuData = []
 let intervalId;
 let timeoutId;
+
+// --- Archive planet collider (H2.8.2) ---
+// One invisible static circle, much larger than the Canvas, standing in
+// for the CSS "rising planet" surface (.floating-archive::before in
+// style.css) so ordinary balls physically land on and slide off of it
+// instead of only appearing to via CSS layering. Re-created inside
+// windowResized() alongside initBorder()'s other static bodies, since
+// resetMatter() there throws away the whole Matter world (see
+// resetMatter()/windowResized() below) — a single setup()-time creation
+// would be wiped out on the very first resize.
+let archivePlanetCollider = null;
+const ARCHIVE_PLANET_RADIUS = canvasWidth * 1.25;
+const ARCHIVE_PLANET_CATEGORY = 0x0004;
+const ARCHIVE_PLANET_MASK = 0x0002; // ordinary balls only — see ball.js
+// World-space Y the collider is currently at; only ever moved a bounded
+// step per frame toward the real target (see updateArchivePlanetCollider)
+// so a large, sudden scroll jump can't teleport/tunnel resting balls.
+let archivePlanetCurrentCenterY = null;
+const ARCHIVE_PLANET_MAX_STEP = 40; // world units per frame
+// H2.8.5R: tracks which ordinary balls have already received their one-time
+// apex nudge (see nudgeStalledBallsFromArchiveApex below), keyed by Matter
+// body id. Cleared in initPlanetCollider() so a fresh world (windowResized)
+// starts with a clean slate rather than permanently exhausting nudges.
+let archivePlanetNudgedBallIds = new Set();
+// Cached once in setup() — real DOM elements, read every draw() frame
+// instead of re-querying the DOM per frame.
+let archivePlanetFloatingArchiveEl = null;
+let archivePlanetCanvasHeroEl = null;
 
 // --- Falling IRIS letters (experiment/falling-iris-letters) ---
 let letters = [];
@@ -89,7 +118,181 @@ function setup() {
   world = engine.world;
   Engine.run(engine);
 
+  // Cached once — real elements, read every frame in
+  // updateArchivePlanetCollider() via getBoundingClientRect() rather
+  // than re-queried each time.
+  archivePlanetFloatingArchiveEl = document.getElementById('floating-archive');
+  archivePlanetCanvasHeroEl = document.getElementById('canvas-hero');
+
   windowResized();
+}
+
+// One true circular Matter.js body standing in for the CSS Archive
+// surface — see the H2.8.2 comment block above the variable
+// declarations. isStatic so gravity/collisions never move it directly;
+// only updateArchivePlanetCollider() (called each draw() frame) moves it,
+// via Body.setPosition(). render.visible is false because the visible
+// surface is entirely CSS (.floating-archive::before) — this body only
+// ever needs to be felt by ordinary balls, never seen.
+function initPlanetCollider() {
+  archivePlanetCurrentCenterY = canvasHeight + ARCHIVE_PLANET_RADIUS + 200;
+  archivePlanetNudgedBallIds.clear();
+
+  archivePlanetCollider = Bodies.circle(
+    canvasWidth / 2,
+    archivePlanetCurrentCenterY,
+    ARCHIVE_PLANET_RADIUS,
+    {
+      isStatic: true,
+      label: "archive-planet-collider",
+      friction: 0.005,
+      frictionStatic: 0.005,
+      restitution: 0.04,
+      collisionFilter: {
+        category: ARCHIVE_PLANET_CATEGORY,
+        mask: ARCHIVE_PLANET_MASK
+      },
+      render: {
+        visible: false
+      }
+    }
+  );
+
+  World.add(world, archivePlanetCollider);
+}
+
+// Reads the real, current CSS surface position and moves the collider
+// to match — called once per draw() frame (see draw() below), before
+// Matter's own internal engine tick (Engine.run() ticks the engine on
+// its own schedule, independent of p5's draw() loop, so this only needs
+// to keep the body's position current; it does not call Engine.update()
+// itself). No new listener or animation loop is introduced — this reuses
+// the draw() call that already runs every frame for balls/letters.
+function updateArchivePlanetCollider() {
+  if (!archivePlanetCollider || !archivePlanetFloatingArchiveEl || !archivePlanetCanvasHeroEl) {
+    return;
+  }
+
+  // The world's own y=0 sits wherever #canvas-hero currently renders on
+  // screen (its child #canvas-stage is inset:0 within it) — this is 0
+  // while the Hero is actively stuck to the viewport top, and changes
+  // once it un-sticks. Wrapped defensively: a direct #floating-archive
+  // or #lower-orbit anchor load must never throw here.
+  let heroScreenTop;
+  let archiveScreenTop;
+  try {
+    heroScreenTop = archivePlanetCanvasHeroEl.getBoundingClientRect().top;
+    archiveScreenTop = archivePlanetFloatingArchiveEl.getBoundingClientRect().top;
+  } catch (err) {
+    return;
+  }
+
+  // Preferred method: read the real, resolved (px, not "clamp(...)")
+  // ::before top offset directly from the CSS that actually draws the
+  // surface, so the collider always follows the true rendered curve
+  // rather than a value duplicated/hand-kept in sync in two places.
+  let surfaceTopOffset = 0;
+  try {
+    const pseudoStyle = getComputedStyle(archivePlanetFloatingArchiveEl, "::before");
+    const parsed = parseFloat(pseudoStyle && pseudoStyle.top);
+    if (!isNaN(parsed)) {
+      surfaceTopOffset = parsed;
+    }
+  } catch (err) {
+    // Fallback: treat the surface apex as flush with #floating-archive's
+    // own top edge (surfaceTopOffset stays 0) — a conservative
+    // approximation if getComputedStyle(el, "::before") is ever
+    // unavailable, rather than throwing or leaving the collider stale.
+  }
+
+  const targetApexScreenY = archiveScreenTop + surfaceTopOffset;
+  const targetApexWorldY = (targetApexScreenY - heroScreenTop) / scaleX;
+  const targetCenterY = targetApexWorldY + ARCHIVE_PLANET_RADIUS;
+
+  // Bounded one-step interpolation, not a hard jump: keeps rapid
+  // scrolling (or a resize snapping the target far from the collider's
+  // current position) from moving a static body a huge distance in a
+  // single physics frame, which is what causes resting bodies to
+  // explode/tunnel through a collider.
+  if (archivePlanetCurrentCenterY === null) {
+    archivePlanetCurrentCenterY = targetCenterY;
+  } else {
+    const delta = targetCenterY - archivePlanetCurrentCenterY;
+    const step = Math.max(-ARCHIVE_PLANET_MAX_STEP, Math.min(ARCHIVE_PLANET_MAX_STEP, delta));
+    archivePlanetCurrentCenterY += step;
+  }
+
+  Body.setPosition(archivePlanetCollider, {
+    x: canvasWidth / 2,
+    y: archivePlanetCurrentCenterY
+  });
+}
+
+// H2.8.5R: because the Archive planet collider is so much larger than the
+// canvas, the ground directly under its apex is nearly flat — an ordinary
+// ball landing dead-center has almost no slope to roll down and can stall
+// there indefinitely. This gives each such ball a single, small, one-time
+// sideways nudge (never continuous, never random — direction is decided by
+// which side of center the ball is already on) so it settles off-apex
+// instead of visibly floating in place. Called once per draw() frame, right
+// after updateArchivePlanetCollider() has positioned the collider for this
+// frame. Only iterates `balls` (ordinary Ball instances) — `letters` (IRIS
+// letters) are a separate array and are never touched here.
+const ARCHIVE_PLANET_APEX_HALF_WIDTH = 30; // world units either side of center
+const ARCHIVE_PLANET_STALL_SPEED = 0.05; // world units/frame, "at rest"
+const ARCHIVE_PLANET_APEX_CONTACT_SLACK = 10; // world units of vertical tolerance
+function nudgeStalledBallsFromArchiveApex() {
+  if (!archivePlanetCollider || archivePlanetCurrentCenterY === null) {
+    return;
+  }
+
+  const apexWorldY = archivePlanetCurrentCenterY - ARCHIVE_PLANET_RADIUS;
+  const centerX = canvasWidth / 2;
+
+  for (let i = 0; i < balls.length; i++) {
+    const ball = balls[i];
+    const body = ball.body;
+
+    // removeBody() replaces a recycled ball's .body with a plain
+    // {position} stub (no id/velocity/mass) — skip anything that isn't a
+    // real Matter body still in the world.
+    if (!body || typeof body.id === 'undefined' || !body.velocity) {
+      continue;
+    }
+
+    if (archivePlanetNudgedBallIds.has(body.id)) {
+      continue;
+    }
+
+    const dx = body.position.x - centerX;
+    if (Math.abs(dx) > ARCHIVE_PLANET_APEX_HALF_WIDTH) {
+      continue;
+    }
+
+    // Only balls actually resting on the surface near the apex — not
+    // balls merely passing through this x-range mid-air.
+    const contactY = body.position.y + ball.r;
+    if (Math.abs(contactY - apexWorldY) > ARCHIVE_PLANET_APEX_CONTACT_SLACK) {
+      continue;
+    }
+
+    const speed = Math.hypot(body.velocity.x, body.velocity.y);
+    if (speed > ARCHIVE_PLANET_STALL_SPEED) {
+      continue;
+    }
+
+    // Deterministic, not random: balls left-of-center (or exactly on
+    // center) roll left, balls right-of-center roll right.
+    const direction = dx > 0 ? 1 : -1;
+    const forceMagnitude = body.mass * 0.000015;
+
+    Body.applyForce(body, body.position, {
+      x: direction * forceMagnitude,
+      y: 0
+    });
+
+    archivePlanetNudgedBallIds.add(body.id);
+  }
 }
 
 function initBorder() {
@@ -447,6 +650,7 @@ function windowResized() {
 
   resetMatter();
   initBorder();
+  initPlanetCollider();
   initMenuData();
   // initIRISData() intentionally not called — see the comment above its
   // definition. The falling IrisLetter bodies replace the old fixed,
@@ -466,6 +670,9 @@ function windowResized() {
 
 function draw() {
   if (!simulationActive) return;
+
+  updateArchivePlanetCollider();
+  nudgeStalledBallsFromArchiveApex();
 
   mx = mouseX / scaleX;
   my = mouseY / scaleX;

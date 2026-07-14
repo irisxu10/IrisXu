@@ -10,6 +10,7 @@
   --site-gutter: clamp(16px, 4vw, 60px);   /* 16px matches the header's existing side padding; 60px matches .about-modern's existing side padding */
   --inner-header-height: 80px;             /* matches the existing header .content height */
   --inner-header-height-mobile: 100px;     /* matches the top clearance mdp/*.html detail pages already hardcode inline, so their un-editable inline padding stays sufficient */
+  --archive-surface-color: #f6f1e8;        /* H2.8: homepage-only warm neutral for the rising Archive surface; no existing token was this close to white while still reading as warm */
 }
 
 /* Baseline safety net so no inner-page image or video can force page-wide
@@ -813,6 +814,33 @@ html, body {
   top: 8px;
 }
 
+/* H2.8.1: this rule lives here, on body.home-page itself, and nowhere
+   deeper in the tree. It exists only to clip the few pixels
+   .floating-archive::before's 100vw/-50vw full-bleed trick can
+   overshoot past the scrollbar-adjusted document width in some
+   browsers. It was previously placed on body.home-page .home-main —
+   an ancestor of the sticky #canvas-hero — which broke/destabilized
+   its stickiness (any non-visible overflow on a sticky element's
+   ancestor does this; overflow-x alone also silently computes
+   overflow-y as auto per spec, turning that ancestor into an
+   unintended scroll container).
+   H2.8.2: prefer overflow-x:clip over hidden — clip is spec'd to never
+   establish a new scroll container under any circumstance (hidden
+   still technically creates a scrollable overflow region, it's simply
+   never reachable), which is the stricter guarantee wanted next to a
+   sticky descendant. Falls back to hidden for browsers that don't
+   support clip; both are applied only to the horizontal axis so
+   vertical scrolling is never affected. */
+body.home-page {
+  overflow-x: hidden;
+}
+
+@supports (overflow: clip) {
+  body.home-page {
+    overflow-x: clip;
+  }
+}
+
 body.home-page .home-main {
   flex: 1;
 }
@@ -920,10 +948,19 @@ body.home-page .home-main {
 }
 
 /* Bottom-left: one clean sentence, no keyword bubbles, no badge
-   fragmentation — a short editorial line, not a paragraph block. */
+   fragmentation — a short editorial line, not a paragraph block.
+   H2.8.3: bottom raised from clamp(24px,5vw,64px) to
+   clamp(96px,13vw,160px) — #floating-archive's own rectangular layout
+   box (governed by its margin-top, unaffected by its ::before/::after
+   pseudo-elements' visual curve or radius) was reaching up far enough
+   to overlap this corner even where the curve painted transparent;
+   border-radius only changes what paints, never what's hit-tested, so
+   only moving this element clear of that box's real vertical extent
+   (not adjusting the curve) actually restores full visibility and
+   click-through. */
 .home-perimeter-statement {
   left: clamp(24px, 5vw, 64px);
-  bottom: clamp(24px, 5vw, 64px);
+  bottom: clamp(96px, 13vw, 160px);
   max-width: 24rem;
   font-size: clamp(13px, 1.4vw, 15px);
   line-height: 1.6;
@@ -932,12 +969,14 @@ body.home-page .home-main {
 /* Bottom-right: the existing bubble/capsule navigation, repositioned to
    its own perimeter anchor — unchanged destinations, semantics, and
    interaction, only its position moved from a shared flex row to its
-   own corner to match the other three zones. */
+   own corner to match the other three zones.
+   H2.8.3: bottom raised to match .home-perimeter-statement above, for
+   the same reason — clearing #floating-archive's own layout box. */
 .home-perimeter-navigation {
   position: absolute;
   z-index: 1;
   right: clamp(24px, 5vw, 64px);
-  bottom: clamp(24px, 5vw, 64px);
+  bottom: clamp(96px, 13vw, 160px);
   display: flex;
   align-items: center;
   gap: clamp(12px, 2vw, 20px);
@@ -1037,6 +1076,98 @@ body.home-page .home-main {
 }
 
 /* =========================
+   HOMEPAGE — SHARED HERO / ARCHIVE SURFACE
+   ========================= */
+
+/* Exploratory prototype (H2.8), testing a structurally different
+   handoff from H2.1R/H2.1R.1/H2.1R.2: instead of a long decorative
+   Corridor followed by the Archive, the Hero stays put (sticky) for a
+   short, bounded scroll distance while the Archive's own warm surface
+   rises up and visually covers it — current and next content share the
+   viewport instead of one fully leaving before the other arrives.
+   isolation:isolate gives this wrapper its own stacking context so the
+   sticky Hero (z-index:0) and the Corridor seam (z-index:1) layer
+   correctly against each other without reaching outside this pair. */
+.home-hero-handoff {
+  position: relative;
+  isolation: isolate;
+}
+
+/* Desktop/tablet only (see the mobile and reduced-motion media queries
+   elsewhere in this file, which both reset this back to
+   position:relative). No JavaScript controls this — sticky is a pure
+   CSS behavior, bounded entirely by .home-hero-handoff's own height
+   (Hero's 100vh/100svh plus the short Corridor seam below it), so the
+   Hero naturally stops sticking once that wrapper's bottom edge
+   reaches the viewport top, exactly when the Archive surface has
+   risen enough to take over. */
+#canvas-hero {
+  position: sticky;
+  top: 0;
+  z-index: 0;
+}
+
+/* Two large decorative forms, rendered as the first children of
+   #floating-archive (before .archive-introduction) — see PART 11.
+   Positioned near the surface's own top padding/curve so neither
+   reaches down into the eyebrow/heading/description text below; both
+   are pointer-events:none, aria-hidden, and never receive focus.
+   Reuses the same radial-gradient-to-transparent construction as
+   .home-transition-bubble (existing palette only, no new colors, no
+   texture image). No explicit z-index needed: .archive-introduction's
+   existing z-index:2 already paints above these (z-index:auto)
+   regardless of DOM order. */
+.archive-surface-orb {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.archive-surface-orb--primary {
+  top: -6%;
+  right: -4%;
+  width: clamp(190px, 28vw, 420px);
+  height: clamp(190px, 28vw, 420px);
+  opacity: 0.22;
+  background: radial-gradient(circle, rgb(0, 191, 255) 0%, transparent 72%);
+}
+
+.archive-surface-orb--secondary {
+  top: 5%;
+  left: 6%;
+  width: clamp(72px, 10vw, 150px);
+  height: clamp(72px, 10vw, 150px);
+  opacity: 0.3;
+  background: radial-gradient(circle, rgb(255, 99, 71) 0%, transparent 72%);
+}
+
+@media (max-width: 767px) {
+  .archive-surface-orb--primary {
+    width: clamp(120px, 40vw, 220px);
+    height: clamp(120px, 40vw, 220px);
+    top: -4%;
+    right: -8%;
+  }
+
+  .archive-surface-orb--secondary {
+    width: clamp(56px, 18vw, 90px);
+    height: clamp(56px, 18vw, 90px);
+  }
+}
+
+/* Explicit stacking safety for PART 12: both are already static,
+   non-positioned normal-flow content that follows the orbs in DOM
+   order, so they already paint above the (position:absolute, z-index:
+   auto) orbs by default — this only makes that guarantee explicit and
+   robust against future changes, rather than relying on implicit
+   paint-order rules. */
+#archive-site-navigation,
+#project-archive-root {
+  position: relative;
+  z-index: 1;
+}
+
+/* =========================
    HOMEPAGE — CONTINUOUS SCROLL CORRIDOR
    ========================= */
 
@@ -1059,14 +1190,21 @@ body.home-page .home-main {
    own padding or the bubble data, was by far the dominant contributor
    to the excessive gap before real Archive content (roughly 600-800px
    of the previous height vs. ~48px of Archive top padding). The -9vh
-   overlap is unchanged; only the corridor's own length shrinks. */
+   overlap is unchanged; only the corridor's own length shrinks.
+   H2.8: height compressed again, from clamp(420px, 58vh, 600px) to
+   clamp(110px, 16vh, 170px) — the corridor is no longer a waiting
+   section in its own right, just a short shared seam between the now-
+   sticky Hero (see .home-hero-handoff below) and the rising Archive
+   surface; background is explicit transparent so the sticky Hero
+   underneath shows through it. */
 .home-transition-corridor {
   position: relative;
   z-index: 1;
-  height: clamp(420px, 58vh, 600px);
+  height: clamp(110px, 16vh, 170px);
   margin-top: -9vh;
   overflow: hidden;
   pointer-events: none;
+  background: transparent;
 }
 
 .home-transition-visual {
@@ -1092,19 +1230,33 @@ body.home-page .home-main {
 /* Mobile and reduced-motion: the hero above collapses to its static,
    content-height fallback (see the shared breakpoint further down), so
    the overlap trick is reset to avoid pulling the corridor up into the
-   now-much-shorter identity stack. Fewer bubbles, shorter corridor. */
+   now-much-shorter identity stack. Fewer bubbles, shorter corridor.
+   H2.8: height compressed again (clamp(260px,38vh,340px) →
+   clamp(72px,10vh,108px)) to match the much shorter desktop seam, and
+   the visible-bubble cutoff tightened from n+7 (was n+20) — the tiny
+   mobile seam can only hold the six bridge bubbles legibly; anything
+   past them would read as clutter rather than atmosphere. */
 @media (max-width: 767px), (prefers-reduced-motion: reduce) {
   .home-transition-corridor {
-    height: clamp(260px, 38vh, 340px);
+    height: clamp(72px, 10vh, 108px);
     margin-top: 0;
   }
 
-  /* n+20, not n+14: H2.1R prepended 6 new bridge bubbles to
-     TRANSITION_BUBBLES, shifting every later bubble's nth-child index
-     by +6 — this keeps the exact same mobile cutoff point (all bridge
-     bubbles, all of the original hero-boundary group, and the first 3
-     of the dissolving-stage group) rather than silently showing less. */
-  .home-transition-bubble:nth-child(n + 20) {
+  .home-transition-bubble:nth-child(n + 7) {
+    display: none;
+  }
+}
+
+/* H2.8: desktop/tablet visible-bubble cutoff for the short shared seam.
+   All 32 entries still render (home.js/H2.3 are untouched) — this only
+   hides the later ones so the seam reads as "a little atmosphere
+   crossing the boundary" rather than the full long-corridor field
+   compressed into ~150px. Keeps the 6 bridge bubbles plus the next 6
+   (the rest of the original hero-boundary group); the dissolving and
+   archive-approach groups (which the short seam has no room for
+   anyway) are hidden here, not deleted. */
+@media (min-width: 768px) and (prefers-reduced-motion: no-preference) {
+  .home-transition-bubble:nth-child(n + 13) {
     display: none;
   }
 }
@@ -1155,25 +1307,107 @@ body.home-page .home-main {
   filter: blur(0.55px);
 }
 
-/* Archive content handoff (H2.1R.2)
-   Real document-flow overlap, not a transform: the Archive stays a
-   normal in-flow section (no position:absolute, no translateY on the
-   whole block), it just begins before the decorative Corridor's own
-   box visually ends. z-index:2 keeps it above the Corridor's bubbles
-   (z-index:1) wherever the two now overlap. The negative margin lands
-   the Archive's top edge at roughly corridor-y:69-70% at every
-   representative viewport height (900/800/700px) — right at the seam
-   between the "dissolving" stage (ends y:62) and "archive approach"
-   stage (starts y:70), comfortably clear of the bridge stage above
-   (y:-2 to 28) and the hero's own perimeter corners. */
+/* Archive as a rising surface (H2.8)
+   Superseding H2.1R.2's overlap model, sized for the old long Corridor
+   (clamp(-180px,-18vh,-120px)): that value is fully replaced, not
+   stacked on top of, since the Corridor is now a short shared seam.
+   .floating-archive itself is still a real in-flow, semantic section —
+   no position:absolute, no whole-block transform. Its own max-width
+   still centers the *content* (unchanged from H2.1R.2, so
+   .archive-introduction/.archive-site-navigation/#project-archive-root
+   keep their existing horizontal position); the surface background and
+   curved top edge instead live on a ::before sized to the full
+   viewport width via the standard "100vw / -50vw" full-bleed technique,
+   so the surface itself never reads as a centered panel with its own
+   side margins. */
+/* H2.8.4: top padding reduced from clamp(130px,14vw,210px) to
+   clamp(64px,8vw,112px) — margin-top (the box's own position) is
+   unchanged; only the empty space between the box's top edge and the
+   actual .archive-introduction content shrinks, so the eyebrow/heading
+   land inside the same shared viewport as the still-partially-visible
+   Hero instead of arriving only after further scrolling past a mostly
+   empty planet surface. */
 .floating-archive {
   position: relative;
-  z-index: 2;
+  z-index: 3;
   max-width: min(72rem, 92vw);
   margin: 0 auto;
-  margin-top: clamp(-180px, -18vh, -120px);
-  padding: clamp(16px, 3vw, 32px) 0 clamp(32px, 5vw, 56px);
+  margin-top: clamp(-110px, -12vh, -72px);
+  padding: clamp(64px, 8vw, 112px) 0 clamp(32px, 5vw, 56px);
   color: rgb(66, 34, 10);
+}
+
+/* H2.8.2: raised from top:0 and the curve deepened from
+   clamp(90px,12vw,180px) to clamp(210px,27vw,360px) — the surface
+   itself rises further (reads as a planet/sunrise apex) while
+   .floating-archive's own margin-top/padding-top (the Archive content's
+   actual position) are untouched, so the title/projects don't get
+   pulled upward just to make the curve taller. sketch.js reads this
+   same top value at runtime (via getComputedStyle(el, "::before").top)
+   to place the matching Matter.js collider — see initPlanetCollider()/
+   updateArchivePlanetCollider(). */
+/* H2.8.3: top trimmed modestly (-160/-15vh/-100 → -130/-12vh/-80) and
+   radius increased (210-360 → 240-400) — border-radius only rounds the
+   corners away from the box's own top edge (the true apex height is
+   always exactly `top`, unaffected by radius; a larger radius only
+   makes the shoulders near the far left/right recede further down,
+   i.e. `top + radius` there), so this keeps a comparably high center
+   apex while giving the curve a visibly softer, wider silhouette.
+   opacity:0.94 is the "slightly translucent, less solid-block" pass —
+   .floating-archive::after below adds the separate soft atmospheric
+   rim; sketch.js's collider sync is untouched, since it reads this
+   rule's own `top` (the true supporting arc), not the rim's. */
+/* H2.8.5R: top raised from clamp(-130px,-12vh,-80px) to
+   clamp(-160px,-14.5vh,-104px) — a ~20-26px lift covering the three
+   remaining white gaps Iris found, without touching the curve model
+   (radius/border-radius unchanged) or Archive's own margin/padding.
+   sketch.js's collider sync reads this same resolved `top` via
+   getComputedStyle unchanged — the target apex simply rises with it,
+   automatically, with zero code change on that side. */
+.floating-archive::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  width: 100vw;
+  margin-left: -50vw;
+  top: clamp(-160px, -14.5vh, -104px);
+  bottom: 0;
+  background: var(--archive-surface-color);
+  opacity: 0.94;
+  border-radius: 50% 50% 0 0 / clamp(240px, 30vw, 400px) clamp(240px, 30vw, 400px) 0 0;
+  pointer-events: none;
+}
+
+/* Soft atmospheric rim — a second, separate pseudo-element (not a
+   modification of ::before, which the physics collider reads) sitting
+   slightly above/around the base surface's own edge: a blurred,
+   fading-to-transparent white band, bounded to a fixed height (not the
+   full box) so only the upper "horizon" area gets the atmospheric
+   treatment rather than washing the whole surface in fog. Matches
+   ::before's silhouette so the two read as one unified planet. */
+/* H2.8.4: height trimmed from clamp(140px,16vw,240px) to
+   clamp(120px,13vw,200px) — top and blur are unchanged, but with
+   .floating-archive's own padding-top now reduced (see above), the
+   rim's fade-to-transparent zone was landing within a few px of where
+   .archive-introduction now begins; shortening its reach (per PART 6's
+   own preferred remedy) restores a comfortable gap without moving the
+   heading back down. */
+/* H2.8.5R: top raised in step with ::before (clamp(-150px,-13.5vh,-92px)
+   → clamp(-180px,-16vh,-122px)) — keeps the rim ~12-20px above the base
+   arc's new position, same as before the lift; height/gradient/opacity/
+   blur all unchanged, so it stays exactly as soft as it already was. */
+.floating-archive::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  width: 100vw;
+  margin-left: -50vw;
+  top: clamp(-180px, -16vh, -122px);
+  height: clamp(120px, 13vw, 200px);
+  background: linear-gradient(to bottom, rgba(255, 255, 255, 0.5) 0%, rgba(255, 255, 255, 0) 100%);
+  border-radius: 50% 50% 0 0 / clamp(240px, 30vw, 400px) clamp(240px, 30vw, 400px) 0 0;
+  filter: blur(16px);
+  pointer-events: none;
 }
 
 /* Project ecosystem emergence
@@ -1606,15 +1840,51 @@ html {
     min-height: auto;
   }
 
-  /* Mobile content handoff (H2.1R.2): a smaller overlap than desktop
-     since the mobile corridor itself is shorter and doesn't overlap
-     the hero (margin-top:0 above) — this only pulls the Archive up
-     into the corridor's own tail, not into the stacked identity
-     content, which sits well above with its own normal-flow spacing. */
+  /* H2.8: sticky is desktop/tablet only — mobile's Hero already
+     collapses to a short, static content-height stack above (see
+     .canvas-hero { min-height: auto } just above), so there is no long
+     scroll distance for a sticky Hero to meaningfully bridge, and
+     sticky-positioning a variable-height stacked layout is exactly the
+     kind of fragile behavior this prototype avoids on mobile. */
+  #canvas-hero {
+    position: relative;
+    top: auto;
+  }
+
+  /* Mobile content handoff (H2.8) — replaces the old H2.1R.2 mobile
+     values (clamp(-88px,-10vh,-56px) / clamp(16px,4vw,24px)), sized
+     for the old long corridor; not stacked on top of them. Smaller
+     overlap and top padding than desktop, and a much flatter curved
+     edge (see .floating-archive::before below) sized for narrow
+     screens. Bottom padding is unchanged from H2.1R.2.
+     H2.8.4: padding-top reduced further (92-140px → 64-96px), matching
+     the desktop content-landing change — mobile's Hero already uses a
+     static stacked layout (not sticky), so this is purely about the
+     eyebrow/heading arriving sooner, not a shared-viewport concern. */
   .floating-archive {
-    margin-top: clamp(-88px, -10vh, -56px);
-    padding-top: clamp(16px, 4vw, 24px);
+    margin-top: clamp(-64px, -8vh, -40px);
+    padding-top: clamp(64px, 16vw, 96px);
     padding-bottom: 40px;
+  }
+
+  /* H2.8.2/H2.8.3: mobile surface raised/deepened and softened
+     proportionally to the desktop change, but far more modestly (no
+     physics collider exists on mobile — the p5/Matter scene never
+     initializes below this width — this is a visual-only adjustment).
+     Mobile's Hero already uses a static, stacked identity layout (not
+     absolute corner positioning), so there is no shoulder-clearance
+     concern here the way there is on desktop/tablet. */
+  .floating-archive::before {
+    top: clamp(-84px, -9vh, -52px);
+    opacity: 0.94;
+    border-radius: 50% 50% 0 0 / clamp(100px, 24vw, 160px) clamp(100px, 24vw, 160px) 0 0;
+  }
+
+  .floating-archive::after {
+    top: clamp(-96px, -10vh, -60px);
+    height: clamp(64px, 12vw, 110px);
+    border-radius: 50% 50% 0 0 / clamp(100px, 24vw, 160px) clamp(100px, 24vw, 160px) 0 0;
+    filter: blur(10px);
   }
 }
 
@@ -1632,6 +1902,17 @@ html {
 
   .canvas-hero {
     min-height: auto;
+  }
+
+  /* H2.8: sticky is the one piece of motion in this handoff — disabled
+     under reduced motion so the Hero simply sits in normal document
+     flow above the (already static, per H2.3's own reduced-motion
+     handling) Corridor and the Archive surface below it. Everything
+     else — the surface, its curved edge, the two orbs, all Archive
+     content — is already static regardless of this rule. */
+  #canvas-hero {
+    position: relative;
+    top: auto;
   }
 }
 
@@ -1884,10 +2165,28 @@ html {
    Contact is the Lower Orbit's own email action — the Footer needs a
    little more separation from it than it did when the gap above was
    still doing most of the work. */
+/* H2.8.1: compacted from the shared .site-footer's own
+   margin-top: clamp(48px,8vw,96px) and padding: clamp(32px,5vw,48px) 0
+   — the homepage Footer inherited the full shared padding, making it
+   read as tall/dominant as its own section rather than a final ground
+   line. Homepage-scoped only; the shared rule below (and every inner
+   page) is untouched. */
 body.home-page .site-footer {
-  margin-top: clamp(16px, 3vw, 32px);
+  margin-top: clamp(8px, 1.5vw, 18px);
+  padding-top: clamp(18px, 2.5vw, 28px);
+  padding-bottom: clamp(18px, 2.5vw, 28px);
+  min-height: 0;
   border-top: none;
   color: rgb(66, 34, 10);
+}
+
+/* Shared .site-footer-inner uses gap: 24px 40px (row column) — the
+   24px row-gap only matters once the flex row wraps (mobile/narrow
+   widths), and reads as excessive alongside the now-compact vertical
+   padding above. Column gap (40px, horizontal spacing between
+   identity/contact/credit) is unchanged. */
+body.home-page .site-footer-inner {
+  gap: clamp(12px, 2vw, 20px) 40px;
 }
 
 body.home-page .site-footer-navigation {

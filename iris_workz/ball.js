@@ -4,7 +4,18 @@ class Ball {
     this.y = y;
     const options = {
       friction: 0.5,
-      restitution: 0.8
+      restitution: 0.8,
+      // H2.8.2: category 0x0002 identifies ordinary balls so the new
+      // Archive planet collider (sketch.js) can target them specifically
+      // via its own mask, without ever matching IRIS letters or the
+      // static boundary/menu bodies (all still the Matter.js default
+      // category 0x0001). mask stays at the default 0xFFFFFFFF (match
+      // everything) so every existing ball-to-ball, ball-to-letter, and
+      // ball-to-wall collision is completely unaffected.
+      collisionFilter: {
+        category: 0x0002,
+        mask: 0xFFFFFFFF
+      }
     };
     this.r = int(random(10, 30));
     this.body = Bodies.circle(x, y, this.r, options);
