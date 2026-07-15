@@ -966,6 +966,68 @@ body.home-page .home-main {
   line-height: 1.6;
 }
 
+/* Decorative-only duplicate of .home-perimeter-statement — aria-hidden in
+   markup, and hidden by default here (only shown by the media query
+   below). Sits in the same corner the plain sentence used, sized to hold
+   a short rising curve rather than a flowed text block.
+   H2.9.1: this base rule must appear before the desktop media query
+   below — both selectors share equal specificity, so whichever comes
+   later in source order wins regardless of which viewport/motion state
+   is active. This rule previously came after the media query, so its
+   display:none always beat the media query's display:block. */
+.home-perimeter-statement-curve {
+  display: none;
+  position: absolute;
+  z-index: 1;
+  left: clamp(24px, 5vw, 64px);
+  bottom: clamp(96px, 13vw, 160px);
+  width: clamp(260px, 30vw, 380px);
+  height: clamp(80px, 8vw, 120px);
+  pointer-events: none;
+}
+
+.home-perimeter-curve-text {
+  font-family: 'Helvetica Neue', sans-serif;
+  font-weight: 600;
+  font-size: clamp(13px, 1.6vw, 17px);
+  letter-spacing: -0.005em;
+}
+
+/* Word-group colors — same palette as the Canvas bubbles (sketch.js's
+   colors[] array / the existing .color-1..10 classes), applied via fill
+   since these are SVG text nodes rather than HTML. Grouped by short
+   phrase rather than per-letter, per the design direction. */
+.home-curve-color-1 { fill: rgb(0, 191, 255); }   /* soft blue */
+.home-curve-color-2 { fill: rgb(34, 139, 34); }   /* green */
+.home-curve-color-3 { fill: rgb(255, 215, 0); }   /* yellow */
+.home-curve-color-4 { fill: rgb(255, 140, 0); }   /* orange */
+.home-curve-color-5 { fill: rgb(255, 182, 193); } /* soft pink */
+.home-curve-color-6 { fill: rgb(139, 69, 19); }   /* brown */
+
+/* Bottom-left, desktop-with-motion only: the plain sentence above stays
+   in the DOM (screen readers still read it) but is visually replaced by
+   the colorful curved SVG version above — same clip-rect technique as
+   .visually-hidden, scoped here instead of applied in markup so mobile
+   and reduced-motion (which never match this query) keep the existing
+   plain/stacked rendering with zero changes to that fallback. */
+@media (min-width: 768px) and (prefers-reduced-motion: no-preference) {
+  .home-perimeter-statement {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  .home-perimeter-statement-curve {
+    display: block;
+  }
+}
+
 /* Bottom-right: the existing bubble/capsule navigation, repositioned to
    its own perimeter anchor — unchanged destinations, semantics, and
    interaction, only its position moved from a shared flex row to its
