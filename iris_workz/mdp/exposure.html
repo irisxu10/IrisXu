@@ -3,88 +3,22 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Long Exposure Portrait</title>
+  <title>IrisXu_The Sofa and I</title>
   <link rel="stylesheet" href="../style.css" />
-  <style>
-    body {
-      background-color: #faf8f9;
-      font-family: 'Urbanist', sans-serif;
-    }
-
-    .long-section {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 60px 20px;
-      padding-top: 100px;
-    }
-
-    .long-row-1 {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: flex-start;
-      gap: 40px;
-      margin-bottom: 60px;
-    }
-
-    .long-row-1 img {
-      max-width: 400px;
-      width: 100%;
-      height: auto;
-      border-radius: 12px;
-      flex: 1;
-    }
-
-    .long-text {
-      flex: 1;
-      min-width: 300px;
-      color: #3f2b4c;
-    }
-
-    .long-text h1 {
-      font-size: 28px;
-      margin-bottom: 16px;
-    }
-
-    .long-text p {
-      font-size: 16px;
-      line-height: 1.7;
-      margin-bottom: 12px;
-    }
-
-    .long-image-full {
-      display: block;
-      margin: 40px auto;
-      max-width: 90%;
-      height: auto;
-      border-radius: 8px;
-    }
-
-    .image-row-2 {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 40px;
-      margin-top: 40px;
-    }
-
-    .image-row-2 img {
-      max-width: 45%;
-      width: 100%;
-      height: auto;
-      border-radius: 10px;
-    }
-  </style>
 </head>
 
-<body>
+<body class="project-detail-page" data-project-accent="exposure">
   <header></header>
 
-  <main class="long-section">
-    <!-- 第一排：图 + 文 -->
-    <div class="long-row-1">
-      <img src="../assets/S0.jpg" alt="Long Exposure Intro Image" />
-      <div class="long-text">
-        <h1>Long Exposure Portrait</h1>
+  <main class="project-detail-main">
+
+    <a class="project-detail-back" href="../index.html#floating-archive">&larr; Back to Archive</a>
+
+    <section class="project-detail-hero">
+      <p class="project-detail-kicker">2025</p>
+      <h1 class="project-detail-title">The Sofa and I</h1>
+      <p class="project-detail-subtitle">Long Exposure Portrait</p>
+      <div class="project-detail-summary">
         <p>
           This portrait series was created through numerous experiments with long exposure techniques. I began by researching how camera exposure works — the relationship between shutter speed, aperture, and ISO. Understanding these foundations helped me control the way motion appears in the frame.
         </p>
@@ -95,21 +29,55 @@
           After many iterations, I found a visual language that felt right to me: expressive, temporal, and slightly surreal — a reflection of memory in motion. The resulting images are not just portraits, but traces of embodied time.
         </p>
       </div>
-    </div>
+      <figure class="project-detail-figure project-detail-figure--hero">
+        <img src="../assets/S0.jpg" alt="Long-exposure self-portrait on a sofa: glowing light trails weave across the frame, with a translucent figure and faint layered head shapes on the wall behind" />
+      </figure>
+    </section>
 
-    <!-- 第二排单张图 S1 -->
-    <img class="long-image-full" src="../assets/S1.jpg" alt="Long Exposure Image S1" />
+    <section class="project-detail-chapter" aria-labelledby="sofa-chapter-study">
+      <h2 id="sofa-chapter-study">Long Exposure Study</h2>
+      <figure class="project-detail-figure project-detail-figure--wide">
+        <img src="../assets/S1.jpg" alt="Research and process board on long-exposure photography: an exposure-triangle reference guide, notes on light trails and disappearing motion, and a sequence of test shots at a desk and on the sofa recording shutter speed, aperture, and ISO settings, ending with notes on a manual two-stage &ldquo;dark then lit&rdquo; exposure technique" />
+      </figure>
+    </section>
 
-    <!-- 后排两张一行 S2 - S6 -->
-    <div class="image-row-2">
-      <img src="../assets/S2.jpg" alt="Long Exposure Image S2" />
-      <img src="../assets/S3.jpg" alt="Long Exposure Image S3" />
-      <img src="../assets/S4.jpg" alt="Long Exposure Image S4" />
-      <img src="../assets/S5.jpg" alt="Long Exposure Image S5" />
-      <img src="../assets/S6.jpg" alt="Long Exposure Image S6" />
-    </div>
+    <section class="project-detail-chapter" aria-labelledby="sofa-chapter-series">
+      <h2 id="sofa-chapter-series">The Series</h2>
+
+      <figure class="project-detail-figure project-detail-figure--wide">
+        <img src="../assets/S2.jpg" alt="Long-exposure self-portrait of a figure reading on the sofa under a blanket, with bright looping light trails crossing the frame" />
+      </figure>
+
+      <div class="project-detail-item">
+        <div class="project-detail-media-grid project-detail-media-grid--pair">
+          <figure class="project-detail-figure">
+            <img src="../assets/S3.jpg" alt="Long-exposure self-portrait with the figure's face held still and visible through the blur, hand near the chin, as light trails arc around the head and shoulders" />
+          </figure>
+          <figure class="project-detail-figure">
+            <img src="../assets/S4.jpg" alt="Long-exposure self-portrait with tangled light trails over the sofa and a single faint head shadow layered on the wall behind" />
+          </figure>
+        </div>
+      </div>
+
+      <figure class="project-detail-figure project-detail-figure--wide">
+        <img src="../assets/S5.jpg" alt="Long-exposure self-portrait with two overlapping head silhouettes on the wall and light trails looping across the sofa" />
+      </figure>
+
+      <figure class="project-detail-figure project-detail-figure--wide">
+        <img src="../assets/S6.jpg" alt="Long-exposure self-portrait with three overlapping translucent figures reading on the sofa, layered without light trails, quieter than the rest of the series" />
+      </figure>
+    </section>
+
+    <p class="project-detail-ending">
+      <a href="../index.html#floating-archive">&larr; Back to the Floating Archive</a>
+    </p>
+
   </main>
 
+  <footer class="site-footer" data-site-footer></footer>
+
+  <script src="../nav-data.js"></script>
+  <script src="../footer.js"></script>
   <script src="../header.js"></script>
 </body>
 </html>

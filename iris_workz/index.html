@@ -20,27 +20,100 @@
     }
   </style>
   <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>IRIS</title>
 
 </head>
 
-<body>
-    <div class="page-wrapper">
-  <main>
-  </main>
-  <script src="ball.js"></script>
-  <script src="sketch.js"></script>
+<body class="home-page">
+  <a class="skip-link" href="#floating-archive">Skip to project archive</a>
+
+  <main id="main-content" class="home-main home-scroll-world">
+
+    <div class="home-hero-handoff">
+      <section id="canvas-hero" class="canvas-hero" aria-labelledby="home-identity-title">
+        <div id="canvas-stage" class="canvas-stage" aria-hidden="true"></div>
+
+        <div class="home-identity-layer">
+          <h1 id="home-identity-title" class="home-perimeter-name">Iris Xiaomeng Xu</h1>
+
+          <p class="home-perimeter-role">Interaction Designer / Creative Technologist</p>
+
+          <p class="home-perimeter-statement">A floating archive of projects, experiments, and speculative ideas.</p>
+
+          <div class="home-perimeter-statement-curve" aria-hidden="true">
+            <svg viewBox="0 0 380 120" width="100%" height="100%" preserveAspectRatio="xMinYMax meet">
+              <path id="home-statement-curve-path" d="M 0 100 Q 150 10 380 35" fill="none" stroke="none" />
+              <text class="home-perimeter-curve-text" xml:space="preserve">
+                <textPath href="#home-statement-curve-path" xlink:href="#home-statement-curve-path" startOffset="0"><tspan class="home-curve-color-1">A floating </tspan><tspan class="home-curve-color-2">archive of </tspan><tspan class="home-curve-color-3">projects, </tspan><tspan class="home-curve-color-4">experiments, </tspan><tspan class="home-curve-color-5">and speculative </tspan><tspan class="home-curve-color-6">ideas.</tspan></textPath>
+              </text>
+            </svg>
+          </div>
+
+          <nav id="home-primary-bubbles" class="home-perimeter-navigation" aria-label="Primary"></nav>
+        </div>
+      </section>
+
+      <div class="home-transition-corridor" aria-hidden="true">
+        <div id="home-transition-bubbles" class="home-transition-visual"></div>
+      </div>
     </div>
 
-<footer class="main-footer">
-    <p>Designed & Built by Iris Xiaomeng Xu</p>
-    <p>
-      <a href="mailto:iris000414@gmail.com">iris000414@gmail.com</a> |
-      <a href="https://www.instagram.com/irisxu_workz?igsh=NTc4MTIwNjQ2YQ%3D%3D&utm_source=qr" target="_blank">Instagram</a>
-    </p>
-  </footer>
+    <section id="floating-archive" class="floating-archive" aria-labelledby="archive-title">
+      <span class="archive-surface-orb archive-surface-orb--primary" aria-hidden="true"></span>
+      <span class="archive-surface-orb archive-surface-orb--secondary" aria-hidden="true"></span>
 
+      <div class="archive-introduction">
+        <p class="archive-eyebrow">Iris Xiaomeng Xu</p>
+        <h2 id="archive-title">Floating Archive</h2>
+        <p class="archive-description">Projects are connected through overlapping ways of thinking, rather than fixed disciplines.</p>
+      </div>
 
+      <nav id="archive-site-navigation" class="archive-site-navigation" aria-label="Site"></nav>
+
+      <div id="project-archive-root" class="project-archive-root"></div>
+    </section>
+
+    <section id="lower-orbit" class="lower-orbit" aria-labelledby="lower-orbit-title">
+      <h2 id="lower-orbit-title" class="visually-hidden">More from Iris</h2>
+
+      <ul class="lower-orbit-list">
+        <li class="lower-orbit-item lower-orbit-item--about">
+          <a class="lower-orbit-link" href="about.html">
+            <span class="lower-orbit-index" aria-hidden="true">01</span>
+            <span class="lower-orbit-label">About</span>
+            <span class="lower-orbit-hint">Designer, artist, and creative technologist.</span>
+          </a>
+        </li>
+
+        <li class="lower-orbit-item lower-orbit-item--writings">
+          <a class="lower-orbit-link" href="writings.html">
+            <span class="lower-orbit-index" aria-hidden="true">02</span>
+            <span class="lower-orbit-label">Writings</span>
+          </a>
+        </li>
+
+        <li class="lower-orbit-item lower-orbit-item--contact">
+          <a class="lower-orbit-link" href="mailto:iris000414@gmail.com">
+            <span class="lower-orbit-index" aria-hidden="true">03</span>
+            <span class="lower-orbit-label">Contact</span>
+            <span class="lower-orbit-hint">iris000414@gmail.com</span>
+          </a>
+        </li>
+      </ul>
+    </section>
+
+  </main>
+
+  <footer class="site-footer" data-site-footer></footer>
+
+  <script src="project-data.js"></script>
+  <script src="nav-data.js"></script>
+  <script src="footer.js"></script>
+  <script src="home.js"></script>
+  <script src="ball.js"></script>
+  <script src="iris-letter.js"></script>
+  <script src="sketch.js"></script>
 </body>
 
 </html>

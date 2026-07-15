@@ -6,95 +6,19 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>IrisXu_ArtQuest at Getty</title>
   <link rel="stylesheet" href="../style.css">
-<style>
-
-
-    body {
-      font-family: "Arial", sans-serif;
-      background-color: #fafafa;
-      margin: 0;
-      padding: 0;
-    }
-
-    .artquest-container {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 40px 20px;
-      padding-top: 100px;
-    }
-
-    .intro-row {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      gap: 40px;
-      margin-bottom: 60px;
-    }
-
-    .intro-row img {
-      max-width: 500px;
-      width: 100%;
-      height: auto;
-      border-radius: 10px;
-    }
-
-    .intro-text {
-      flex: 1;
-      min-width: 280px;
-      color: #522a03;
-    }
-
-    .intro-text h1 {
-      font-size: 28px;
-      margin-bottom: 16px;
-      color: #522a03;
-    }
-
-    .intro-text p {
-      font-size: 16px;
-      line-height: 1.7;
-      margin-bottom: 12px;
-    }
-
-    .image-row {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 20px;
-      margin-bottom: 40px;
-    }
-
-    .image-row img {
-      max-width: 100%;
-      width: 100%;
-      max-width: 360px;
-      border-radius: 6px;
-    }
-
-    @media (max-width: 768px) {
-      .intro-row {
-        flex-direction: column;
-      }
-
-      .image-row img {
-        max-width: 90%;
-      }
-    }
-  </style>
 </head>
 
-<body>
-
+<body class="project-detail-page" data-project-accent="getty">
   <header></header>
 
+  <main class="project-detail-main">
 
-  <main class="artquest-container">
+    <a class="project-detail-back" href="../index.html#floating-archive">&larr; Back to Archive</a>
 
-    <!-- 第一行：图 + 描述 -->
-    <div class="intro-row">
-      <img src="../assets/Q.png" alt="ArtQuest Overview Image" />
-      <div class="intro-text">
-        <h1>ArtQuest at Getty</h1>
+    <section class="project-detail-hero">
+      <p class="project-detail-kicker">2024</p>
+      <h1 class="project-detail-title">ArtQuest at Getty</h1>
+      <div class="project-detail-summary">
         <p>
           The journey of ArtQuest began with on-site observation. First, we each chose a location within the Getty Museum and explored it freely, noting what caught our attention. In the second visit, we selected three points of interest and dove deeper into observing their visual and contextual details. In the third visit, we focused on just one of these points and carried out experimental actions or interactions based on it.
         </p>
@@ -104,42 +28,97 @@
         <p>
           This project eventually evolved into a game-based card system designed to enhance museum experiences.
         </p>
-
-        <h1>Game Modes & Rules</h1>
-        <p>
-          The ArtQuest card system includes two main modes:
-        </p>
-        <p>
-          <strong>1. Task & Challenge:</strong> Players physically navigate the Getty Museum with task cards in hand. Each card presents a challenge — for example, finding an artwork that meets specific criteria. Successfully completing tasks earns points. This mode encourages deeper, more meaningful engagement with the museum's diverse collection.
-        </p>
-        <p>
-          <strong>2. Matching & Competing:</strong> In this multi-player mode, players do not need to be on-site. Each player draws a set of artwork cards and tries to match them with a set of public objective cards using logic, intuition, or narrative reasoning. Players score based on the creativity and relevance of their matches, encouraging open interpretation, discussion, and playful competition while learning about art.
-        </p>
       </div>
-    </div>
+      <figure class="project-detail-figure project-detail-figure--hero">
+        <img src="../assets/Q.png" alt="ArtQuest at Getty poster titled &ldquo;Discover, Connect, and Play with Art at the Getty,&rdquo; Fall 2024, showing a visitor at the Getty Museum photographing a painting while holding a set of task cards" />
+      </figure>
+    </section>
 
-    <!--  Q1 - Q4 -->
-    <div class="image-row">
-      <img src="../assets/Q1.jpg" alt="Observation Image 1" style="max-width: 90%; display: block; margin: 20px auto;" />
-      <img src="../assets/Q2.jpg" alt="Observation Image 2" style="max-width: 90%; display: block; margin: 20px auto;" />
-      <img src="../assets/Q3.jpg" alt="Observation Image 3" style="max-width: 90%; display: block; margin: 20px auto;" />
-      <img src="../assets/Q4.jpg" alt="Observation Image 4" style="max-width: 90%; display: block; margin: 20px auto;" />
-    </div>
+    <section class="project-detail-chapter" aria-labelledby="artquest-chapter-exploration">
+      <h2 id="artquest-chapter-exploration">Museum Exploration</h2>
 
-    <!-- Q5 和 Q6 -->
-    <div class="image-row" style="align-items: flex-start;">
-      <img src="../assets/Q5.jpg" alt="Observation Image 5" style="height: 320px; width: auto; border-radius: 6px;" />
-      <img src="../assets/Q6.jpg" alt="Observation Image 6" style="height: 320px; width: auto; border-radius: 6px;" />
-    </div>
+      <div class="project-detail-item">
+        <h3 class="project-detail-item-label">First Visit: Open Observation</h3>
+        <figure class="project-detail-figure project-detail-figure--wide">
+          <img src="../assets/Q1.jpg" alt="Observation research board tracing a visitor's full arrival journey at the Getty Museum — parking, tram, entrance, information center, and outdoor rest areas — annotated with notes on person-to-person and person-technology interactions" />
+        </figure>
+      </div>
 
+      <div class="project-detail-item">
+        <h3 class="project-detail-item-label">Second Visit: Three Physical Interactions</h3>
+        <figure class="project-detail-figure project-detail-figure--wide">
+          <img src="../assets/Q2.jpg" alt="Research board titled &ldquo;Analysis of 3 PHYSICAL interactions,&rdquo; documenting close observation of visitors pointing at artworks, picking up map guides at the information center, and using sunshade umbrellas outdoors" />
+        </figure>
+      </div>
 
+      <div class="project-detail-item">
+        <h3 class="project-detail-item-label">Third Visit: Deep-Dive and Redesign</h3>
+        <figure class="project-detail-figure project-detail-figure--wide">
+          <img src="../assets/Q3.jpg" alt="Research board documenting a single interaction — a visitor asking museum staff for directions — through an experience flowchart, three on-site experiments, reflection questions, and redesign intervention plans" />
+        </figure>
+      </div>
+    </section>
 
+    <section class="project-detail-chapter" aria-labelledby="artquest-chapter-ideas">
+      <h2 id="artquest-chapter-ideas">Ideas and Proposal</h2>
+      <figure class="project-detail-figure project-detail-figure--wide">
+        <img src="../assets/Q4.jpg" alt="Ideation board titled &ldquo;Non-Verbal Communication of Issues at the Information Center&rdquo; and &ldquo;Ideas and Proposal,&rdquo; presenting five candidate concepts — a gesture guide poster, a paper bird surprise box, mini info cards, an interactive table map, and an AR navigation app — alongside early card design sketches" />
+      </figure>
+    </section>
 
+    <section class="project-detail-chapter" aria-labelledby="artquest-chapter-rules">
+      <h2 id="artquest-chapter-rules">Game Modes &amp; Rules</h2>
+      <div class="project-detail-summary">
+        <p>The ArtQuest card system includes two main modes:</p>
+      </div>
 
+      <div class="project-detail-item">
+        <h3 class="project-detail-item-label">Task &amp; Challenge</h3>
+        <div class="project-detail-summary">
+          <p>
+            <strong>1. Task &amp; Challenge:</strong> Players physically navigate the Getty Museum with task cards in hand. Each card presents a challenge — for example, finding an artwork that meets specific criteria. Successfully completing tasks earns points. This mode encourages deeper, more meaningful engagement with the museum's diverse collection.
+          </p>
+        </div>
+      </div>
+
+      <div class="project-detail-item">
+        <h3 class="project-detail-item-label">Matching &amp; Competing</h3>
+        <div class="project-detail-summary">
+          <p>
+            <strong>2. Matching &amp; Competing:</strong> In this multi-player mode, players do not need to be on-site. Each player draws a set of artwork cards and tries to match them with a set of public objective cards using logic, intuition, or narrative reasoning. Players score based on the creativity and relevance of their matches, encouraging open interpretation, discussion, and playful competition while learning about art.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section class="project-detail-chapter" aria-labelledby="artquest-chapter-final">
+      <h2 id="artquest-chapter-final">Final Experience</h2>
+
+      <div class="project-detail-item">
+        <h3 class="project-detail-item-label">In the Gallery</h3>
+        <figure class="project-detail-figure project-detail-figure--wide">
+          <img src="../assets/Q5.jpg" alt="A hand holding a stack of physical ArtQuest at Getty challenge cards next to Edgar Degas's painting The Milliners and its museum wall label" />
+        </figure>
+      </div>
+
+      <div class="project-detail-item">
+        <h3 class="project-detail-item-label">Presentation and Playtesting</h3>
+        <figure class="project-detail-figure project-detail-figure--wide">
+          <img src="../assets/Q6.jpg" alt="A group reviewing the finished ArtQuest at Getty card game around a table, with a whiteboard explaining the Task &amp; Challenge and Matching &amp; Competing modes and their point values" />
+        </figure>
+      </div>
+    </section>
+
+    <p class="project-detail-ending">
+      <a href="../index.html#floating-archive">&larr; Back to the Floating Archive</a>
+    </p>
 
   </main>
 
+  <footer class="site-footer" data-site-footer></footer>
 
+  <script src="../nav-data.js"></script>
+  <script src="../footer.js"></script>
   <script src="../header.js"></script>
 </body>
 

@@ -4,67 +4,93 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>IrisXu_About Me</title>
+  <title>IrisXu_About</title>
   <link rel="stylesheet" href="style.css">
 </head>
 
-<body>
+<body class="about-page">
   <header></header>
 
-<main class="about-modern">
-  <h1 class="about-big-title">About Me</h1>
+  <main class="about-main">
 
-  <div class="about-columns">
-
-    <!-- 左列 -->
-    <div class="about-block">
-      <h2>Hello — I’m Iris Xiaomeng Xu</h2>
-      <p>I’m a designer and artist from Beijing, currently based in Los Angeles.
-
-I’m pursuing an MFA in Media Design Practices at ArtCenter College of Design, where I explore the intersections of art, design, and technology—especially how interaction, systems, and media can become tools for reflection and relation. With a background in Studio Art and Graphic Design, I’ve always worked through visual language and material form.
-
-Rather than stepping away from art, I see my current practice as an expansion of it—one that brings artistic thinking into dialogue with design methods, emerging technologies, and critical research.
-My goal is to create work that seamlessly integrates these domains, where poetic sensibility and technical systems can coexist and inform one another.
-</p>
-    </div>
-
-    <!-- 中列：先是图片，然后是文字 -->
-    <div class="about-block center-photo">
-      <div class="about-image">
-        <img src="assets/me.jpg" alt="Portrait of Iris Xu" />
+    <section class="about-hero">
+      <div class="about-hero-copy">
+        <p class="about-eyebrow">About</p>
+        <h1 class="about-title">Iris Xiaomeng Xu</h1>
+        <p class="about-role">Designer, artist, and creative technologist.</p>
+        <p class="about-introduction">
+          I create interactive systems, visual narratives, and physical&ndash;digital experiences that explore how people relate to technology, materials, environments, and one another.
+        </p>
+        <div class="about-context">
+          <p>Based in Los Angeles</p>
+          <p>MFA candidate, Media Design Practices &mdash; ArtCenter College of Design</p>
+        </div>
       </div>
-      <h2>Where I Come From</h2>
-      <p>I began in fine arts, exploring traditional media like painting, drawing, and printmaking.
-Over time, I grew curious: What if the canvas expanded beyond the frame? What if design could tell stories not just through visuals, but through interaction, motion, code, and materials?
-That curiosity brought me to the Media Design Practices program at ArtCenter, where I now work at the intersection of design, technology, and critical research.
-</p>
-    </div>
 
-    <!-- 右列 -->
-    <div class="about-block right-column">
-      <h2>What I Care About</h2>
-      <p>I care deeply about relationships—the subtle, often invisible threads that connect people, nature, technology, and the self.
-I observe the world through patterns of interaction: how people relate to one another, how we engage with our environments, how tools mediate emotion, and how natural and technological systems shape our inner lives.
-Design, for me, begins with attention. I grow plants and track their rhythms of unfolding; I notice how people place and use objects around them—what they keep close, what they leave untouched. I also reflect on how technologies influence emotional states, habits, and unspoken needs.
-Through these observations, I attempt to engage in dialogue with environments, behaviors, and systems—and respond through form, structure, or interaction.
-My goal is not to control these relationships, but to listen to them—and to make work that quietly reflects, connects, and invites.</p>
-    </div>
+      <figure class="about-portrait">
+        <img src="assets/me.jpg" alt="Portrait of Iris Xiaomeng Xu." />
+      </figure>
+    </section>
 
-</main>
+    <section class="about-capabilities">
+      <h2>Capabilities</h2>
+      <div class="about-capability-list">
+        <article class="about-capability">
+          <h3>Interaction &amp; Experience Design</h3>
+          <p>Interfaces, user flows, interactive environments, and physical&ndash;digital experiences.</p>
+        </article>
+        <article class="about-capability">
+          <h3>Creative Technology</h3>
+          <p>Creative coding, web prototypes, p5.js, Unity, TouchDesigner, and AI-assisted workflows.</p>
+        </article>
+        <article class="about-capability">
+          <h3>Visual Systems</h3>
+          <p>Identity, editorial design, data visualization, typography, and image-making.</p>
+        </article>
+        <article class="about-capability">
+          <h3>Research &amp; Speculative Design</h3>
+          <p>Nonhuman perspectives, emerging technologies, environmental systems, and future-world building.</p>
+        </article>
+      </div>
+    </section>
 
+    <section class="about-practice">
+      <div class="about-approach">
+        <h2>How I Work</h2>
+        <p>
+          My practice begins with close observation. I look at how people interact with objects, environments, technologies, and one another, then translate those relationships into visual systems, interfaces, and material experiences. I am especially interested in work that connects critical research with experimentation and poetic visual language.
+        </p>
+        <ul class="about-principles">
+          <li>Observe relationships</li>
+          <li>Build through experimentation</li>
+          <li>Connect research with form</li>
+        </ul>
+      </div>
 
+      <div class="about-background">
+        <h2>Background</h2>
+        <p>
+          I began in studio art and graphic design, working through painting, drawing, printmaking, and visual communication. My current practice expands that foundation through interaction design, creative technology, critical research, and physical prototyping.
+        </p>
+      </div>
+    </section>
 
+    <section class="about-contact">
+      <h2>Let&rsquo;s Connect</h2>
+      <p>For collaborations, creative technology projects, and research-led design inquiries, get in touch.</p>
+      <div class="about-contact-links">
+        <a href="mailto:iris000414@gmail.com">Email</a>
+        <a href="https://www.instagram.com/irisxu_workz?igsh=NTc4MTIwNjQ2YQ%3D%3D&amp;utm_source=qr" target="_blank" rel="noopener noreferrer">Instagram<span class="visually-hidden"> (opens in a new tab)</span></a>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="site-footer" data-site-footer></footer>
+
+  <script src="nav-data.js"></script>
+  <script src="footer.js"></script>
   <script src="header.js"></script>
 </body>
-
-
-<footer class="site-footer">
-  <p>Designed & Built by Iris Xiaomeng Xu</p>
-  <p>
-    <a href="mailto:iris@example.com">iris000414@gmail.com</a> |
-    <a href="https://www.instagram.com/irisxu_workz?igsh=NTc4MTIwNjQ2YQ%3D%3D&utm_source=qr" target="_blank">Instagram</a>
-  </p>
-</footer>
-
 
 </html>

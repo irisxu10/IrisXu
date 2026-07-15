@@ -5,107 +5,177 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>CONO Project</title>
   <link rel="stylesheet" href="../style.css" />
-  <style>
-    body {
-      background-color: #faf8f9;
-      font-family: 'Urbanist', sans-serif;
-    }
-
-    .cono-section {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 60px 20px;
-      padding-top: 100px;
-    }
-
-    /* 第一排：图 + 文排版 */
-    .cono-row-1 {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: flex-start;
-      gap: 40px;
-      margin-bottom: 60px;
-    }
-
-    .cono-row-1 img {
-      max-width: 400px;
-      width: 100%;
-      height: auto;
-      border-radius: 12px;
-      flex: 1;
-    }
-
-    .cono-text {
-      flex: 1;
-      min-width: 300px;
-      color: #3f2b4c;
-    }
-
-    .cono-text h1 {
-      font-size: 28px;
-      margin-bottom: 16px;
-    }
-
-    .cono-text p {
-      font-size: 16px;
-      line-height: 1.7;
-      margin-bottom: 12px;
-    }
-
-    /* 第二排开始：每张图单独一行展示 */
-    .cono-image-full {
-      display: block;
-      margin: 40px auto;
-      max-width: 90%;
-      height: auto;
-      border-radius: 8px;
-    }
-  </style>
 </head>
 
-<body>
+<body class="project-detail-page" data-project-accent="cono">
   <header></header>
 
-  <main class="cono-section">
+  <main class="project-detail-main">
 
-    <!-- 第一排：图 + 文字 -->
-    <div class="cono-row-1">
-      <img src="../assets/cono.png" alt="Overview Image" />
-      <div class="cono-text">
-        <h1>CONO</h1>
+    <a class="project-detail-back" href="../index.html#floating-archive">&larr; Back to Archive</a>
+
+    <section class="project-detail-hero">
+      <p class="project-detail-kicker">2025</p>
+      <h1 class="project-detail-title">CONO</h1>
+      <div class="project-detail-summary">
         <p>
           CONO is a thoughtfully crafted app for coffee lovers and professionals — a place to belong, for those whose days begin with coffee and stories. Inspired by friends who see brewing coffee not just as a daily habit but as a personal ritual, CONO provides a space to log, reflect, and share.
         </p>
         <p>
-          Whether you’re behind the bar or at home, CONO helps you document your brews and revisit your journey — not just through data, but through memories, visuals, and emotions. It’s designed for those who care about the quiet details: the flavor of a single origin, the method of brewing, the feeling behind a cup.
+          Whether you're behind the bar or at home, CONO helps you document your brews and revisit your journey — not just through data, but through memories, visuals, and emotions. It's designed for those who care about the quiet details: the flavor of a single origin, the method of brewing, the feeling behind a cup.
         </p>
         <p>
           By combining flexible journaling tools, a searchable log system, and a welcoming community space, CONO turns fragmented notes into meaningful reflections. It honors both the routine and the creative expression behind every brew — and offers a space to grow, one cup at a time.
         </p>
       </div>
-    </div>
+      <figure class="project-detail-figure project-detail-figure--hero">
+        <img src="../assets/CONO.png" alt="CONO coffee-journaling app case-study presentation slide, showing the app icon alongside phone interface-screen mockups" />
+      </figure>
+    </section>
 
-    <!-- 第二排开始的图片 CN1 - CN17 -->
-    <img class="cono-image-full" src="../assets/CN1.jpg" alt="CONO Panel 1" />
-    <img class="cono-image-full" src="../assets/CN2.jpg" alt="CONO Panel 2" />
-    <img class="cono-image-full" src="../assets/CN3.jpg" alt="CONO Panel 3" />
-    <img class="cono-image-full" src="../assets/CN4.jpg" alt="CONO Panel 4" />
-    <img class="cono-image-full" src="../assets/CN5.jpg" alt="CONO Panel 5" />
-    <img class="cono-image-full" src="../assets/CN6.jpg" alt="CONO Panel 6" />
-    <img class="cono-image-full" src="../assets/CN7.jpg" alt="CONO Panel 7" />
-    <img class="cono-image-full" src="../assets/CN8.jpg" alt="CONO Panel 8" />
-    <img class="cono-image-full" src="../assets/CN9.jpg" alt="CONO Panel 9" />
-    <img class="cono-image-full" src="../assets/CN10.jpg" alt="CONO Panel 10" />
-    <img class="cono-image-full" src="../assets/CN11.jpg" alt="CONO Panel 11" />
-    <img class="cono-image-full" src="../assets/CN12.jpg" alt="CONO Panel 12" />
-    <img class="cono-image-full" src="../assets/CN13.jpg" alt="CONO Panel 13" />
-    <img class="cono-image-full" src="../assets/CN14.jpg" alt="CONO Panel 14" />
-    <img class="cono-image-full" src="../assets/CN15.jpg" alt="CONO Panel 15" />
-    <img class="cono-image-full" src="../assets/CN16.jpg" alt="CONO Panel 16" />
-    <img class="cono-image-full" src="../assets/CN17.jpg" alt="CONO Panel 17" />
+    <section class="project-detail-chapter" aria-labelledby="cono-chapter-overview">
+      <h2 id="cono-chapter-overview">Project Overview</h2>
+
+      <div class="project-detail-item">
+        <h3 class="project-detail-item-label">Overview</h3>
+        <div class="project-detail-media-grid project-detail-media-grid--pair">
+          <figure class="project-detail-figure">
+            <img src="../assets/CN1.jpg" alt="CONO cover slide: Welcome to CONO, an app for coffee lovers and professionals, shown with onboarding and home-screen phone mockups" />
+          </figure>
+          <figure class="project-detail-figure">
+            <img src="../assets/CN2.jpg" alt="CONO case study table of contents: About CONO, Problem Space, Interviews, Persona, HMW Statement, Competitive Analysis, Feature Prioritization, Design Process, and Final Design" />
+          </figure>
+        </div>
+      </div>
+
+      <div class="project-detail-item">
+        <h3 class="project-detail-item-label">About CONO</h3>
+        <figure class="project-detail-figure project-detail-figure--wide">
+          <img src="../assets/CN3.jpg" alt="About CONO slide describing the app as a quiet space to log brews, reflect, and connect with a coffee community, shown with home-screen phone mockups" />
+        </figure>
+      </div>
+    </section>
+
+    <section class="project-detail-chapter" aria-labelledby="cono-chapter-understanding">
+      <h2 id="cono-chapter-understanding">Understanding the Product</h2>
+
+      <div class="project-detail-item">
+        <h3 class="project-detail-item-label">Problem Space</h3>
+        <figure class="project-detail-figure project-detail-figure--wide">
+          <img src="../assets/CN4.jpg" alt="Problem Space slide listing coffee lovers' needs alongside three photos of a handwritten brew notebook, tasting cards, and a spiral log book" />
+        </figure>
+      </div>
+
+      <div class="project-detail-item">
+        <h3 class="project-detail-item-label">Interviews</h3>
+        <figure class="project-detail-figure project-detail-figure--wide">
+          <img src="../assets/CN5.jpg" alt="Interviews slide profiling three coffee drinkers — Dyna, a flavor-focused enthusiast; Song, a specialty shop owner; and Chao, a certified bean roaster" />
+        </figure>
+      </div>
+
+      <div class="project-detail-item">
+        <h3 class="project-detail-item-label">Persona</h3>
+        <figure class="project-detail-figure project-detail-figure--wide">
+          <img src="../assets/CN6.jpg" alt="Persona slide introducing Irina, a barista and graduate student, with her habits, goals, and needs for logging and reflecting on brews" />
+        </figure>
+      </div>
+
+      <div class="project-detail-item">
+        <h3 class="project-detail-item-label">HMW</h3>
+        <figure class="project-detail-figure project-detail-figure--wide">
+          <img src="../assets/CN7.jpg" alt="How Might We statement: combining flexible journaling, a searchable record system, and a gentle community space to transform coffee note-taking" />
+        </figure>
+      </div>
+
+      <div class="project-detail-item">
+        <h3 class="project-detail-item-label">Competitive Analysis</h3>
+        <figure class="project-detail-figure project-detail-figure--wide">
+          <img src="../assets/CN8.jpg" alt="Competitive analysis slide comparing HiCoffee, the Caffeine App, and handwritten notebooks against CONO's approach" />
+        </figure>
+      </div>
+    </section>
+
+    <section class="project-detail-chapter" aria-labelledby="cono-chapter-development">
+      <h2 id="cono-chapter-development">Design Development</h2>
+
+      <div class="project-detail-item">
+        <h3 class="project-detail-item-label">Feature Prioritization</h3>
+        <figure class="project-detail-figure project-detail-figure--wide">
+          <img src="../assets/CN9.jpg" alt="Feature prioritization matrix sorting CONO's features into Must Have, Will Have, Could Have, and Wouldn't Have categories" />
+        </figure>
+      </div>
+
+      <div class="project-detail-item">
+        <h3 class="project-detail-item-label">Design Process</h3>
+        <figure class="project-detail-figure project-detail-figure--wide">
+          <img src="../assets/CN10.jpg" alt="Design process slide showing CONO's purple color palette, the Urbanist typeface, and its icon set" />
+        </figure>
+      </div>
+    </section>
+
+    <section class="project-detail-chapter" aria-labelledby="cono-chapter-final">
+      <h2 id="cono-chapter-final">Final Design</h2>
+
+      <div class="project-detail-item">
+        <h3 class="project-detail-item-label">On Boarding</h3>
+        <figure class="project-detail-figure">
+          <img src="../assets/CN11.jpg" alt="Final design, Onboarding: three phone screens introducing CONO's Capture Every Cup, Reflect on Your Journey, and Connect with Others screens" />
+        </figure>
+      </div>
+
+      <div class="project-detail-item">
+        <h3 class="project-detail-item-label">Log New Brew</h3>
+        <figure class="project-detail-figure">
+          <img src="../assets/CN12.jpg" alt="Final design, Log New Brew: three phone screens for starting a new coffee journey, from the home dashboard to brew details" />
+        </figure>
+      </div>
+
+      <div class="project-detail-item">
+        <h3 class="project-detail-item-label">Profile</h3>
+        <figure class="project-detail-figure">
+          <img src="../assets/CN13.jpg" alt="Final design, Profile: three phone screens for viewing and editing a CONO profile and account settings" />
+        </figure>
+      </div>
+
+      <div class="project-detail-item">
+        <h3 class="project-detail-item-label">Community</h3>
+        <figure class="project-detail-figure">
+          <img src="../assets/CN14.jpg" alt="Final design, Community: three phone screens showing the CONO community feed and shared brewing tutorials" />
+        </figure>
+      </div>
+
+      <div class="project-detail-item">
+        <h3 class="project-detail-item-label">Share</h3>
+        <figure class="project-detail-figure">
+          <img src="../assets/CN15.jpg" alt="Final design, Share: three phone screens for selecting photos, writing a post, and publishing a shared brew" />
+        </figure>
+      </div>
+
+      <div class="project-detail-item">
+        <h3 class="project-detail-item-label">Records</h3>
+        <figure class="project-detail-figure">
+          <img src="../assets/CN16.jpg" alt="Final design, Records: three phone screens for browsing a coffee calendar and reviewing past brew records" />
+        </figure>
+      </div>
+    </section>
+
+    <section class="project-detail-chapter" aria-labelledby="cono-chapter-notes">
+      <h2 id="cono-chapter-notes">Designer Notes</h2>
+      <figure class="project-detail-figure project-detail-figure--wide">
+        <img src="../assets/CN17.jpg" alt="Designer notes reflecting on CONO as a space to hold coffee stories through data, feelings, visuals, and memory" />
+      </figure>
+    </section>
+
+    <p class="project-detail-ending">
+      <a href="../index.html#floating-archive">&larr; Back to the Floating Archive</a>
+    </p>
 
   </main>
 
+  <footer class="site-footer" data-site-footer></footer>
+
+  <script src="../nav-data.js"></script>
+  <script src="../footer.js"></script>
   <script src="../header.js"></script>
 </body>
 </html>
