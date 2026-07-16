@@ -968,29 +968,59 @@ body.home-page .home-main {
 
 /* Decorative-only duplicate of .home-perimeter-statement — aria-hidden in
    markup, and hidden by default here (only shown by the media query
-   below). Sits in the same corner the plain sentence used, sized to hold
-   a short rising curve rather than a flowed text block.
-   H2.9.1: this base rule must appear before the desktop media query
+   below).
+   H2.9.4C: moved back into the Hero (.home-identity-layer), positioned
+   relative to #canvas-hero via `bottom` instead of living inside
+   #floating-archive and using `top`. #floating-archive's own box (and
+   the visual reach of its ::before curve) is unrelated to the Hero's own
+   box — a `top` offset anchored to #floating-archive's edge was placing
+   this text against that section's padding-box, nowhere near the actual
+   rendered arc silhouette, and reading as "content inside the Archive
+   section" rather than a Hero perimeter element. Anchoring to the Hero's
+   own `bottom` instead means this text's vertical position is relative
+   to the same viewport-height box the arc visually rises into, which is
+   what actually lets it sit close to the rendered edge. The SVG path's
+   own y-range (see index.html) is what does the real "hugging" work —
+   calculated directly against .floating-archive::before's measured
+   top/radius so the curve matches where the arc's silhouette actually is
+   at each x position, including the sharp early rise near its true left
+   edge (nearly flat) before the shoulder climbs toward center.
+   H2.9.4D: bottom lowered (104-142 -> 46-72) so the text sits inside the
+   warm fill rather than above it — the path's own y-range (see
+   index.html) was recalculated against the same measured arc geometry to
+   land ~8-18px inside the edge rather than well above or well below it.
+   H2.9.1: the base rule must still appear before the desktop media query
    below — both selectors share equal specificity, so whichever comes
    later in source order wins regardless of which viewport/motion state
-   is active. This rule previously came after the media query, so its
-   display:none always beat the media query's display:block. */
+   is active. */
 .home-perimeter-statement-curve {
   display: none;
   position: absolute;
-  z-index: 1;
-  left: clamp(24px, 5vw, 64px);
-  bottom: clamp(96px, 13vw, 160px);
-  width: clamp(260px, 30vw, 380px);
-  height: clamp(80px, 8vw, 120px);
+  z-index: 2;
+  left: clamp(58px, 5vw, 88px);
+  bottom: clamp(46px, 4.2vw, 72px);
+  width: clamp(720px, 56vw, 900px);
+  height: clamp(74px, 6vw, 96px);
+  overflow: visible;
   pointer-events: none;
+}
+
+/* SVG default overflow is hidden — without this, any part of the curve
+   or text extending past the viewBox's own bounds (rather than the
+   wrapper's) would still be clipped even though the wrapper above is
+   overflow:visible. */
+.home-perimeter-statement-curve svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
 }
 
 .home-perimeter-curve-text {
   font-family: 'Helvetica Neue', sans-serif;
-  font-weight: 600;
-  font-size: clamp(13px, 1.6vw, 17px);
-  letter-spacing: -0.005em;
+  font-weight: 500;
+  font-size: clamp(14px, 1.15vw, 17px);
+  letter-spacing: 0.005em;
 }
 
 /* Word-group colors — same palette as the Canvas bubbles (sketch.js's
