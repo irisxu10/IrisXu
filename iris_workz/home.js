@@ -40,6 +40,54 @@
     return mediaWrap;
   }
 
+  // H3.2: minimal year/keyword row — no new data fields, everything here
+  // already exists in project-data.js (year, keywords, lenses), just not
+  // rendered until now. Falls back to lenses only when keywords is empty,
+  // and never shows more than two terms total. Returns null (rendering
+  // nothing) when neither a year nor any terms are present, rather than
+  // inventing placeholder content.
+  function createBubbleMeta(project) {
+    var year = project.year;
+    var terms = (project.keywords && project.keywords.length ? project.keywords : project.lenses) || [];
+    terms = terms.slice(0, 2);
+
+    if (!year && terms.length === 0) {
+      return null;
+    }
+
+    var meta = document.createElement("span");
+    meta.className = "project-bubble-meta";
+
+    if (year) {
+      var yearEl = document.createElement("span");
+      yearEl.className = "project-bubble-year";
+      yearEl.textContent = year;
+      meta.appendChild(yearEl);
+    }
+
+    if (year && terms.length) {
+      var separator = document.createElement("span");
+      separator.className = "project-bubble-meta-separator";
+      separator.setAttribute("aria-hidden", "true");
+      separator.textContent = "·";
+      meta.appendChild(separator);
+    }
+
+    if (terms.length) {
+      var keywordsWrap = document.createElement("span");
+      keywordsWrap.className = "project-bubble-keywords";
+      terms.forEach(function (term) {
+        var keywordEl = document.createElement("span");
+        keywordEl.className = "project-bubble-keyword";
+        keywordEl.textContent = term;
+        keywordsWrap.appendChild(keywordEl);
+      });
+      meta.appendChild(keywordsWrap);
+    }
+
+    return meta;
+  }
+
   // The title/description are real headings/paragraphs (h3/p), not spans —
   // each project's stable id (from project-data.js) becomes its element
   // IDs, which createBubbleLink below wires to the anchor via
@@ -47,6 +95,11 @@
   // h3 because the homepage's new identity layer (Part 5/6) introduced a
   // page h1 and demoted "Floating Archive" to h2 — these titles are its
   // subordinate project entries, not sibling sections.
+  // H3.2: the description stays in the DOM (aria-describedby still points
+  // to it) but is now visually-hidden — the visible hover hierarchy is
+  // title -> year/keywords, keeping the bubble image-led rather than a
+  // circular text card; the fuller description remains available to
+  // assistive technology exactly as before.
   function createBubbleOverlay(project) {
     var overlay = document.createElement("span");
     overlay.className = "project-bubble-overlay";
@@ -57,9 +110,14 @@
     title.textContent = project.title;
     overlay.appendChild(title);
 
+    var meta = createBubbleMeta(project);
+    if (meta) {
+      overlay.appendChild(meta);
+    }
+
     if (project.description) {
       var desc = document.createElement("p");
-      desc.className = "project-bubble-description";
+      desc.className = "project-bubble-description visually-hidden";
       desc.id = "project-description-" + project.id;
       desc.textContent = project.description;
       overlay.appendChild(desc);
