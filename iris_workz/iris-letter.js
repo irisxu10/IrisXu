@@ -13,6 +13,20 @@ const IRIS_LETTER_SETTLE_THRESHOLD_PX = 6;
 const IRIS_LETTER_MAX_TILT_DEGREES = 10;    // within the requested 8-12 degree range
 const IRIS_LETTER_LANE_MARGIN_FACTOR = 1.4; // how far a letter may drift before being nudged back
 
+// H4.6: letters previously had no explicit collisionFilter at all, so they
+// used Matter's bare default (category 0x0001) — the Archive planet
+// collider's mask (sketch.js, ARCHIVE_PLANET_MASK) was deliberately scoped
+// to ordinary balls only (see ball.js's H2.8.2 comment) and never included
+// this category, so letters only ever rested on initBorder()'s fixed,
+// unsynced flat floor rather than the real CSS-tracked curved ground —
+// causing them to visually sink into the ground once that floor no longer
+// matched the ground's actual rendered position. mask stays 0xFFFFFFFF
+// (match everything) so every existing letter-to-ball, letter-to-letter,
+// and letter-to-wall collision is completely unaffected — only the
+// Archive planet collider's mask (sketch.js) is widened to recognize this
+// new category, additively.
+const IRIS_LETTER_CATEGORY = 0x0008;
+
 // H2.8.6V: query-controlled, development-only diagnostic mode — off for
 // every normal visitor by default, on only when the URL explicitly asks
 // for it (index.html?debugLetterColliders=1), so Iris can open it without
@@ -150,7 +164,16 @@ class IrisLetter {
       parts,
       friction: 0.6,
       frictionAir: 0.015,
-      restitution: 0.35
+      restitution: 0.35,
+      // H4.6: set explicitly on the top-level compound body — Matter's
+      // broadphase collision filtering (Detector.canCollide) reads the
+      // parent body's own collisionFilter, not each part's, for compound
+      // bodies. mask stays 0xFFFFFFFF so nothing existing changes; this
+      // only lets the Archive planet collider's mask (sketch.js) match it.
+      collisionFilter: {
+        category: IRIS_LETTER_CATEGORY,
+        mask: 0xFFFFFFFF
+      }
     });
 
     // An asymmetric compound (R's bowl+leg, S's circle chain) does not
@@ -254,10 +277,51 @@ class IrisLetter {
     textFont(font);
     textSize(this.textSizePx);
     textAlign(CENTER, CENTER);
-    fill(colors[1]);
     translate(this.x, this.y);
     rotate(this.angle);
+
+    // H4.9A-R: emergency reset. H4.9A's four-layer treatment (a manually
+    // assigned drawingContext.fillStyle gradient, a native shadowBlur, and
+    // a save()/clip()/restore()-masked highlight, all stacked together)
+    // produced a black/poisoned result that couldn't be safely diagnosed
+    // without a browser. Replaced with exactly three plain p5 fill()/
+    // stroke()/text() passes only — no raw drawingContext mutation, no
+    // gradient, no clip, no shadowBlur — so the render path stays simple
+    // and predictable. Physics/collider/spawn/timing above are completely
+    // untouched; only how the letter is drawn here changes.
+
+    // Pass 1: subtle separation shadow — the same glyph, drawn once more
+    // at a small fixed offset, underneath the main fill below (Pass 3
+    // paints directly over most of it, leaving only a thin sliver visible
+    // at the lower-right edge). A plain offset text() fill, not a Canvas
+    // shadow/filter, so it can't leak state onto later passes.
+    noStroke();
+    fill(132, 70, 60, 28);
+    text(this.char, 2.5, 4);
+
+    // H4.9B: Pass 2 — one small upper-left edge reflection, a stroke-only
+    // duplicate glyph offset by ~1px, drawn after the shadow and before
+    // the main coral fill so Pass 3 covers all but a narrow sliver along
+    // the upper-left edge. Deterministic (fixed offset, no time/velocity/
+    // angle input, no randomness), same for every letter. Plain p5
+    // stroke()/text() only — no gradient, no clip, no native shadow.
+    noFill();
+    stroke(255, 244, 238, 46);
+    strokeWeight(1.4);
+    text(this.char, -1.1, -1.35);
+    noStroke();
+
+    // Pass 3: main translucent coral body — the letter's one primary
+    // fill, drawn once, plain color, no gradient.
+    fill(239, 103, 84, 210);
     text(this.char, 0, 0);
+
+    // Pass 4: thin pale glass edge — stroke only, on top of Pass 3.
+    noFill();
+    stroke(255, 236, 228, 82);
+    strokeWeight(1.25);
+    text(this.char, 0, 0);
+    noStroke();
 
     // H2.8.6V dev-only diagnostics — drawn inside the same
     // translate()/rotate() as the glyph above, so they rotate and move

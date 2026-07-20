@@ -875,9 +875,11 @@ body.home-page .home-main {
    #canvas-stage z-index:1 (the p5/Matter simulation) →
    .home-identity-layer z-index:2, a thin full-bleed wrapper holding
    z-index/pointer-events:none plus the top/bottom edge washes (below) →
-   the four perimeter zones (name, role, statement, navigation), each
-   independently positioned at its own corner rather than grouped into
-   one block. Only the navigation opts back into pointer-events:auto. */
+   H2.10R: one consolidated identity/caption block grounded near the
+   lower-left, plus the navigation bubbles at lower-right — replacing the
+   former four-corner arrangement (separate name/role/statement zones)
+   that read as scattered HTML labels rather than one intentional scene.
+   Only the navigation opts back into pointer-events:auto. */
 .home-identity-layer {
   position: absolute;
   inset: 0;
@@ -911,166 +913,198 @@ body.home-page .home-main {
   background: linear-gradient(to top, rgba(255, 255, 255, 0.55) 0%, rgba(255, 255, 255, 0) 100%);
 }
 
-/* Shared corner-label typography. Each zone sits above the wash
-   (z-index:1, inside .home-identity-layer's own stacking context). */
-.home-perimeter-name,
-.home-perimeter-role,
-.home-perimeter-statement {
+/* H2.10R.2: moved from the lower-left (grounded against the pale curve)
+   to the upper-left — the bottom layer is now reserved entirely for the
+   curved ground itself, read as clean breathing space/entrance toward
+   the Floating Archive below, rather than sharing that area with text.
+   Width narrowed (58vw/720px -> 40vw/460px) so it reads as one compact
+   composed object near the corner rather than a wide block reaching
+   toward center. Still no background/border/card by default; a
+   restrained text-shadow is the only readability aid, since there's no
+   way to visually confirm from this environment whether this placement
+   crosses an unusually dense patch of balls that would need a subtle
+   surface-patch fallback — left unadded unless Iris's review shows it's
+   needed. */
+.home-grounded-identity {
   position: absolute;
-  z-index: 1;
+  left: clamp(28px, 4.5vw, 68px);
+  top: clamp(36px, 4.5vw, 64px);
+  z-index: 4;
+  width: min(40vw, 460px);
+  max-width: calc(100vw - 320px);
+  pointer-events: none;
+  color: rgb(70, 43, 25);
+}
+
+/* H2.10R.3: split into three explicit tiers — name (strongest), role
+   (its own line directly under the name, smaller but still weighted
+   enough to read as connected to it), caption (smallest, most quiet).
+   Name sized up slightly (clamp(15,1.2vw,19) -> clamp(17,1.4vw,21)) now
+   that it no longer shares a line with the role text, so it still reads
+   as clearly the strongest tier once the role becomes its own line. */
+.home-grounded-identity__name {
   margin: 0;
   font-family: 'Helvetica Neue', sans-serif;
-  color: rgb(66, 34, 10);
-}
-
-/* Top-left: the maker signature — small, confident, sans-serif, well
-   under the Canvas IRIS letters' scale. Not a second display title. */
-.home-perimeter-name {
-  left: clamp(24px, 5vw, 64px);
-  top: clamp(24px, 5vw, 56px);
-  max-width: 15rem;
-  font-size: clamp(20px, 2.4vw, 26px);
-  font-weight: 700;
+  font-size: clamp(17px, 1.4vw, 21px);
+  font-weight: 650;
+  line-height: 1.2;
   letter-spacing: -0.01em;
-  line-height: 1.1;
+  text-shadow: 0 1px 6px rgba(255, 255, 255, 0.74);
 }
 
-/* Top-right: a quiet interface label, not a badge — plain text,
-   right-aligned so it reads as anchored to that corner. */
-.home-perimeter-role {
-  right: clamp(24px, 5vw, 64px);
-  top: clamp(24px, 5vw, 56px);
-  max-width: 13rem;
-  text-align: right;
-  font-size: clamp(13px, 1.4vw, 15px);
-  font-weight: 600;
-  line-height: 1.4;
-}
-
-/* Bottom-left: one clean sentence, no keyword bubbles, no badge
-   fragmentation — a short editorial line, not a paragraph block.
-   H2.8.3: bottom raised from clamp(24px,5vw,64px) to
-   clamp(96px,13vw,160px) — #floating-archive's own rectangular layout
-   box (governed by its margin-top, unaffected by its ::before/::after
-   pseudo-elements' visual curve or radius) was reaching up far enough
-   to overlap this corner even where the curve painted transparent;
-   border-radius only changes what paints, never what's hit-tested, so
-   only moving this element clear of that box's real vertical extent
-   (not adjusting the curve) actually restores full visibility and
-   click-through. */
-.home-perimeter-statement {
-  left: clamp(24px, 5vw, 64px);
-  bottom: clamp(96px, 13vw, 160px);
-  max-width: 24rem;
-  font-size: clamp(13px, 1.4vw, 15px);
-  line-height: 1.6;
-}
-
-/* Decorative-only duplicate of .home-perimeter-statement — aria-hidden in
-   markup, and hidden by default here (only shown by the media query
-   below). Sits in the same corner the plain sentence used, sized to hold
-   a short rising curve rather than a flowed text block.
-   H2.9.1: this base rule must appear before the desktop media query
-   below — both selectors share equal specificity, so whichever comes
-   later in source order wins regardless of which viewport/motion state
-   is active. This rule previously came after the media query, so its
-   display:none always beat the media query's display:block. */
-.home-perimeter-statement-curve {
-  display: none;
-  position: absolute;
-  z-index: 1;
-  left: clamp(24px, 5vw, 64px);
-  bottom: clamp(96px, 13vw, 160px);
-  width: clamp(260px, 30vw, 380px);
-  height: clamp(80px, 8vw, 120px);
-  pointer-events: none;
-}
-
-.home-perimeter-curve-text {
+/* Tight margin-top keeps this visually attached to the name above it
+   (a caption-like second line, not a separate block), while its own
+   smaller size/lighter weight/reduced opacity keep it clearly secondary. */
+.home-grounded-identity__role {
+  margin: clamp(2px, 0.3vw, 4px) 0 0;
   font-family: 'Helvetica Neue', sans-serif;
-  font-weight: 600;
-  font-size: clamp(13px, 1.6vw, 17px);
-  letter-spacing: -0.005em;
+  font-size: clamp(12px, 1vw, 15px);
+  font-weight: 500;
+  line-height: 1.3;
+  letter-spacing: -0.002em;
+  color: rgba(70, 43, 25, 0.88);
+  text-shadow: 0 1px 6px rgba(255, 255, 255, 0.74);
 }
 
-/* Word-group colors — same palette as the Canvas bubbles (sketch.js's
-   colors[] array / the existing .color-1..10 classes), applied via fill
-   since these are SVG text nodes rather than HTML. Grouped by short
-   phrase rather than per-letter, per the design direction. */
-.home-curve-color-1 { fill: rgb(0, 191, 255); }   /* soft blue */
-.home-curve-color-2 { fill: rgb(34, 139, 34); }   /* green */
-.home-curve-color-3 { fill: rgb(255, 215, 0); }   /* yellow */
-.home-curve-color-4 { fill: rgb(255, 140, 0); }   /* orange */
-.home-curve-color-5 { fill: rgb(255, 182, 193); } /* soft pink */
-.home-curve-color-6 { fill: rgb(139, 69, 19); }   /* brown */
-
-/* Bottom-left, desktop-with-motion only: the plain sentence above stays
-   in the DOM (screen readers still read it) but is visually replaced by
-   the colorful curved SVG version above — same clip-rect technique as
-   .visually-hidden, scoped here instead of applied in markup so mobile
-   and reduced-motion (which never match this query) keep the existing
-   plain/stacked rendering with zero changes to that fallback. */
-@media (min-width: 768px) and (prefers-reduced-motion: no-preference) {
-  .home-perimeter-statement {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    padding: 0;
-    margin: -1px;
-    overflow: hidden;
-    clip: rect(0, 0, 0, 0);
-    white-space: nowrap;
-    border: 0;
-  }
-
-  .home-perimeter-statement-curve {
-    display: block;
-  }
+.home-grounded-identity__caption {
+  margin: clamp(6px, 0.8vw, 10px) 0 0;
+  max-width: 620px;
+  font-family: 'Helvetica Neue', sans-serif;
+  font-size: clamp(11px, 0.85vw, 13px);
+  font-weight: 450;
+  line-height: 1.4;
+  letter-spacing: 0.002em;
+  color: rgba(70, 43, 25, 0.76);
+  text-shadow: 0 1px 6px rgba(255, 255, 255, 0.74);
 }
 
-/* Bottom-right: the existing bubble/capsule navigation, repositioned to
-   its own perimeter anchor — unchanged destinations, semantics, and
-   interaction, only its position moved from a shared flex row to its
-   own corner to match the other three zones.
-   H2.8.3: bottom raised to match .home-perimeter-statement above, for
-   the same reason — clearing #floating-archive's own layout box. */
+/* H2.10R.2: moved from the lower-right to the upper-right, matching the
+   identity block's move — both former bottom zones are now upper-corner
+   entry points, leaving the pale curved ground clear at the bottom.
+   Destinations/semantics/interaction unchanged — only position. */
 .home-perimeter-navigation {
   position: absolute;
-  z-index: 1;
-  right: clamp(24px, 5vw, 64px);
-  bottom: clamp(96px, 13vw, 160px);
+  z-index: 5;
+  right: clamp(28px, 4.5vw, 68px);
+  top: clamp(36px, 4.5vw, 64px);
   display: flex;
   align-items: center;
-  gap: clamp(12px, 2vw, 20px);
+  gap: clamp(10px, 1vw, 15px);
   pointer-events: auto;
 }
 
-/* One coherent bubble family — translucent center, restrained accent
-   edge — with two proportions within it (capsules for Archive/Writings,
-   a near-circle for About) rather than three identical pills. */
+/* Visual-direction pass: shifted from a near-opaque "solid warm-white"
+   bubble (0.93 fill, no backdrop-filter) toward genuine glass — lower
+   fill opacity plus a soft backdrop-filter so the ball field behind
+   actually blurs through, a thinner/softer border, and a lighter shadow.
+   These values are written directly into this rule (rather than relying
+   on a shared class) because these <a> elements are generated at
+   runtime by home.js's renderPrimaryNavigation() — home.js is untouched
+   this phase, so it can't also apply an extra class. */
 .home-nav-bubble {
+  position: relative;
+  background: rgba(250, 247, 239, 0.52);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  border: 1px solid rgba(124, 77, 49, 0.18);
+  color: rgb(75, 43, 25);
+  /* Second inset shadow (offset toward the upper-left) approximates a
+     soft radial highlight/glass-surface glow without a new pseudo-
+     element — box-shadow always paints behind the label text, avoiding
+     any risk of a separate positioned layer washing over it. */
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.75),
+    inset 3px 3px 8px rgba(255, 255, 255, 0.35),
+    0 6px 20px rgba(75, 45, 29, 0.08);
+
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-height: 48px;
-  padding: 12px 24px;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.45);
-  border: 1.5px solid rgba(255, 99, 71, 0.55);
-  color: rgb(66, 34, 10);
+  /* H2.10R.2: sized down (72-90px -> 56-68px) for the upper-right corner
+     — small, quiet entry points rather than a prominent bottom nav. */
+  width: clamp(56px, 5vw, 68px);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  padding: 0;
+  text-align: center;
   font-family: 'Helvetica Neue', sans-serif;
-  font-size: clamp(14px, 1.6vw, 16px);
-  font-weight: 600;
+  font-size: clamp(12px, 0.9vw, 14px);
+  font-weight: 650;
+  line-height: 1;
   text-decoration: none;
-  white-space: nowrap;
+  white-space: normal;
+  /* Legibility insurance now that the fill is much more transparent —
+     a soft light halo behind the dark label text, same technique the
+     identity block already uses. */
+  text-shadow: 0 1px 5px rgba(255, 255, 255, 0.65);
+  animation: home-navigation-float 5.2s ease-in-out infinite;
   transition: transform 0.2s ease, background-color 0.2s ease, border-color 0.2s ease;
+}
+
+/* H2.10R.1: a thin soap-bubble-like iridescent rim, not a fill — the
+   standard padding + mask-composite "gradient border" technique keeps
+   the pastel conic-gradient visible only in a ~1.5px ring right at the
+   edge, fully transparent everywhere else (including behind the label),
+   so the warm-white fill and centered text stay exactly as they were.
+   pointer-events:none keeps it purely decorative. */
+.home-nav-bubble::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  padding: 1.5px;
+  border-radius: 50%;
+  background: conic-gradient(
+    from 200deg,
+    rgba(173, 216, 230, 0.55),
+    rgba(255, 214, 224, 0.5),
+    rgba(255, 250, 205, 0.5),
+    rgba(200, 230, 201, 0.5),
+    rgba(173, 216, 230, 0.55)
+  );
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  opacity: 0.7;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+}
+
+/* Same size for all three — only a per-bubble negative animation-delay
+   (starting each bubble partway into its own cycle) staggers them. */
+.home-nav-bubble--archive {
+  animation-delay: 0s;
+}
+
+.home-nav-bubble--about {
+  animation-delay: -1.4s;
+}
+
+.home-nav-bubble--writings {
+  animation-delay: -2.8s;
+}
+
+/* H2.10R.1: amplitude increased from 3px to 5px — still gentle, just a
+   bit more noticeable than before. */
+@keyframes home-navigation-float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-5px);
+  }
 }
 
 .home-nav-bubble:hover,
 .home-nav-bubble:focus-visible {
-  transform: scale(1.05);
-  background: rgba(255, 255, 255, 0.72);
-  border-color: rgb(255, 99, 71);
+  animation: none;
+  background: rgba(255, 252, 245, 0.98);
+  border-color: rgba(255, 99, 71, 0.52);
+  transform: translateY(-2px) scale(1.04);
+}
+
+.home-nav-bubble:hover::before,
+.home-nav-bubble:focus-visible::before {
+  opacity: 0.85;
 }
 
 .home-nav-bubble:focus-visible {
@@ -1078,24 +1112,14 @@ body.home-page .home-main {
   outline-offset: 3px;
 }
 
-.home-nav-bubble--archive {
-  padding: 16px 32px;
-  font-size: clamp(15px, 1.8vw, 18px);
-}
-
-.home-nav-bubble--about {
-  min-width: 92px;
-  aspect-ratio: 1;
-  border-radius: 50%;
-  padding: 12px;
-}
-
-.home-nav-bubble--writings {
-  padding: 10px 26px;
+.home-nav-bubble:active {
+  animation: none;
+  transform: translateY(0) scale(0.97);
 }
 
 @media (prefers-reduced-motion: reduce) {
   .home-nav-bubble {
+    animation: none;
     transition: none;
   }
 }
@@ -1122,18 +1146,38 @@ body.home-page .home-main {
     content: none;
   }
 
-  .home-perimeter-name,
-  .home-perimeter-role,
-  .home-perimeter-statement,
+  /* H2.10R: the consolidated identity block and navigation both drop
+     into the static, centered stack — the identity block releases its
+     fixed width/max-width so its two lines can wrap naturally instead of
+     forcing the same measure used for the absolute-positioned desktop
+     layout. */
+  .home-grounded-identity,
   .home-perimeter-navigation {
     position: static;
-    max-width: none;
     text-align: center;
+  }
+
+  .home-grounded-identity {
+    width: 100%;
+    max-width: 480px;
+  }
+
+  .home-grounded-identity__caption {
+    max-width: none;
   }
 
   .home-perimeter-navigation {
     flex-wrap: wrap;
     justify-content: center;
+  }
+
+  /* Smaller bubbles at constrained widths, still comfortably above the
+     ~44px touch-target minimum; floating drift is disabled here too —
+     small screens are touch-first, where a constant idle drift adds
+     little and this keeps the stacked list calmer. */
+  .home-nav-bubble {
+    width: clamp(58px, 16vw, 68px);
+    animation: none;
   }
 }
 
@@ -1214,6 +1258,159 @@ body.home-page .home-main {
   .archive-surface-orb--secondary {
     width: clamp(56px, 18vw, 90px);
     height: clamp(56px, 18vw, 90px);
+  }
+}
+
+/* H3.5: restrained entrance haze + four ambient glass orbs — a quiet
+   visual bridge between the opening scene's curved ground and the
+   project ecosystem's glass bubbles. #floating-archive is already
+   position:relative (see below), so this reuses the same 100vw full-
+   bleed technique its own ::before/::after already use, rather than
+   introducing a new positioning pattern. Bounded to a fixed height near
+   the very top of the section and its own overflow:hidden, so it can
+   never reach into the project rows or require any change to
+   #floating-archive's own overflow/position. */
+.archive-entrance-atmosphere {
+  position: absolute;
+  z-index: 1;
+  top: clamp(8px, 1vw, 18px);
+  left: 50%;
+  width: 100vw;
+  height: clamp(220px, 26vw, 360px);
+  transform: translateX(-50%);
+  overflow: hidden;
+  pointer-events: none;
+  opacity: 1;
+  transition: opacity 1050ms cubic-bezier(0.22, 1, 0.36, 1), transform 1050ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.archive-entrance-atmosphere::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(
+      to bottom,
+      rgba(255, 255, 255, 0.18) 0%,
+      rgba(248, 244, 236, 0.09) 34%,
+      rgba(248, 244, 236, 0.025) 68%,
+      transparent 100%
+    );
+}
+
+/* H2.2's own is-reveal-ready/is-project-ecosystem-visible classes (see
+   setupProjectEcosystemReveal() in home.js) are reused as-is — no new
+   JavaScript, no new observer. Default (no JS, or reduced-motion, where
+   is-reveal-ready is never added at all) stays at the base rule's
+   opacity:1 above; only when JS has explicitly marked the archive ready
+   does the atmosphere first hide/offset, then reveal once visible. */
+.floating-archive.is-reveal-ready:not(.is-project-ecosystem-visible) .archive-entrance-atmosphere {
+  opacity: 0;
+  transform: translateX(-50%) translateY(12px);
+}
+
+.floating-archive.is-reveal-ready.is-project-ecosystem-visible .archive-entrance-atmosphere {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .archive-entrance-atmosphere {
+    opacity: 1;
+    transform: translateX(-50%);
+    transition: none;
+  }
+}
+
+/* Environmental traces, not project bubbles — much quieter than the
+   H3.1 glass material (lower opacity, no image, no hover, no click).
+   Shared membrane/highlight/shadow treatment; each --archive-orb-*
+   custom property is set per position/accent variant below. */
+.archive-entrance-orb {
+  position: absolute;
+  display: block;
+  width: var(--archive-orb-size);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  opacity: var(--archive-orb-opacity);
+  pointer-events: none;
+  border: 1px solid rgba(255, 255, 255, 0.54);
+  background:
+    radial-gradient(
+      circle at 30% 24%,
+      rgba(255, 255, 255, 0.48) 0%,
+      rgba(255, 255, 255, 0.14) 20%,
+      rgba(var(--archive-orb-accent), 0.08) 56%,
+      transparent 78%
+    );
+  box-shadow:
+    inset 0 1px 2px rgba(255, 255, 255, 0.46),
+    0 8px 24px rgba(69, 47, 34, 0.06);
+}
+
+/* Deterministic desktop placement — upper-left/upper-right shoulders
+   (orbs 1 and 3) plus two smaller, quieter mid orbs (2 and 4), kept out
+   of the central heading corridor and well above the first project row
+   (project row 1 starts with clamp(26-52px, see H3.4) margin-top below
+   an entrance-atmosphere region that ends by ~360px at most). */
+.archive-entrance-orb--1 {
+  --archive-orb-size: clamp(32px, 3.4vw, 52px);
+  --archive-orb-opacity: 0.44;
+  --archive-orb-accent: 0, 191, 255;
+  left: clamp(5%, 8vw, 11%);
+  top: clamp(28px, 4vw, 58px);
+}
+
+.archive-entrance-orb--2 {
+  --archive-orb-size: clamp(18px, 2vw, 30px);
+  --archive-orb-opacity: 0.3;
+  --archive-orb-accent: 255, 182, 193;
+  left: clamp(20%, 24vw, 29%);
+  top: clamp(126px, 13vw, 186px);
+}
+
+.archive-entrance-orb--3 {
+  --archive-orb-size: clamp(42px, 4.6vw, 68px);
+  --archive-orb-opacity: 0.38;
+  --archive-orb-accent: 255, 215, 0;
+  right: clamp(8%, 10vw, 14%);
+  top: clamp(42px, 5vw, 76px);
+}
+
+.archive-entrance-orb--4 {
+  --archive-orb-size: clamp(22px, 2.5vw, 38px);
+  --archive-orb-opacity: 0.27;
+  --archive-orb-accent: 34, 139, 34;
+  right: clamp(25%, 28vw, 33%);
+  top: clamp(148px, 15vw, 214px);
+}
+
+/* Tablet and below: orbs 2/4 (the smaller, more central pair) drop out
+   first to avoid crowding the narrower Archive heading column; the
+   remaining shoulder orbs (1/3) also ease back slightly. Mobile
+   (<=767px) inherits this same rule — a second, narrower query isn't
+   needed since two orbs is already the "no more than two" ceiling. */
+@media (max-width: 1024px) {
+  .archive-entrance-orb--2,
+  .archive-entrance-orb--4 {
+    display: none;
+  }
+
+  .archive-entrance-orb--1 {
+    --archive-orb-opacity: 0.36;
+  }
+
+  .archive-entrance-orb--3 {
+    --archive-orb-opacity: 0.3;
+  }
+}
+
+/* Narrower phones: the height floor (220px) reads disproportionately
+   tall once 26vw drops well below it — scale the band down with the
+   viewport instead of holding a fixed height. */
+@media (max-width: 767px) {
+  .archive-entrance-atmosphere {
+    height: clamp(140px, 34vw, 220px);
   }
 }
 
@@ -1426,6 +1623,25 @@ body.home-page .home-main {
    sketch.js's collider sync reads this same resolved `top` via
    getComputedStyle unchanged — the target apex simply rises with it,
    automatically, with zero code change on that side. */
+/* H5.1A-R: the H5.1A pearlescent optical field moved here from
+   #project-archive-root, which was too narrow/short to cover more than a
+   rectangular content column — it read as a visible panel rather than
+   Archive atmosphere. ::before already spans the section's complete
+   width/height (100vw, top..bottom:0) and already sits behind every
+   project element, so painting the field here removes the rectangle
+   entirely with no new element and no geometry change. Only this
+   background declaration changed — content/position/inset/top/bottom/
+   opacity/border-radius/pointer-events below are byte-identical to
+   before, and sketch.js's updateArchivePlanetCollider() only ever reads
+   this pseudo-element's computed `top` (never background), so the
+   physics-linked ground synchronization is completely unaffected.
+   Palette/stops are unchanged from the approved H5.1A values: cyan
+   RGB(0,191,255), coral RGB(255,140,120), lavender RGB(200,190,224),
+   warm pearl base — the original var(--archive-surface-color) solid fill
+   is folded into the base layer's own warm-neutral stops so the surface
+   keeps reading as the same warm archive tone, just with the approved
+   optical light layered over it. Radial layers listed first paint
+   frontmost; the base gradient is listed last. */
 .floating-archive::before {
   content: "";
   position: absolute;
@@ -1434,7 +1650,35 @@ body.home-page .home-main {
   margin-left: -50vw;
   top: clamp(-160px, -14.5vh, -104px);
   bottom: 0;
-  background: var(--archive-surface-color);
+  background:
+    radial-gradient(
+      ellipse at 76% 39%,
+      rgba(255, 140, 120, 0.08) 0%,
+      rgba(255, 140, 120, 0.045) 28%,
+      rgba(255, 140, 120, 0.016) 65%,
+      rgba(255, 140, 120, 0) 96%
+    ),
+    radial-gradient(
+      ellipse at 21% 31%,
+      rgba(0, 191, 255, 0.09) 0%,
+      rgba(0, 191, 255, 0.05) 28%,
+      rgba(0, 191, 255, 0.018) 65%,
+      rgba(0, 191, 255, 0) 96%
+    ),
+    radial-gradient(
+      ellipse at 52% 75%,
+      rgba(200, 190, 224, 0.07) 0%,
+      rgba(200, 190, 224, 0.04) 28%,
+      rgba(200, 190, 224, 0.014) 65%,
+      rgba(200, 190, 224, 0) 96%
+    ),
+    linear-gradient(
+      180deg,
+      rgba(250, 247, 240, 1) 0%,
+      rgba(240, 247, 249, 1) 30%,
+      rgba(241, 236, 247, 1) 62%,
+      rgba(247, 243, 236, 1) 100%
+    );
   opacity: 0.94;
   border-radius: 50% 50% 0 0 / clamp(240px, 30vw, 400px) clamp(240px, 30vw, 400px) 0 0;
   pointer-events: none;
@@ -1641,17 +1885,123 @@ body.home-page .home-main {
   width: 100%;
 }
 
-.project-entry[data-accent="coffee"]   { --project-accent: #8b4513; }
-.project-entry[data-accent="cono"]     { --project-accent: #3f2b4c; }
-.project-entry[data-accent="getty"]    { --project-accent: #2a3659; }
-.project-entry[data-accent="exposure"] { --project-accent: #b8733b; }
-.project-entry[data-accent="catstar"]  { --project-accent: #101f5d; }
-.project-entry[data-accent="tech"]     { --project-accent: #243c1e; }
+/* H3.3: gentle idle floating — deliberately kept on .project-entry, not
+   .project-archive-item (which already owns the H2.2 viewport-reveal
+   transform) and not .project-bubble (which owns H3.2's hover/focus/
+   active scale). Composing transforms live on separate, nested elements
+   this way rather than colliding on one, so none of the three systems
+   can ever overwrite another. Vertical translation only; translate3d is
+   used purely as a compositor hint, not for any perspective/3D effect. */
+@keyframes project-entry-float {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+
+  50% {
+    transform: translate3d(0, var(--project-float-y, -4px), 0);
+  }
+}
+
+/* Desktop/tablet, real-hover devices, motion-allowed only — mirrors the
+   existing gating this codebase already uses elsewhere (e.g. the
+   Corridor's own bubble treatments) rather than inventing a new pattern. */
+@media (min-width: 768px) and (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .project-entry {
+    animation-name: project-entry-float;
+    animation-duration: var(--project-float-duration, 9s);
+    animation-delay: var(--project-float-delay, 0s);
+    animation-timing-function: ease-in-out;
+    animation-iteration-count: infinite;
+    transform-origin: center;
+  }
+
+  /* Six deterministic, hand-assigned rhythms (no runtime randomness) —
+     amplitude/duration/delay all differ enough that the six bubbles
+     drift out of sync with each other, without any one clearly moving
+     "more" than another in a way that reads as importance. Negative
+     delays start each bubble already partway into its own cycle instead
+     of all beginning from the same phase at page load. */
+  .project-archive-item:nth-child(1) .project-entry {
+    --project-float-y: -5px;
+    --project-float-duration: 8.6s;
+    --project-float-delay: -1.4s;
+  }
+
+  .project-archive-item:nth-child(2) .project-entry {
+    --project-float-y: -3px;
+    --project-float-duration: 10.1s;
+    --project-float-delay: -5.2s;
+  }
+
+  .project-archive-item:nth-child(3) .project-entry {
+    --project-float-y: -6px;
+    --project-float-duration: 9.2s;
+    --project-float-delay: -3.1s;
+  }
+
+  .project-archive-item:nth-child(4) .project-entry {
+    --project-float-y: -4px;
+    --project-float-duration: 10.8s;
+    --project-float-delay: -7.3s;
+  }
+
+  .project-archive-item:nth-child(5) .project-entry {
+    --project-float-y: -5px;
+    --project-float-duration: 9.7s;
+    --project-float-delay: -2.6s;
+  }
+
+  .project-archive-item:nth-child(6) .project-entry {
+    --project-float-y: -3.5px;
+    --project-float-duration: 8.9s;
+    --project-float-delay: -6.1s;
+  }
+
+  /* Hovering or keyboard-focusing anywhere inside the project item pauses
+     that bubble's idle motion — it holds at its current position (CSS
+     animation-play-state:paused freezes mid-cycle, it does not reset to
+     0%) rather than snapping back to rest. H3.2's own hover/focus scale
+     on .project-bubble and image clarification are untouched — this only
+     pauses the parent .project-entry's separate animation. */
+  .project-archive-item:hover .project-entry,
+  .project-archive-item:focus-within .project-entry {
+    animation-play-state: paused;
+  }
+}
+
+/* Explicit safeguard, kept separate from the enabling media query above
+   so it always wins regardless of viewport/hover matching: reduced
+   motion always fully disables the idle float, both the animation and
+   any transform it could have left mid-cycle. */
+@media (prefers-reduced-motion: reduce) {
+  .project-entry {
+    animation: none !important;
+    transform: none !important;
+  }
+}
+
+/* H3.1: RGB triplets alongside each existing accent hex — needed so the
+   glass shell (below) can tint its edge with rgba(var(--project-accent-
+   rgb), low-opacity) instead of a solid, full-opacity accent border. */
+.project-entry[data-accent="coffee"]   { --project-accent: #8b4513; --project-accent-rgb: 139, 69, 19; }
+.project-entry[data-accent="cono"]     { --project-accent: #3f2b4c; --project-accent-rgb: 63, 43, 76; }
+.project-entry[data-accent="getty"]    { --project-accent: #2a3659; --project-accent-rgb: 42, 54, 89; }
+.project-entry[data-accent="exposure"] { --project-accent: #b8733b; --project-accent-rgb: 184, 115, 59; }
+.project-entry[data-accent="catstar"]  { --project-accent: #101f5d; --project-accent-rgb: 16, 31, 93; }
+.project-entry[data-accent="tech"]     { --project-accent: #243c1e; --project-accent-rgb: 36, 60, 30; }
 
 /* The bubble itself: one anchor, real block-level geometry, no unsized
    wrapper between it and its three layers (unchanged from the minimal
    pass). isolation: isolate keeps the shell/media/overlay/highlight
    stack self-contained. */
+/* H3.2: transition lengthened (0.25s linear ease -> 550ms soft
+   cubic-bezier, no bounce) and hover scale increased slightly
+   (1.035 -> 1.045) to read as a calmer, slightly more deliberate
+   response. This element (not .project-archive-item) is the one meant
+   to keep owning hover/focus scale — H3.3's future idle float belongs on
+   the outer .project-archive-item wrapper instead, so the two never
+   fight over the same transform. */
 .project-bubble {
   display: block;
   position: relative;
@@ -1661,13 +2011,13 @@ body.home-page .home-main {
   isolation: isolate;
   color: inherit;
   text-decoration: none;
-  transition: transform 0.25s ease;
+  transition: transform 550ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .project-bubble:hover,
 .project-bubble:focus-visible,
 .project-bubble:focus {
-  transform: scale(1.035);
+  transform: scale(1.045);
 }
 
 .project-bubble:focus-visible {
@@ -1675,42 +2025,166 @@ body.home-page .home-main {
   outline-offset: 6px;
 }
 
+/* Restrained press feedback — quick, no native-navigation delay
+   (transition duration only, no preventDefault, no JS). */
+.project-bubble:active {
+  transform: scale(0.985);
+  transition-duration: 100ms;
+}
+
+/* H3.1: internal glass/refraction layer — two very restrained radial
+   gradients suggesting light bending through a curved surface, not a
+   veil over the image. Uses .project-bubble::before (the highlight below
+   already owns ::after), painted above the shell but still under nothing
+   opaque, so it only ever softens, never hides, the media beneath it.
+   The second gradient's pale cyan hint matches the reference's "soap
+   bubble" quality at very low opacity — the site's warm cream page
+   background is untouched; this is strictly an internal bubble effect. */
+.project-bubble::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 34% 28%, rgba(255, 255, 255, 0.26), rgba(255, 255, 255, 0.08) 25%, transparent 52%),
+    radial-gradient(circle at 72% 74%, rgba(175, 215, 220, 0.08), transparent 46%);
+  opacity: 0.82;
+  transition: opacity 550ms cubic-bezier(0.22, 1, 0.36, 1);
+  pointer-events: none;
+}
+
+/* H3.2: a modest opacity lift on hover/focus for the glass + both
+   highlight layers — "the membrane and highlights become slightly more
+   visible" — never an animated sweep across the surface, just a static
+   brighten while the interaction state is active. */
+.project-bubble:hover::before,
+.project-bubble:focus-visible::before,
+.project-bubble:focus::before {
+  opacity: 1;
+}
+
 /* A single restrained highlight (Part 7) — generated content on the
-   anchor itself, painted above shell/media/overlay alike, suggesting a
-   curved glass surface rather than an opaque decoration. Off-center
-   toward the upper-left, soft white-to-transparent, no animation. */
+   anchor itself, painted above the shell/media/glass layers (but below
+   the hover overlay, which must stay topmost), suggesting a curved glass
+   surface rather than an opaque decoration. Off-center toward the
+   upper-left, soft white-to-transparent, no animation.
+   H3.1: alternates between two close positions per nth-child so all six
+   bubbles don't carry an identical highlight in the exact same spot. */
 .project-bubble::after {
   content: "";
   position: absolute;
   inset: 0;
+  z-index: 3;
   border-radius: 50%;
   background: radial-gradient(circle at 30% 24%, rgba(255, 255, 255, 0.38) 0%, rgba(255, 255, 255, 0) 36%);
+  opacity: 0.85;
+  transition: opacity 550ms cubic-bezier(0.22, 1, 0.36, 1);
   pointer-events: none;
 }
 
+.project-bubble:hover::after,
+.project-bubble:focus-visible::after,
+.project-bubble:focus::after {
+  opacity: 1;
+}
+
+.project-archive-item:nth-child(even) .project-bubble::after {
+  background: radial-gradient(circle at 36% 20%, rgba(255, 255, 255, 0.36) 0%, rgba(255, 255, 255, 0) 34%);
+}
+
 /* Layer 1 — shell: a membrane, not a solid ring. Transparent through the
-   center, the accent only gathers in the outer ~20% of the circle. A
-   hairline accent border stays as a geometry safeguard; the dominant
-   read comes from the gradient plus two restrained inset shadows (a
-   soft highlight from above, a soft shadow from below) for a slightly
-   dimensional, glass-like feel rather than a flat cartoon outline. */
+   center, the accent only gathers in the outer ~20% of the circle. The
+   project's own accent color is kept only as a secondary low-opacity
+   tint inside the shell's own gradient — never a full-opacity
+   accent-colored ring. H3.1's original flat white border and its exact
+   outer-bloom value are both superseded below by H5.2A's directional
+   edge and recolored bloom — see that comment for the current values. */
+/* H5.2A: pearlescent shell material — three new background layers
+   (upper-left warm-white light response, faint cool cyan/lavender
+   reflection, and a soft warm-white haze forming the shell's own base)
+   sit in front of the existing H3.1 per-project accent ring (kept, listed
+   last, unchanged) so the shared Archive palette reads as reflected light
+   without erasing each project's own accent identity. The old uniform
+   `border` is removed in favor of the single directional edge on ::before
+   below — this is the one new edge treatment, not a second ring stacked
+   on the old one. The outer box-shadow is recolored from warm brown to a
+   cool-neutral pale tone (atmospheric separation from the optical
+   background, per the approved direction) and gains one very faint
+   zero-offset glow; both inset layers are untouched. */
 .project-bubble-shell {
   position: absolute;
   inset: 0;
+  z-index: 0;
   border-radius: 50%;
-  border: 1px solid var(--project-accent);
-  background: radial-gradient(circle, transparent 0%, transparent 78%, var(--project-accent) 100%);
-  opacity: 0.6;
+  background:
+    radial-gradient(circle at 28% 22%, rgba(255, 252, 246, 0.36) 0%, rgba(255, 252, 246, 0.16) 30%, rgba(255, 252, 246, 0) 62%),
+    radial-gradient(circle at 74% 68%, rgba(150, 205, 225, 0.12) 0%, rgba(190, 185, 220, 0.06) 34%, rgba(190, 185, 220, 0) 60%),
+    radial-gradient(circle, rgba(255, 250, 244, 0.1) 0%, rgba(255, 250, 244, 0.08) 55%, rgba(255, 250, 244, 0.05) 100%),
+    radial-gradient(circle, transparent 0%, transparent 80%, rgba(var(--project-accent-rgb), 0.32) 100%);
+  opacity: 0.7;
   box-shadow:
-    inset 0 3px 8px rgba(255, 255, 255, 0.5),
-    inset 0 -6px 14px rgba(0, 0, 0, 0.06);
-  transition: opacity 0.25s ease;
+    inset 0 1px 2px rgba(255, 255, 255, 0.55),
+    inset 0 -6px 14px rgba(0, 0, 0, 0.05),
+    0 10px 32px rgba(118, 148, 164, 0.13),
+    0 0 20px rgba(230, 244, 248, 0.14);
+  transition: opacity 550ms cubic-bezier(0.22, 1, 0.36, 1), box-shadow 550ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
+/* H5.2A: the shell's one directional edge — a thin ring built with the
+   same padding + mask-composite "gradient border" technique already used
+   for .home-nav-bubble::before, reused here rather than inventing a new
+   pattern. Single warm-white hue throughout (never a hue-rotating
+   rainbow) — only alpha varies around the ring, brightest at the
+   upper-left (from 315deg) and dimmest at the opposite, lower-right edge. */
+.project-bubble-shell::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  padding: 1px;
+  border-radius: 50%;
+  background: conic-gradient(
+    from 315deg,
+    rgba(255, 250, 245, 0.62),
+    rgba(255, 250, 245, 0.16) 50%,
+    rgba(255, 250, 245, 0.62) 100%
+  );
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+/* Optional second, much weaker highlight (Part 11) — a soft curved glow
+   near the lower-right, low opacity, no streak. */
+.project-bubble-shell::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: radial-gradient(circle at 78% 70%, rgba(255, 255, 255, 0.16) 0%, rgba(255, 255, 255, 0) 30%);
+  opacity: 0.8;
+  transition: opacity 550ms cubic-bezier(0.22, 1, 0.36, 1);
+  pointer-events: none;
+}
+
+/* H3.2: membrane slightly more visible + a slightly stronger outer bloom
+   on hover/focus — the accent tint itself is untouched, staying subtle. */
 .project-bubble:hover .project-bubble-shell,
 .project-bubble:focus-visible .project-bubble-shell,
 .project-bubble:focus .project-bubble-shell {
-  opacity: 0.8;
+  opacity: 0.88;
+  box-shadow:
+    inset 0 1px 2px rgba(255, 255, 255, 0.6),
+    inset 0 -6px 14px rgba(0, 0, 0, 0.05),
+    0 14px 40px rgba(118, 148, 164, 0.17),
+    0 0 26px rgba(230, 244, 248, 0.18);
+}
+
+.project-bubble:hover .project-bubble-shell::after,
+.project-bubble:focus-visible .project-bubble-shell::after,
+.project-bubble:focus .project-bubble-shell::after {
+  opacity: 1;
 }
 
 /* Layer 2 — media: real img/video, circularly clipped, with a radial
@@ -1721,13 +2195,20 @@ body.home-page .home-main {
 .project-bubble-media {
   position: absolute;
   inset: 7%;
+  z-index: 1;
   display: block;
   border-radius: 50%;
   overflow: hidden;
-  -webkit-mask-image: radial-gradient(circle, #000 72%, transparent 99%);
-  mask-image: radial-gradient(circle, #000 72%, transparent 99%);
+  -webkit-mask-image: radial-gradient(circle, #000 0%, #000 72%, rgba(0, 0, 0, 0.92) 82%, transparent 100%);
+  mask-image: radial-gradient(circle, #000 0%, #000 72%, rgba(0, 0, 0, 0.92) 82%, transparent 100%);
 }
 
+/* H5.2B: resting image is gently softened (opacity/saturate/contrast all
+   just under 1, brightness ~1) so it feels embedded in the shell rather
+   than pasted at full clarity underneath it — still clearly readable at
+   these values, never blurred/gray/washed out. Scale is unchanged from
+   H3.2 (1.06 rest / 1.07 hover, already restrained); opacity is now
+   included in the shared transition so it fades in step with filter. */
 .project-bubble-media img,
 .project-bubble-media video {
   display: block;
@@ -1735,36 +2216,62 @@ body.home-page .home-main {
   height: 100%;
   object-fit: cover;
   transform: scale(1.06);
-  transition: transform 0.25s ease, filter 0.25s ease;
+  opacity: 0.9;
+  filter: saturate(0.92) contrast(0.95) brightness(0.99);
+  transition: transform 550ms cubic-bezier(0.22, 1, 0.36, 1), filter 550ms cubic-bezier(0.22, 1, 0.36, 1), opacity 550ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
+/* H3.2: hover now brightens the image slightly (was brightness(0.96), a
+   dimming) — the overlay is much more transparent than before (Part 7),
+   so keeping the image clear/bright matters more than it did when a
+   near-opaque white wash sat on top of it regardless.
+   H5.2B: values gently pulled back toward neutral (was brightness(1.045)
+   saturate(1.035) contrast(1.015)) so the hover state reads as "the
+   resting softness lifting" rather than an added enhancement on top of
+   an already-full-clarity image; opacity now completes the return to 1. */
 .project-bubble:hover .project-bubble-media img,
 .project-bubble:hover .project-bubble-media video,
 .project-bubble:focus-visible .project-bubble-media img,
 .project-bubble:focus-visible .project-bubble-media video,
 .project-bubble:focus .project-bubble-media img,
 .project-bubble:focus .project-bubble-media video {
-  transform: scale(1.1);
-  filter: brightness(0.96);
+  transform: scale(1.07);
+  opacity: 1;
+  filter: saturate(1) contrast(1.02) brightness(1.01);
 }
 
-/* Layer 3 — hover/focus overlay: title + short description only. Its
-   opacity is the only thing hidden at rest; it never controls the
-   shell's or media's visibility. A soft radial gradient (rather than a
-   flat white disk) keeps a faint impression of the image beneath it. */
+/* H3.2: rebuilt as a bottom-anchored dark wash rather than a near-opaque
+   white disk centered over the whole bubble — the upper part of the
+   image now stays clear at rest and on hover alike; only title/year/
+   keywords need contrast, and they all live in the lower portion. */
 .project-bubble-overlay {
   position: absolute;
   inset: 0;
+  z-index: 4;
+  border-radius: 50%;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-end;
   text-align: center;
-  padding: 16%;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.68) 100%);
+  padding:
+    clamp(22px, 2.8vw, 38px)
+    clamp(18px, 2.2vw, 30px)
+    clamp(28px, 3.4vw, 48px);
+  color: rgba(255, 252, 246, 0.98);
+  background:
+    linear-gradient(
+      to top,
+      rgba(42, 29, 22, 0.68) 0%,
+      rgba(42, 29, 22, 0.35) 28%,
+      rgba(42, 29, 22, 0.08) 54%,
+      transparent 72%
+    );
   opacity: 0;
-  transition: opacity 0.2s ease;
+  /* H5.2B: 550ms -> 480ms so the information reveal reads as its own,
+     slightly quicker "floating into focus" moment, distinct from the
+     shell's own unchanged 550ms hover response. */
+  transition: opacity 480ms cubic-bezier(0.22, 1, 0.36, 1);
   pointer-events: none;
 }
 
@@ -1774,23 +2281,79 @@ body.home-page .home-main {
   opacity: 1;
 }
 
-/* .project-bubble-title is an h2 and .project-bubble-description is a p
-   (see home.js) — both need their browser-default margins reset
-   explicitly, since neither had any UA-stylesheet margin to override
-   back when these were plain spans. */
+/* H3.2: title is now the primary hover information — larger, on the warm
+   dark wash rather than a white disk, so it needs a real text-shadow
+   (not the old plain dark-on-light text) to stay legible over any
+   thumbnail. */
 .project-bubble-title {
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
-  max-width: 100%;
   margin: 0;
-  font-weight: bold;
-  font-size: clamp(14px, 1.8vw, 16px);
-  line-height: 1.25;
-  color: rgb(66, 34, 10);
+  max-width: 90%;
+  font-family: 'Helvetica Neue', sans-serif;
+  font-size: clamp(17px, 1.55vw, 24px);
+  font-weight: 650;
+  line-height: 1.08;
+  letter-spacing: -0.015em;
+  color: rgba(255, 252, 246, 0.98);
+  text-shadow: 0 2px 10px rgba(25, 16, 12, 0.28);
+  transform: translateY(6px);
+  /* H5.2B: 550ms -> 480ms, matching the overlay's own adjusted timing. */
+  transition: transform 480ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
+/* H3.2: year + up to two keywords (see createBubbleMeta() in home.js) —
+   quiet, compact, no pills/borders, clearly secondary to the title. */
+.project-bubble-meta {
+  margin-top: clamp(7px, 0.8vw, 11px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 5px 7px;
+  max-width: 88%;
+  font-family: 'Helvetica Neue', sans-serif;
+  font-size: clamp(10px, 0.78vw, 12px);
+  font-weight: 550;
+  line-height: 1.25;
+  letter-spacing: 0.045em;
+  color: rgba(255, 252, 246, 0.82);
+  transform: translateY(6px);
+  /* H5.2B: 550ms -> 480ms, matching the overlay's own adjusted timing. */
+  transition: transform 480ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.project-bubble-keywords {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
+.project-bubble-keyword {
+  display: inline-block;
+}
+
+.project-bubble:hover .project-bubble-title,
+.project-bubble:hover .project-bubble-meta,
+.project-bubble:focus-visible .project-bubble-title,
+.project-bubble:focus-visible .project-bubble-meta,
+.project-bubble:focus .project-bubble-title,
+.project-bubble:focus .project-bubble-meta {
+  transform: translateY(0);
+}
+
+/* H3.2: the fuller description stays in the DOM (aria-describedby still
+   points to its unchanged id) but is now always visually-hidden — see
+   the "visually-hidden" class home.js adds alongside this one. The
+   visible hover hierarchy is title -> year/keywords only, keeping the
+   bubble image-led rather than a circular text card. This rule's own
+   line-clamp/color values are harmless leftovers (never visible once
+   .visually-hidden's sizing/clip wins) and are kept only so the class
+   name stays self-descriptive if the treatment ever changes again. */
 .project-bubble-description {
   display: -webkit-box;
   -webkit-line-clamp: 3;
@@ -1804,83 +2367,280 @@ body.home-page .home-main {
 }
 
 /* Touch/no-hover devices: the overlay can't wait for a hover that will
-   never come, so it stays permanently present but restrained — a soft
-   gradient anchoring the title to the lower portion of the bubble
-   (Part 16), not a full opaque disk. The description is suppressed
-   visually (max-height/opacity, not display: none) so it stays out of
-   the way while remaining in the accessibility tree. Tapping anywhere
-   still activates the one real link immediately — nothing here
-   intercepts the tap. */
+   never come, so it stays permanently present but restrained — a
+   smaller version of the same bottom gradient, title (and year, when
+   space allows) only. Tapping anywhere still activates the one real
+   link immediately — nothing here intercepts the tap. */
 @media (hover: none) {
   .project-bubble-overlay {
     opacity: 1;
-    justify-content: flex-end;
-    padding-bottom: 14%;
-    background: linear-gradient(to top, rgba(255, 255, 255, 0.92) 0%, rgba(255, 255, 255, 0.86) 26%, rgba(255, 255, 255, 0) 60%);
+    padding-bottom: clamp(20px, 6vw, 30px);
+    background:
+      linear-gradient(
+        to top,
+        rgba(42, 29, 22, 0.58) 0%,
+        rgba(42, 29, 22, 0.16) 42%,
+        transparent 68%
+      );
   }
 
-  .project-bubble-description {
-    max-height: 0;
-    opacity: 0;
-    margin-top: 0;
+  .project-bubble-title,
+  .project-bubble-meta {
+    transform: translateY(0);
+  }
+
+  /* Compact touch bubbles can't comfortably hold title + year + keywords
+     without crowding — keywords drop first, title and year stay. */
+  .project-bubble-keywords {
+    display: none;
+  }
+
+  .project-bubble-meta-separator {
+    display: none;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .project-bubble,
   .project-bubble-shell,
+  .project-bubble-shell::after,
+  .project-bubble::before,
+  .project-bubble::after,
   .project-bubble-media img,
   .project-bubble-media video,
-  .project-bubble-overlay {
+  .project-bubble-overlay,
+  .project-bubble-title,
+  .project-bubble-meta {
     transition: none;
   }
+
+  /* No transform-based motion, but the information itself must still
+     reach keyboard/focus users immediately — opacity/translate jump to
+     their active-state values with no animation rather than being
+     removed. */
+  .project-bubble:hover,
+  .project-bubble:focus-visible,
+  .project-bubble:focus {
+    transform: none;
+  }
+
+  .project-bubble:hover .project-bubble-media img,
+  .project-bubble:hover .project-bubble-media video,
+  .project-bubble:focus-visible .project-bubble-media img,
+  .project-bubble:focus-visible .project-bubble-media video,
+  .project-bubble:focus .project-bubble-media img,
+  .project-bubble:focus .project-bubble-media video {
+    transform: scale(1.06);
+  }
 }
 
-/* Tablet: two columns, one restrained size, a small alternating offset. */
+/* H3.6: 8-column tablet ecosystem, replacing the old uniform 2-column
+   grid — two items per row across three broad rows (same conceptual
+   shape as the H3.4 desktop composition, just narrower), each row
+   leaving generous slack between its two items even where their grid
+   cells are directly adjacent or (row 3) partially overlapping in track
+   allocation — verified at 768px, the narrowest tablet width: row gaps
+   of 140-207px between bubble edges, and a 69px row-gap that comfortably
+   covers focus-outline+bloom+idle-float protrusion (float only applies
+   on a hover-capable device per H3.3's own gating, and hovering a bubble
+   pauses *that* bubble's float, so the true worst case is one hovered
+   bubble's growth against one independently-floating neighbor, well
+   under 69px). DOM/tab order is untouched — only paint position moves. */
 @media (min-width: 768px) and (max-width: 1024px) {
   .project-archive-list {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: repeat(8, minmax(0, 1fr));
+    grid-template-rows: repeat(3, auto);
+    column-gap: clamp(16px, 2.5vw, 28px);
+    row-gap: clamp(68px, 9vw, 104px);
   }
 
-  .project-archive-item {
-    --bubble-size: clamp(184px, 30vw, 224px);
+  .project-archive-item:nth-child(1) {
+    grid-row: 1;
+    grid-column: 1 / 5;
+    justify-self: start;
+    margin-top: clamp(12px, 2vw, 26px);
   }
 
-  .project-archive-item:nth-child(even) {
-    margin-top: clamp(14px, 2.5vw, 24px);
-  }
-}
-
-/* Desktop: three columns / two rows for six projects. Modest static
-   vertical offsets and horizontal nudges within the grid cell, plus
-   three restrained size tiers on a repeating 3-item rhythm, so the
-   field reads as spatial rather than a rigid product grid without any
-   single project reading as "featured." Every tier stays well under a
-   column's share of the grid, so hover scaling (1.035x) never risks
-   clipping into a neighboring cell. */
-@media (min-width: 1025px) {
-  .project-archive-list {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+  .project-archive-item:nth-child(2) {
+    grid-row: 1;
+    grid-column: 5 / 9;
+    justify-self: end;
+    margin-top: clamp(66px, 8vw, 92px);
   }
 
-  .project-archive-item:nth-child(1) { justify-self: end; }
-  .project-archive-item:nth-child(4) { justify-self: start; }
-
-  .project-archive-item:nth-child(2) { margin-top: clamp(16px, 2vw, 28px); }
-  .project-archive-item:nth-child(3) { margin-top: clamp(-12px, -1vw, 0px); }
-  .project-archive-item:nth-child(5) { margin-top: clamp(20px, 2.5vw, 32px); }
-  .project-archive-item:nth-child(6) { margin-top: clamp(-8px, -0.5vw, 0px); }
-
-  .project-archive-item:nth-child(3n+1) { --bubble-size: clamp(216px, 18vw, 240px); }
-  .project-archive-item:nth-child(3n+2) { --bubble-size: clamp(232px, 19vw, 256px); }
-  .project-archive-item:nth-child(3n)   { --bubble-size: clamp(200px, 16vw, 216px); }
-}
-
-/* Mobile: single column, no offsets. */
-@media (max-width: 767px) {
-  .project-archive-item {
+  .project-archive-item:nth-child(3) {
+    grid-row: 2;
+    grid-column: 2 / 6;
+    justify-self: start;
     margin-top: 0;
   }
+
+  .project-archive-item:nth-child(4) {
+    grid-row: 2;
+    grid-column: 5 / 9;
+    justify-self: end;
+    margin-top: clamp(54px, 7vw, 82px);
+  }
+
+  .project-archive-item:nth-child(5) {
+    grid-row: 3;
+    grid-column: 1 / 5;
+    justify-self: start;
+    margin-top: clamp(38px, 5vw, 64px);
+  }
+
+  .project-archive-item:nth-child(6) {
+    grid-row: 3;
+    grid-column: 4 / 8;
+    justify-self: end;
+    margin-top: 0;
+  }
+
+  /* Same deterministic nth-child mechanism as desktop, tablet-scaled
+     ranges — no runtime randomness, no fourth tier. */
+  .project-archive-item:nth-child(3n+1) { --bubble-size: clamp(230px, 34vw, 300px); } /* large */
+  .project-archive-item:nth-child(3n+2) { --bubble-size: clamp(210px, 31vw, 272px); } /* medium */
+  .project-archive-item:nth-child(3n)   { --bubble-size: clamp(190px, 28vw, 246px); } /* small */
+}
+
+/* H3.4: 12-column ecosystem composition, replacing the old 3-column/
+   2-row grid. Six projects are placed as a controlled vertical path —
+   two per row across three broad rows — each row leaving at least one
+   full empty column track between its two items (verified at 1440/1280/
+   1100/1025px: the narrowest case, row 2, still clears ~366px between
+   bubble edges, far past the ~32px target), so the composition reads as
+   an open field rather than a rigid grid without any risk of overlap
+   under hover scale, idle float, or focus outline. DOM/tab order is
+   untouched — this only changes where each already-ordered item paints.
+   Size tiers (below) and transform ownership (.project-archive-item /
+   .project-entry / .project-bubble) are both unchanged from H3.1/H3.3. */
+@media (min-width: 1025px) {
+  .project-archive-list {
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    grid-template-rows: repeat(3, auto);
+    column-gap: clamp(18px, 2.6vw, 42px);
+    row-gap: clamp(92px, 11vw, 158px);
+  }
+
+  .project-archive-item:nth-child(1) {
+    grid-row: 1;
+    grid-column: 1 / 5;
+    justify-self: start;
+    margin-top: clamp(26px, 3vw, 52px);
+  }
+
+  .project-archive-item:nth-child(2) {
+    grid-row: 1;
+    grid-column: 7 / 12;
+    justify-self: end;
+    margin-top: clamp(92px, 8vw, 136px);
+  }
+
+  .project-archive-item:nth-child(3) {
+    grid-row: 2;
+    grid-column: 3 / 7;
+    justify-self: start;
+    margin-top: 0;
+  }
+
+  .project-archive-item:nth-child(4) {
+    grid-row: 2;
+    grid-column: 8 / 13;
+    justify-self: end;
+    margin-top: clamp(70px, 7vw, 116px);
+  }
+
+  .project-archive-item:nth-child(5) {
+    grid-row: 3;
+    grid-column: 1 / 5;
+    justify-self: start;
+    margin-top: clamp(62px, 6vw, 104px);
+  }
+
+  .project-archive-item:nth-child(6) {
+    grid-row: 3;
+    grid-column: 6 / 11;
+    justify-self: end;
+    margin-top: 0;
+  }
+
+  /* H3.1: widened into a clearer large/medium/small rhythm (was a
+     narrower 216-240/232-256/200-216 spread) — still the same
+     deterministic nth-child mechanism, no runtime randomness, and still
+     comfortably under a column's share so hover scaling never clips a
+     neighboring cell. Unchanged in H3.4. */
+  .project-archive-item:nth-child(3n+1) { --bubble-size: clamp(230px, 22vw, 320px); } /* large */
+  .project-archive-item:nth-child(3n+2) { --bubble-size: clamp(205px, 19vw, 280px); } /* medium */
+  .project-archive-item:nth-child(3n)   { --bubble-size: clamp(185px, 17vw, 245px); } /* small */
+}
+
+/* H3.6: single-column vertical archive path — replaces the old uniform
+   centered stack with alternating left/end/center alignment and three
+   size tiers, so mobile still reads as a spatial sequence rather than
+   six identical circles. padding-inline floor raised to 16px (from the
+   originally-considered 10px) specifically to guarantee the ~16px
+   bubble-to-viewport-edge clearance target at the very narrowest tested
+   width (320px: 3vw resolves to 9.6px there, below the target, so the
+   clamp floor does the real work at that end). Idle float never runs
+   here (H3.3 requires hover:hover, which touch devices don't match), so
+   the only clearance need is focus-outline+shell bloom between stacked
+   rows — the 52px row-gap floor comfortably covers that. */
+@media (max-width: 767px) {
+  .project-archive-list {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: none;
+    row-gap: clamp(52px, 14vw, 84px);
+    padding-inline: clamp(16px, 3vw, 22px);
+    align-items: start;
+  }
+
+  .project-archive-item {
+    grid-column: 1;
+    grid-row: auto;
+    margin-top: 0;
+  }
+
+  .project-archive-item:nth-child(1) { justify-self: start; }
+  .project-archive-item:nth-child(2) { justify-self: end; }
+  .project-archive-item:nth-child(3) { justify-self: center; }
+  .project-archive-item:nth-child(4) { justify-self: start; }
+  .project-archive-item:nth-child(5) { justify-self: end; }
+  .project-archive-item:nth-child(6) { justify-self: center; }
+
+  /* Same deterministic nth-child mechanism as desktop/tablet — width-
+     based (min(vw,px)) rather than clamp(), matching the preferred
+     mobile direction, but read through the same --bubble-size variable
+     .project-archive-item already consumes. */
+  .project-archive-item:nth-child(3n+1) { --bubble-size: min(82vw, 330px); } /* large */
+  .project-archive-item:nth-child(3n+2) { --bubble-size: min(76vw, 304px); } /* medium */
+  .project-archive-item:nth-child(3n)   { --bubble-size: min(70vw, 278px); } /* small */
+
+  /* The desktop overlay padding/title size were tuned for 230-320px
+     bubbles; the small mobile tier (down to ~252px at narrow phones)
+     can crowd against the same values, so this trims padding and title
+     size slightly — the visible hierarchy (title -> year, keywords
+     already hidden under hover:none) is unchanged, only the numbers. */
+  .project-bubble-overlay {
+    padding: 20px clamp(16px, 5vw, 24px) clamp(24px, 7vw, 34px);
+  }
+
+  .project-bubble-title {
+    font-size: clamp(16px, 4.8vw, 21px);
+    max-width: 88%;
+  }
+
+  .project-bubble-meta {
+    margin-top: 6px;
+    font-size: clamp(10px, 3vw, 12px);
+  }
+}
+
+/* Very narrow phones: cap sizes a bit further so even "large" never
+   crowds a ~320-360px viewport uncomfortably. */
+@media (max-width: 379px) {
+  .project-archive-item:nth-child(3n+1) { --bubble-size: min(84vw, 300px); }
+  .project-archive-item:nth-child(3n+2) { --bubble-size: min(78vw, 276px); }
+  .project-archive-item:nth-child(3n)   { --bubble-size: min(72vw, 252px); }
 }
 
 html {
@@ -1940,6 +2700,39 @@ html {
     top: clamp(-84px, -9vh, -52px);
     opacity: 0.94;
     border-radius: 50% 50% 0 0 / clamp(100px, 24vw, 160px) clamp(100px, 24vw, 160px) 0 0;
+    /* H5.1A-R: same positions/hues/stop percentages as the desktop
+       optical field above — only peak alphas trimmed (~a quarter softer,
+       matching H5.1A's original mobile reduction), reusing this existing
+       breakpoint rather than a new one. */
+    background:
+      radial-gradient(
+        ellipse at 76% 39%,
+        rgba(255, 140, 120, 0.06) 0%,
+        rgba(255, 140, 120, 0.034) 28%,
+        rgba(255, 140, 120, 0.012) 65%,
+        rgba(255, 140, 120, 0) 96%
+      ),
+      radial-gradient(
+        ellipse at 21% 31%,
+        rgba(0, 191, 255, 0.068) 0%,
+        rgba(0, 191, 255, 0.038) 28%,
+        rgba(0, 191, 255, 0.013) 65%,
+        rgba(0, 191, 255, 0) 96%
+      ),
+      radial-gradient(
+        ellipse at 52% 75%,
+        rgba(200, 190, 224, 0.053) 0%,
+        rgba(200, 190, 224, 0.03) 28%,
+        rgba(200, 190, 224, 0.01) 65%,
+        rgba(200, 190, 224, 0) 96%
+      ),
+      linear-gradient(
+        180deg,
+        rgba(250, 247, 240, 1) 0%,
+        rgba(240, 247, 249, 1) 30%,
+        rgba(241, 236, 247, 1) 62%,
+        rgba(247, 243, 236, 1) 100%
+      );
   }
 
   .floating-archive::after {
