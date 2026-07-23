@@ -744,12 +744,26 @@ function initBall() {
         clearInterval(intervalId);
         intervalId = null;
       }
-      timeoutId = setTimeout(() => {
-        for (let i = balls.length - 1; i >= 0; i--) {
-          balls[i].removeBody();
-        }
-        resetMatter();
-      }, 5000);
+      // H5-P0: previously scheduled a 5s-later cleanup here that
+      // unconditionally force-froze every ball's rendered position
+      // (removeBody(), which detaches the JS wrapper from its live Matter
+      // body without checking whether that specific ball had actually
+      // finished settling) and then wiped the entire Matter world
+      // (resetMatter() — Engine.clear/World.clear + a brand-new empty
+      // engine/world). With FINAL_BALL_CAP balls, some can legitimately
+      // still be mid-fall or mid-roll 5s after the cap is reached — this
+      // froze them wherever they happened to be, including mid-air or
+      // mid-ground-penetration, and orphaned the shared Archive ground
+      // collider (initPlanetCollider(), plus initBorder()'s walls) from
+      // the newly emptied world for anything that continued afterward,
+      // since nothing re-created them the way windowResized() does after
+      // its own resetMatter() call. Removed entirely: every ball already
+      // has its own correct, independent settle detection in
+      // Ball.update() (isStatic only once genuinely stable for 1000ms),
+      // so nothing further is needed once Stage C's interval clears —
+      // the shared ground collider, border, and any still-settling ball
+      // now simply keep running under the same live Matter world/engine
+      // for as long as they need to.
     } else {
       const remaining = FINAL_BALL_CAP - balls.length;
       const spawnAmount = Math.min(MAIN_RAIN_BATCH_SIZE, remaining);
