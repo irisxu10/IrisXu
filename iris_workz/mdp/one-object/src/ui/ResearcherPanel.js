@@ -237,8 +237,8 @@ export class ResearcherPanel {
         ['maxMemory', rs.maxMemory.toFixed(2)],
       ];
     } else {
-      const gel = rs.gel;
-      this.stateEl.textContent = rs.grabbing ? 'CONTACT' : gel?.recovering ? 'RECOVERY' : rs.proximity > 0.05 ? 'APPROACH' : gel && !gel.settled ? 'SETTLING' : 'IDLE';
+      const gel = rs.gel, sil = rs.silicone, live = gel || sil;
+      this.stateEl.textContent = rs.grabbing ? 'CONTACT' : live?.recovering ? 'RECOVERY' : rs.proximity > 0.05 ? 'APPROACH' : live && !live.settled ? 'SETTLING' : 'IDLE';
       rows = [
         ['elapsed', (rs.timeMs / 1000).toFixed(1) + 's'],
         ['contacts', tot.contactEpisodes],
@@ -247,7 +247,14 @@ export class ResearcherPanel {
       if (gel) {
         rows.push(['peakDeformation', (tot.peakDeformation ?? 0).toFixed(3)]);
         rows.push(['redistribution', (tot.peakRedistribution ?? 0).toFixed(3)]);
+        rows.push(['internalDisplacement', gel.maxU.toFixed(3)]);
+        rows.push(['compression', gel.compression.toFixed(3)]);
         rows.push(['volumeChange', (gel.volumeChange * 100).toFixed(2) + '%']);
+      }
+      if (sil) {
+        rows.push(['stretch', (tot.peakStretch ?? 0).toFixed(3)]);
+        rows.push(['strain', sil.maxStrain.toFixed(3)]);
+        rows.push(['peakDeformation', sil.maxDisp.toFixed(3)]);
       }
     }
     rows.push(['events', eventCount]);

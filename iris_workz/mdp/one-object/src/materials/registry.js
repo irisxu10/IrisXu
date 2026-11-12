@@ -6,7 +6,7 @@ export const MATERIALS = Object.freeze([
   Object.freeze({ id: '01', key: 'structural', name: 'Structural / Memory', status: 'full', load: () => import('./StructuralMaterial.js') }),
   Object.freeze({ id: '02', key: 'gel', name: 'Gel / Flow', status: 'full', load: () => import('./GelMaterial.js') }),
   Object.freeze({ id: '03', key: 'plastic', name: 'Plastic / Crease', status: 'placeholder', load: () => import('./PlasticMaterial.js') }),
-  Object.freeze({ id: '04', key: 'silicone', name: 'Silicone / Elasticity', status: 'placeholder', load: () => import('./SiliconeMaterial.js') }),
+  Object.freeze({ id: '04', key: 'silicone', name: 'Silicone / Elasticity', status: 'full', load: () => import('./SiliconeMaterial.js') }),
 ]);
 
 export const CONDITION_IDS = Object.freeze(MATERIALS.map((m) => m.id));

@@ -4,16 +4,16 @@ An interactive MFA thesis research prototype. It shows one unfamiliar, transluce
 
 **This folder is the canonical project.** Edit files here. Everything else in `iris_workz/mdp/` that relates to this work is an archived earlier version (see [CHANGELOG.md](CHANGELOG.md)).
 
-Current version: **5.0.0-alpha.2** ("V5 — Same Form, Different Materialities"; Phase 03: Gel). The tab title shows "· V5".
+Current version: **5.0.0-alpha.4** ("V5 — Same Form, Different Materialities"; Gel and Silicone implemented, Plastic still a placeholder). The tab title shows "· V5".
 
 **Four conditions** share the same initial form. Participants see only **01 / 02 / 03 / 04**, in a narrow selector on the left:
 
 | ID | Name (researchers only) | Status |
 |---|---|---|
 | 01 | Structural / Memory | Full system (V4.2 physics, memory, adaptation, filaments, sound) |
-| 02 | Gel / Flow | Full: viscous, volume-conserving contained fluid (pressure redistribution, slow drag, flow layers) |
+| 02 | Gel / Flow | Full: thick translucent hydrogel; press, hold or drag anywhere inside (interior field coupled to a pressure boundary) |
 | 03 | Plastic / Crease | Placeholder |
-| 04 | Silicone / Elasticity | Placeholder |
+| 04 | Silicone / Elasticity | Full: elastic membrane; stretch anywhere, resistance rises, springs back with a slight overshoot; no memory |
 
 ---
 
@@ -47,7 +47,7 @@ Tests need Node 18 or later:
 
 ```bash
 cd iris_workz/mdp/one-object
-npm test            # 45 tests (incl. 9 Gel acceptance tests): physics, memory, adaptation, sweep, filaments, proximity/dwell, shared form, research session, logging, export
+npm test            # 59 tests (incl. 12 Gel and 11 Silicone acceptance tests): physics, memory, adaptation, sweep, filaments, proximity/dwell, shared form, research session, logging, export
 npm run example     # regenerates examples/session-example.json (deterministic)
 ```
 
@@ -63,7 +63,8 @@ one-object/
 │   ├── config.js                 ALL parameters, presets, slider definitions, version
 │   ├── util/math.js              seeded PRNG, smoothstep, ids
 │   ├── physics/SoftBody.js       material behaviour (01): 80-node perimeter soft body
-│   ├── physics/GelBody.js        material behaviour (02): pressure-redistribution viscous boundary + interior flow
+│   ├── physics/SiliconeBody.js   material behaviour (04): triangulated mass-spring membrane (stiffening springs, area constraint)
+│   ├── physics/GelBody.js        material behaviour (02): pressure boundary ⇄ interior displacement grid (indenter, lag fields, trail)
 │   ├── behavior/
 │   │   ├── MemorySystem.js       per-node behavioural memory (accumulates, decays, residual shape)
 │   │   ├── AdaptationSystem.js   memory → reduced sensitivity, stiffer, wider contact
@@ -76,12 +77,14 @@ one-object/
 │   │   ├── StructuralMaterial.js 01 — adapter around Simulation + FilamentRenderer (unchanged)
 │   │   ├── PlaceholderMaterial.js  base for 02–04: shared form + static texture + pointer logging
 │   │   ├── GelMaterial.js        02 — wires GelBody + GelRenderer, research logging, parameters
-│   │   ├── PlasticMaterial.js · SiliconeMaterial.js   03 / 04 placeholder textures
+│   │   ├── SiliconeMaterial.js   04 — wires SiliconeBody + SiliconeRenderer, research logging, parameters
+│   │   ├── PlasticMaterial.js    03 placeholder texture
 │   │   └── PointerTracker.js     pointer event logging for materials without their own physics
 │   ├── rendering/
 │   │   ├── FilamentNetwork.js    seeded filament anchors/edges mapped through the deformation
 │   │   ├── FilamentRenderer.js   Canvas 2D (01): membrane, folds, filaments, tension, memory traces
-│   │   └── GelRenderer.js        Canvas 2D (02): translucent body, liquid layers, flow lines, rim highlights
+│   │   ├── SiliconeRenderer.js   Canvas 2D (04): mapped elastic bands, thickness shading, sheets, satin highlight
+│   │   └── GelRenderer.js        Canvas 2D (02): volume, density map, folded membranes, Fresnel rim, field-driven speculars
 │   ├── interaction/PointerController.js   Pointer Events (mouse/touch/pen) → object units
 │   ├── audio/AudioEngine.js      procedural Web Audio (off by default)
 │   ├── research/
@@ -134,5 +137,6 @@ All live in `src/config.js`. ★ means the parameter is also a Researcher Mode s
 | Proximity / sweep | `proximityRadius`, `proximityPush`, `proximitySpeedGain`, `proximityWake`, `sweepSpeed`, `sweepGain`, `sweepDent`, `sweepMemory` |
 | Immediate response | `interactionRadius`★, `proximityResponse`★, `proximityGlow`, `responseRate`, `dwellRadius`, `dwellDelay`★, `dwellRamp`, `dwellRelease`, `dwellAttraction`★, `dwellGlow`, `dwellActivity` |
 | Memory / adaptation | `memoryEnabled`★, `learningRate`★, `decayRate`★, `plasticity`, `adaptiveEnabled`★, `adaptationStrength`★, `adaptationThreshold`★, `adaptationHysteresis`, `adaptationTau`, `adaptStiffen`, `adaptWiden` |
+| Silicone (04, researcher-only) | `stiffness` (0.5), `resistance` (0.5), `damping` (0.75), `recovery` (0.5), `maxDeformation` (0.45) — defaults in `config.js` `SILICONE_DEFAULTS` |
 | Gel (02, researcher-only) | `viscosity` (0.6), `pressure` redistribution (1.0), `recovery` speed (0.5), `flow` intensity (0.7) — defaults in `config.js` `GEL_DEFAULTS` |
 | Display only (never changes the condition) | `filamentDensity`★, `membraneOpacity`★, `structuralContrast`★, `tensionHighlight`★, `visualMemory`★, `lowDetail`★ |

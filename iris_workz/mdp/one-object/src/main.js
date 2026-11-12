@@ -3,7 +3,7 @@
 // Switching condition (or resetting, applying a preset or seed) closes the
 // current encounter — its record is frozen and kept — and begins a new one.
 
-import { APP_VERSION, DEFAULT_PARAMS, PRESETS, DEFAULT_VISUAL, DEFAULT_SEED, GEL_DEFAULTS } from './config.js';
+import { APP_VERSION, DEFAULT_PARAMS, PRESETS, DEFAULT_VISUAL, DEFAULT_SEED, GEL_DEFAULTS, SILICONE_DEFAULTS } from './config.js';
 import { PointerController } from './interaction/PointerController.js';
 import { AudioEngine } from './audio/AudioEngine.js';
 import { SessionLogger } from './research/SessionLogger.js';
@@ -26,7 +26,7 @@ const SILENT = Object.freeze({ tension: 0, motion: 0, sweep: 0, kinetic: 0 });
 const params = { ...DEFAULT_PARAMS };          // behaviour (condition 01)
 const visual = { ...DEFAULT_VISUAL };          // display (condition 01)
 const visualCommitted = { ...DEFAULT_VISUAL };
-const materialParams = { gel: { ...GEL_DEFAULTS } };   // per-material researcher parameters (02–04)
+const materialParams = { gel: { ...GEL_DEFAULTS }, silicone: { ...SILICONE_DEFAULTS } };   // per-material researcher parameters (02–04)
 const preset = { id: 'B', custom: false };
 let seed = DEFAULT_SEED;
 const presetLabel = () => PRESETS[preset.id].id + (preset.custom ? '+custom' : '');

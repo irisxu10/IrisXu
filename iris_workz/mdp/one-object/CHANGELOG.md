@@ -2,6 +2,78 @@
 
 All notable changes to ONE OBJECT / MANY ENCOUNTERS. Dates are 2026.
 
+## 5.0.0-alpha.4 — 12 Nov · Phase 05: Silicone / Elasticity (condition 04)
+
+**Condition 04 is now a real material.** Conditions 01, 02 and 03 are unchanged: 01 and 02 pass their regression and Gel checks (52/52 and 21/21), and 03 remains a placeholder.
+
+**Physics** (`physics/SiliconeBody.js`, pure, fixed step, deterministic): a triangulated mass-spring disk.
+
+- **Mesh:** a centre plus 12 rings of 6k nodes. That is 469 nodes, 864 triangles and 1,332 springs, with at most 7 links per node. The outer ring lies on the shared outline.
+- **Springs stiffen with strain:** `k·(1 + resistance·strain²)`, with a stability cap.
+- **Oriented area constraint:** uses signed area, so it resists squeezing and unfolds any triangle that flips over.
+- **Weak shape tether:** holds no history, so there is no memory or adaptation.
+- **Grab:** a gaussian footprint pulled toward the pointer offset, soft-limited by `maxDeformation`.
+- **Underdamped integration** in two sub-steps per physics step. A settled, untouched membrane is not simulated at all, so it stays exactly at rest.
+- **Measured behaviour:**
+  - the grab follows 56–66% of the pointer's travel, with resistance rising with stretch;
+  - release overshoots about 30% with 2–3 crossings of rest and settles in about 1.8 s;
+  - normal use folds zero triangles;
+  - extreme flailing folds on average under 1% of triangles momentarily, then recovers fully.
+
+**Rendering** (`rendering/SiliconeRenderer.js`): everything is driven by the mesh.
+
+- Broad elastic bands mapped through the membrane. They thin and brighten where stretched, and align with the pull.
+- Soft per-node thickness shading from triangle area: clearer where thinned, milkier where compressed. Sprites are used, so no mesh seams show.
+- Two gentle overlapping sheets, a soft inner rim for thickness, and a satin highlight that lengthens under strain.
+- No wireframe and no glare.
+
+**Researcher parameters:** elastic stiffness, stretch resistance, damping, recovery speed and maximum deformation. Recovery speed scales both the pull home and the energy loss, so it genuinely shortens recovery; damping sets how bouncy the return is.
+
+**Logging:**
+
+- `contact_end`: stretch duration, `stretchDistance`, `peakDeformation`, `peakStrain`, `releaseDisplacement`.
+- `recovery` (kind `settle`): duration, `releaseVelocity`, `overshoots` (crossings of rest) and `maxOvershoot`.
+- The export summary adds `peakStretch`, `peakDeformation`, `peakStrain`, `peakReleaseVelocity` and `interiorContacts`.
+
+**Tests:** 59 (11 new Silicone tests). Reference screenshots are in `research/screenshots/silicone/`. Version 5.0.0-alpha.4.
+
+## 5.0.0-alpha.3 — 12 Nov · Gel refinement: volumetric interaction (condition 02)
+
+The whole interior of the Gel is now interactive. Only Gel files and the minimum shared wiring changed; Condition 01 is untouched (52/52 regression checks).
+
+**Interaction model** (`physics/GelBody.js`):
+
+- The 80-node pressure boundary is kept and coupled both ways to a new **interior displacement grid** (31 × 31, about 750 cells inside the body).
+- Cells are elastically coupled to their neighbours, so a disturbance propagates outward over time.
+- Cells next to the edge take the boundary's displacement as their outside neighbour, and each boundary node is pulled toward the interior displacement just inside it.
+- A press **anywhere** drives an indenter that pushes material away from the finger, leaving a cleared dimple inside a compressed ring.
+  - The indentation registers immediately (35%), then deepens under a hold to a stable compressed state.
+  - Near the edge, the existing edge dent also applies.
+- **Interior pressure**, driven by the actual interior displacement, raises the body's target area after a delay. The contour swells about 0.15 s after the inside moves, and returns after release.
+- **Dragging** carries nearby material with viscous lag.
+- Two lagged copies of the field give the deeper layers their slower motion, and a decaying trail records recent pointer-driven flow.
+- Everything settles to exact rest, with no autonomous motion.
+
+**Rendering** (`rendering/GelRenderer.js`): the contour-like flow lines and nested layer rings are removed. In their place:
+
+- A thick translucent volume with scattered light.
+- A smooth density map computed from the field's compression (blurred: brighter where compressed, clearer under the dimple).
+- Ten folded membranes warped through the field at three depths. Each has a dark trough and a specular ridge that brightens with local compression and flow.
+- A Fresnel-style rim.
+- Specular highlights that the field and interior pressure move and stretch.
+- In-form brightness at rest is 32.1, against 31.3 for Condition 01.
+
+**Logging:**
+
+- `contact_start` gains `interior` and `depthFromEdge`.
+- `contact_end` gains `localCompression`, `internalDisplacement` and `pressurePropagationMs`. `peakDeformation` is now the larger of the edge indent and the interior displacement.
+- The export summary adds `interiorContacts`, `peakCompression` and `peakInternalDisplacement`.
+- Researcher Mode shows internal displacement and compression. "Volume change" is relabelled "Area change", because a press now intentionally spreads the footprint by up to about 6%.
+
+**Parameters:** the same four. `flow` now scales the interior response; `pressure` scales how far the contour spreads.
+
+**Tests:** 48 (12 Gel tests rewritten for the new model, including an explicit center-press visibility test and an interior–boundary coherence test). Reference screenshots replaced (five states). Version 5.0.0-alpha.3.
+
 ## 5.0.0-alpha.2 — 12 Nov · Phase 03: Gel / Flow (condition 02)
 
 **Condition 02 is now a real material** rather than a placeholder. Condition 01 is untouched: its files are unchanged and all 52 regression checks still pass.

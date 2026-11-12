@@ -1,59 +1,83 @@
-// Condition 02 — Gel / Flow: viscous, volume-conserving contained fluid.
+// Condition 02 — Gel / Flow: a viscous, volume-conserving contained hydrogel.
 //
 // Pure (no DOM), fixed step (config.STEP), deterministic per seed + input.
 //
-// BOUNDARY — 80 nodes, starting on the shared rest outline. Per step:
-//   pressure    P = kP · pressure · (A0 − A) / A0           (A = enclosed polygon area)
-//               applied along each node's outward normal → pressing one side
-//               in raises P and pushes every other region OUT (redistribution,
-//               area approximately conserved)
-//   smoothing   ks · Laplacian of displacement              (surface stays smooth)
-//   shape       −kR · displacement                          (weak return to the circle)
-//   contact     kC · w_i · (target_i − p_i)                  (gaussian footprint around the press)
-//   integration v = v · damp + F · gain, then viscous neighbour coupling of v
-//               (heavy, overdamped: follows with delay, no springy overshoot,
-//               motion continues briefly after release and dissipates)
+// Two coupled parts, so the WHOLE interior is interactive:
 //
-// INTERIOR (visual, but simulated here so it is testable):
-//   3 liquid layers  — rings whose displacement low-passes the boundary's at
-//                      different rates, so layers slide relative to each other
-//   flow lines       — tracer points carried by a flow field interpolated from
-//                      boundary velocities (gaussian kernel), relaxing back to rest
+// 1. BOUNDARY — 80 nodes on the shared rest outline.
+//      pressure    P = kP · pressure · (A0 − A)/A0 along each outward normal
+//                  (press one side in → the rest moves out; area ≈ conserved)
+//      smoothing   Laplacian of boundary displacement
+//      shape       weak spring back to the rest outline
+//      edge dent   when a press is near the edge, a gaussian footprint sinks in
+//      interior →  each node is pulled toward the interior field's displacement
+//                  sampled just inside it (the inside pushes the contour)
 //
-// Settling: once motion and displacement are negligible the state snaps exactly
-// to rest, so there is no autonomous movement after settling.
+// 2. INTERIOR — a G×G displacement grid (≈750 cells inside the body).
+//      elasticity  Laplacian coupling between neighbouring cells, so a local
+//                  disturbance propagates outward over time
+//      boundary →  cells next to the edge use the boundary's displacement as
+//                  their outside neighbour (the contour holds/pushes the inside)
+//      restoring   weak spring back to zero displacement (no rigid drift)
+//      indenter    a press ANYWHERE pushes material away from the finger
+//                  (local indentation + a compressed ring around it); it deepens
+//                  while held, toward a stable compressed state
+//      drag        material near the (viscously lagged) contact point is carried
+//                  along with the pointer
+//      density     compression = −div(u); drives the rendered density/refraction
+//      lag fields  two low-passed copies of u (deeper layers move later)
+//      trail       a decaying record of recent interior motion (short flow history)
+//
+//  Integration for both: v = v·damp + F·gain (+ viscous neighbour coupling),
+//  heavy and overdamped. Once everything is negligible and untouched it eases
+//  out and snaps exactly to rest: no autonomous motion after settling.
 
-import { clamp, mulberry32 } from '../util/math.js';
+import { clamp } from '../util/math.js';
 import { STEP, REGION_COUNT, GEL_DEFAULTS } from '../config.js';
 
 const TAU = Math.PI * 2;
 export { GEL_DEFAULTS };   // defaults live in config.js
 
-const K_PRESSURE = 0.5;        // per-step pressure gain at pressure = 1
-const K_SMOOTH = 0.16;         // displacement Laplacian
-const K_CONTACT = 0.06;        // pull of contacted nodes toward their target
-const CONTACT_WIDTH = 0.46;    // gaussian width of the contact footprint
-const CONTACT_MARGIN = 0.3;    // press within this of the edge (or inside) to engage
-const PRESS_DEPTH = 0.3;       // how far a held press sinks in
-const PRESS_TAU = 0.35;        // s — press sinks in with this time constant
-const DRAG_FOLLOW = 0.85;      // fraction of the drag offset the footprint tries to follow
-const MAX_DRAG = 0.55;
+// boundary
+const K_PRESSURE = 0.5;
+const K_SMOOTH = 0.16;
+const K_EDGE = 0.06;            // edge dent pull
+const K_COUPLE_B = 0.05;        // boundary ← interior coupling
+const EDGE_WIDTH = 0.42;        // gaussian width of the edge dent footprint
+const EDGE_DEPTH = 0.24;
+const CONTACT_MARGIN = 0.3;     // press within this outside the edge (or anywhere inside) to engage
 const MAX_DISP = 0.45;
-const SETTLE_DISP = 0.01, SETTLE_SPEED = 2e-4;   // "recovered" thresholds (object units, units/step)
-const SNAP_DISP = 0.002, SNAP_SPEED = 1e-5;      // exact-rest snap (≈0.6 px; invisible)
-const FINAL_DISP = 0.02, FINAL_SPEED = 5e-4;     // below this, untouched: ease out the remainder
-const FINAL_EASE = 0.97;                         // per step (≈0.55 s time constant)
-const LAYER_SCALE = [0.86, 0.66, 0.44];
-const LAYER_RATE = [4.5, 2.4, 1.2];              // 1/s at viscosity 0 (slower when more viscous)
-const TRACERS = 11, TRACER_PTS = 22;
-const FLOW_SIGMA = 0.35;
-const FLOW_RELAX = 0.9;                          // 1/s
+// interior
+export const GRID = 31;
+export const EXTENT = 1.2;      // grid spans [−EXTENT, EXTENT]²
+const K_ELASTIC = 0.11;         // neighbour coupling (propagation)
+const K_RESTORE_I = 0.004;      // interior spring to rest
+const K_INDENT = 0.14;          // indenter pull toward its target field
+const INDENT_RADIUS = 0.3;      // footprint scale of the indenter
+const INDENT_DEPTH = 0.22;      // peak radial push at full press
+const PRESS_TAU = 0.45;         // s — sinks in with this time constant (settles under a hold)
+const TOUCH_DEPTH = 0.35;       // fraction of the indentation applied immediately on contact (first-contact feedback)
+const DRAG_FOLLOW = 0.75;       // how much interior material near the finger is carried
+const CONTACT_LAG = 9;          // 1/s — the indenter follows the pointer with viscous lag
+const MAX_DRAG = 0.55;
+const MAX_U = 0.4;
+const LAG_RATES = [3.2, 1.3];   // 1/s at viscosity 0
+const TRAIL_TAU = 0.9;          // s — flow history fades
+const SPREAD = 0.075;           // pressing in raises the body's target area by up to this fraction (footprint spreads)
+const SPREAD_TAU = 0.4;         // s — interior pressure builds/relaxes with this delay
+// settling
+const SETTLE_DISP = 0.01, SETTLE_SPEED = 2e-4;
+const FINAL_DISP = 0.02, FINAL_SPEED = 5e-4, FINAL_EASE = 0.97;
+const SNAP_DISP = 0.002, SNAP_SPEED = 1e-5;
+const BOUNDARY_RESPONSE = 0.004; // mean outward boundary motion that counts as "pressure has reached the contour"
 
 export class GelBody {
   constructor(outline, seed, params = {}) {
     const n = (this.n = outline.length);
     this.params = { ...GEL_DEFAULTS, ...params };
     this.seed = seed >>> 0;
+    this.outline = outline;
+    // ---- boundary ----
     this.rx = new Float32Array(n); this.ry = new Float32Array(n);
     this.cos = new Float32Array(n); this.sin = new Float32Array(n);
     for (let i = 0; i < n; i++) {
@@ -62,59 +86,71 @@ export class GelBody {
       this.rx[i] = this.cos[i] * outline[i]; this.ry[i] = this.sin[i] * outline[i];
     }
     this.A0 = polygonArea(this.rx, this.ry);
-    this.px = new Float32Array(n); this.py = new Float32Array(n);
-    this.vx = new Float32Array(n); this.vy = new Float32Array(n);
-    this.fx = new Float32Array(n); this.fy = new Float32Array(n);
-    this.tvx = new Float32Array(n); this.tvy = new Float32Array(n);
-    this.w = new Float32Array(n);
-    this.radial = new Float32Array(n);
-    // layers
-    const rng = mulberry32((this.seed ^ 0x6e15) >>> 0);
-    this.layers = LAYER_SCALE.map((s, k) => ({
-      s, m: 2 + Math.floor(rng() * 3), amp: 0.03 + rng() * 0.05, phase: rng() * TAU,
-      ox: (rng() - 0.5) * 0.08, oy: (rng() - 0.5) * 0.08,
-      dx: new Float32Array(n), dy: new Float32Array(n), x: new Float32Array(n), y: new Float32Array(n), k,
-    }));
-    // flow-line tracers (rest positions inside the body)
-    const T = TRACERS * TRACER_PTS;
-    this.trRestX = new Float32Array(T); this.trRestY = new Float32Array(T);
-    this.trOX = new Float32Array(T); this.trOY = new Float32Array(T);
-    this.trX = new Float32Array(T); this.trY = new Float32Array(T);
-    for (let c = 0; c < TRACERS; c++) {
-      const y0 = -0.78 + (c + 0.2 + rng() * 0.6) * (1.56 / TRACERS), amp = 0.05 + rng() * 0.09, ph = rng() * TAU, tilt = (rng() - 0.5) * 0.45;
-      for (let k = 0; k < TRACER_PTS; k++) {
-        const x = -0.95 + (1.9 * k) / (TRACER_PTS - 1);
-        const j = c * TRACER_PTS + k;
-        this.trRestX[j] = x; this.trRestY[j] = y0 + tilt * x + amp * Math.sin(x * 2.2 + ph);
+    for (const k of ['px', 'py', 'vx', 'vy', 'fx', 'fy', 'tvx', 'tvy', 'w', 'radial', 'sampX', 'sampY']) this[k] = new Float32Array(n);
+    // ---- interior grid ----
+    const G = GRID, N = G * G, h = (this.h = (2 * EXTENT) / (G - 1));
+    this.G = G;
+    this.cx = new Float32Array(N); this.cy = new Float32Array(N);
+    this.inside = new Uint8Array(N);
+    for (let gy = 0; gy < G; gy++) for (let gx = 0; gx < G; gx++) {
+      const j = gy * G + gx, x = -EXTENT + gx * h, y = -EXTENT + gy * h;
+      this.cx[j] = x; this.cy[j] = y;
+      const r = Math.hypot(x, y), th = Math.atan2(y, x);
+      this.inside[j] = r < this.restRadiusAt(th) * 0.985 ? 1 : 0;
+    }
+    // neighbours: inside index, or −1 with a boundary sample (node index + fraction) as Dirichlet value
+    this.nb = new Int32Array(N * 4); this.nbNode = new Int32Array(N * 4); this.nbFrac = new Float32Array(N * 4);
+    const OFF = [[1, 0], [-1, 0], [0, 1], [0, -1]];
+    for (let j = 0; j < N; j++) {
+      if (!this.inside[j]) continue;
+      const gx = j % G, gy = (j / G) | 0;
+      for (let k = 0; k < 4; k++) {
+        const nx = gx + OFF[k][0], ny = gy + OFF[k][1], q = j * 4 + k;
+        const nj = ny * G + nx;
+        if (nx >= 0 && ny >= 0 && nx < G && ny < G && this.inside[nj]) { this.nb[q] = nj; continue; }
+        this.nb[q] = -1;
+        let u = (Math.atan2(-EXTENT + ny * h, -EXTENT + nx * h) / TAU) * n; u = ((u % n) + n) % n;
+        this.nbNode[q] = Math.floor(u) % n; this.nbFrac[q] = u - Math.floor(u);
       }
     }
-    this.tracerCount = TRACERS; this.tracerPoints = TRACER_PTS;
-    this.onEvent = null;   // (type, fields) => void
+    this.insideList = Int32Array.from([...this.inside.keys()].filter((j) => this.inside[j]));
+    for (const k of ['ux', 'uy', 'uvx', 'uvy', 'ufx', 'ufy', 'div', 'trail', 'l1x', 'l1y', 'l2x', 'l2y', 'tmpx', 'tmpy']) this[k] = new Float32Array(N);
+    // boundary sample points (just inside each node) for interior → boundary coupling
+    for (let i = 0; i < n; i++) { this.sampX[i] = this.rx[i] * 0.9; this.sampY[i] = this.ry[i] * 0.9; }
+    this.onEvent = null;
     this.reset();
+  }
+
+  restRadiusAt(theta) {
+    const n = this.n;
+    let u = (theta / TAU) * n; u = ((u % n) + n) % n;
+    const i0 = Math.floor(u) % n, i1 = (i0 + 1) % n, f = u - Math.floor(u);
+    return this.outline[i0] * (1 - f) + this.outline[i1] * f;
   }
 
   reset() {
     this.px.set(this.rx); this.py.set(this.ry);
-    this.vx.fill(0); this.vy.fill(0); this.w.fill(0); this.radial.fill(0);
-    for (const L of this.layers) { L.dx.fill(0); L.dy.fill(0); }
-    this.trOX.fill(0); this.trOY.fill(0);
+    for (const k of ['vx', 'vy', 'w', 'radial', 'ux', 'uy', 'uvx', 'uvy', 'div', 'trail', 'l1x', 'l1y', 'l2x', 'l2y']) this[k].fill(0);
     this.timeMs = 0;
     this.input = { present: false, x: 0, y: 0, vx: 0, vy: 0, down: false };
     this.wasDown = false;
     this.contact = null;
-    this.recovery = null;           // { startMs } after a release until settled
+    this.recovery = null;
     this.settled = true;
     this.area = this.A0;
-    this.maxDisp = 0; this.meanSpeed = 0;
+    this.maxDisp = 0; this.meanSpeed = 0; this.maxU = 0; this.meanUSpeed = 0; this.maxCompression = 0;
+    this.pInt = 0;                // interior pressure (0..1): builds under a press, relaxes after release
     this.regionContacts = new Uint16Array(REGION_COUNT);
-    this.totals = { contactEpisodes: 0, contactMs: 0, dragDistance: 0, revisits: 0, recoveries: 0, peakDeformation: 0, peakRedistribution: 0 };
-    this.updateVisual(STEP);
+    this.totals = {
+      contactEpisodes: 0, interiorContacts: 0, contactMs: 0, dragDistance: 0, revisits: 0, recoveries: 0,
+      peakDeformation: 0, peakRedistribution: 0, peakCompression: 0, peakInternalDisplacement: 0,
+    };
   }
 
   setInput(inp) { Object.assign(this.input, inp); }
   emit(type, fields) { this.onEvent?.(type, fields); }
 
-  /** Radius of the CURRENT boundary at angle theta (interpolated). */
+  /** Radius of the CURRENT boundary at angle theta. */
   radiusAt(theta) {
     const n = this.n;
     let u = (theta / TAU) * n; u = ((u % n) + n) % n;
@@ -124,139 +160,265 @@ export class GelBody {
 
   regionAt(theta) { return Math.floor((((theta / TAU) * REGION_COUNT + 0.5) % REGION_COUNT + REGION_COUNT) % REGION_COUNT); }
 
+  /** Bilinear sample of a grid field (fx, fy) at (x, y) in rest coordinates; returns [ux, uy] into out. */
+  sample(x, y, fx = this.ux, fy = this.uy, out = [0, 0]) {
+    const G = this.G, h = this.h;
+    let gx = (x + EXTENT) / h, gy = (y + EXTENT) / h;
+    gx = clamp(gx, 0, G - 1.001); gy = clamp(gy, 0, G - 1.001);
+    const x0 = gx | 0, y0 = gy | 0, tx = gx - x0, ty = gy - y0, j = y0 * G + x0;
+    const a = (1 - tx) * (1 - ty), b = tx * (1 - ty), c = (1 - tx) * ty, d = tx * ty;
+    out[0] = fx[j] * a + fx[j + 1] * b + fx[j + G] * c + fx[j + G + 1] * d;
+    out[1] = fy[j] * a + fy[j + 1] * b + fy[j + G] * c + fy[j + G + 1] * d;
+    return out;
+  }
+
+  sampleScalar(x, y, f) {
+    const G = this.G, h = this.h;
+    let gx = clamp((x + EXTENT) / h, 0, G - 1.001), gy = clamp((y + EXTENT) / h, 0, G - 1.001);
+    const x0 = gx | 0, y0 = gy | 0, tx = gx - x0, ty = gy - y0, j = y0 * G + x0;
+    return f[j] * (1 - tx) * (1 - ty) + f[j + 1] * tx * (1 - ty) + f[j + G] * (1 - tx) * ty + f[j + G + 1] * tx * ty;
+  }
+
   step() {
     const p = this.params, n = this.n, dt = STEP, inp = this.input;
     this.timeMs += dt * 1000;
-    const visc = clamp(p.viscosity, 0, 1);
-    const gain = 0.42 * (1 - 0.55 * visc);       // heavier when more viscous
-    const damp = 0.9 - 0.1 * visc;               // more dissipation → no overshoot
-    const mu = 0.12 + 0.22 * visc;               // viscous neighbour coupling
+    const visc = clamp(p.viscosity, 0, 1), flow = Math.max(0, p.flow);
+    const gain = 0.42 * (1 - 0.55 * visc), damp = 0.9 - 0.1 * visc, mu = 0.12 + 0.22 * visc;
     const kR = 0.0012 + 0.006 * clamp(p.recovery, 0, 1);
+    const kRi = K_RESTORE_I * (0.5 + clamp(p.recovery, 0, 1));
 
-    // --- contact edges ---
     if (inp.down && !this.wasDown) this.beginContact();
     if (!inp.down && this.contact) this.endContact();
     this.wasDown = inp.down;
+    const c = this.contact;
+    if (c) {
+      c.depth += (1 - c.depth) * (1 - Math.exp(-dt / PRESS_TAU));               // 0 → 1 while held
+      const a = 1 - Math.exp(-CONTACT_LAG * (1 - 0.6 * visc) * dt);             // viscous lag of the indenter
+      c.ix += (inp.x - c.ix) * a; c.iy += (inp.y - c.iy) * a;
+    }
 
-    // --- forces ---
+    // interior pressure: pressing INTO the gel displaces volume sideways, so the footprint
+    // spreads. It is driven by how far the interior has ACTUALLY been displaced (inside
+    // first, contour later), builds/relaxes with a delay, and relaxes after release.
+    const pTarget = c ? clamp(this.maxU / 0.12, 0, 1) * (0.35 + 0.65 * (1 - c.edge)) : 0;
+    this.pInt += (pTarget - this.pInt) * (1 - Math.exp(-dt / SPREAD_TAU));
+    const Atarget = this.A0 * (1 + SPREAD * this.pInt * Math.min(1, p.pressure));
+
+    // ================= boundary forces =================
     const { px, py, rx, ry, fx, fy } = this;
     this.area = polygonArea(px, py);
-    const P = K_PRESSURE * p.pressure * (this.A0 - this.area) / this.A0;
-    const segRest = (TAU * Math.sqrt(this.A0 / Math.PI)) / n;
+    const P = K_PRESSURE * Math.max(0.15, p.pressure) * (Atarget - this.area) / this.A0;
+    const segRest = (TAU * Math.sqrt(this.A0 / Math.PI)) / n, s = [0, 0];
     for (let i = 0; i < n; i++) {
       const im = i === 0 ? n - 1 : i - 1, ip = i === n - 1 ? 0 : i + 1;
-      // outward normal from the neighbours' chord (nodes run counter-clockwise in object coordinates)
       const tx = px[ip] - px[im], ty = py[ip] - py[im], tl = Math.hypot(tx, ty) || 1;
       const nx = ty / tl, ny = -tx / tl, seg = (tl / 2) / segRest;
       const dxi = px[i] - rx[i], dyi = py[i] - ry[i];
-      fx[i] = P * nx * seg + K_SMOOTH * ((px[im] - rx[im]) + (px[ip] - rx[ip]) - 2 * dxi) - kR * dxi;
-      fy[i] = P * ny * seg + K_SMOOTH * ((py[im] - ry[im]) + (py[ip] - ry[ip]) - 2 * dyi) - kR * dyi;
+      this.sample(this.sampX[i], this.sampY[i], this.ux, this.uy, s);
+      fx[i] = P * nx * seg + K_SMOOTH * ((px[im] - rx[im]) + (px[ip] - rx[ip]) - 2 * dxi) - kR * dxi + K_COUPLE_B * (s[0] - dxi);
+      fy[i] = P * ny * seg + K_SMOOTH * ((py[im] - ry[im]) + (py[ip] - ry[ip]) - 2 * dyi) - kR * dyi + K_COUPLE_B * (s[1] - dyi);
     }
-    if (this.contact) this.applyContact(dt);
+    if (c && c.edge > 0.01) {
+      let ox = (c.ix - c.sx) * DRAG_FOLLOW, oy = (c.iy - c.sy) * DRAG_FOLLOW;
+      const ol = Math.hypot(ox, oy); if (ol > MAX_DRAG) { ox *= MAX_DRAG / ol; oy *= MAX_DRAG / ol; }
+      const depth = EDGE_DEPTH * c.edge * c.depth;
+      for (let i = 0; i < n; i++) {
+        const w = this.w[i]; if (!w) continue;
+        const tx = rx[i] + w * (-this.cos[i] * depth + ox * c.edge), ty = ry[i] + w * (-this.sin[i] * depth + oy * c.edge);
+        fx[i] += K_EDGE * w * (tx - px[i]); fy[i] += K_EDGE * w * (ty - py[i]);
+      }
+    }
 
-    // --- heavy, overdamped integration + viscous neighbour coupling ---
+    // ================= interior forces =================
+    const { ux, uy, ufx, ufy, insideList, nb, nbNode, nbFrac } = this;
+    const kE = K_ELASTIC * (0.6 + 0.4 * Math.min(1.5, flow));
+    for (let q = 0; q < insideList.length; q++) {
+      const j = insideList[q];
+      let lx = 0, ly = 0;
+      for (let k = 0; k < 4; k++) {
+        const t = j * 4 + k, m = nb[t];
+        let vx_, vy_;
+        if (m >= 0) { vx_ = ux[m]; vy_ = uy[m]; }
+        else { const a = nbNode[t], b = a === n - 1 ? 0 : a + 1, f = nbFrac[t]; vx_ = (px[a] - rx[a]) * (1 - f) + (px[b] - rx[b]) * f; vy_ = (py[a] - ry[a]) * (1 - f) + (py[b] - ry[b]) * f; }
+        lx += vx_ - ux[j]; ly += vy_ - uy[j];
+      }
+      ufx[j] = kE * lx - kRi * ux[j]; ufy[j] = kE * ly - kRi * uy[j];
+    }
+    if (c) this.applyIndenter(c, flow);
+
+    // ================= integrate =================
     const { vx, vy, tvx, tvy } = this;
     for (let i = 0; i < n; i++) { vx[i] = vx[i] * damp + fx[i] * gain; vy[i] = vy[i] * damp + fy[i] * gain; }
     for (let i = 0; i < n; i++) {
       const im = i === 0 ? n - 1 : i - 1, ip = i === n - 1 ? 0 : i + 1;
-      tvx[i] = vx[i] + mu * (vx[im] + vx[ip] - 2 * vx[i]);
-      tvy[i] = vy[i] + mu * (vy[im] + vy[ip] - 2 * vy[i]);
+      tvx[i] = vx[i] + mu * (vx[im] + vx[ip] - 2 * vx[i]); tvy[i] = vy[i] + mu * (vy[im] + vy[ip] - 2 * vy[i]);
     }
     let maxD = 0, sumV = 0;
     for (let i = 0; i < n; i++) {
-      vx[i] = tvx[i]; vy[i] = tvy[i];
-      px[i] += vx[i]; py[i] += vy[i];
+      vx[i] = tvx[i]; vy[i] = tvy[i]; px[i] += vx[i]; py[i] += vy[i];
       let dx = px[i] - rx[i], dy = py[i] - ry[i];
       const m = Math.hypot(dx, dy);
-      if (m > MAX_DISP) { const s = MAX_DISP / m; dx *= s; dy *= s; px[i] = rx[i] + dx; py[i] = ry[i] + dy; vx[i] *= 0.5; vy[i] *= 0.5; }
+      if (m > MAX_DISP) { const sc = MAX_DISP / m; dx *= sc; dy *= sc; px[i] = rx[i] + dx; py[i] = ry[i] + dy; vx[i] *= 0.5; vy[i] *= 0.5; }
       this.radial[i] = dx * this.cos[i] + dy * this.sin[i];
-      maxD = Math.max(maxD, Math.min(m, MAX_DISP));
-      sumV += Math.hypot(vx[i], vy[i]);
+      maxD = Math.max(maxD, Math.min(m, MAX_DISP)); sumV += Math.hypot(vx[i], vy[i]);
     }
     this.maxDisp = maxD; this.meanSpeed = sumV / n;
 
-    // --- contact metrics / recovery bookkeeping ---
-    if (this.contact) this.trackContact(dt);
-    if (this.recovery && maxD < SETTLE_DISP && this.meanSpeed < SETTLE_SPEED) {
+    const { uvx, uvy, trail } = this, igain = gain * 1.1, trailDecay = Math.exp(-dt / TRAIL_TAU);
+    let maxU = 0, sumUV = 0;
+    for (let q = 0; q < insideList.length; q++) {
+      const j = insideList[q];
+      uvx[j] = uvx[j] * damp + ufx[j] * igain; uvy[j] = uvy[j] * damp + ufy[j] * igain;
+      ux[j] += uvx[j]; uy[j] += uvy[j];
+      const m = Math.hypot(ux[j], uy[j]);
+      if (m > MAX_U) { const sc = MAX_U / m; ux[j] *= sc; uy[j] *= sc; uvx[j] *= 0.5; uvy[j] *= 0.5; }
+      const sp = Math.hypot(uvx[j], uvy[j]);
+      trail[j] = Math.min(1, trail[j] * trailDecay + sp * (c ? 9 : 2.5) * flow);   // mostly pointer-driven flow
+      if (trail[j] < 0.004) trail[j] = 0;
+      maxU = Math.max(maxU, Math.min(m, MAX_U)); sumUV += sp;
+    }
+    this.maxU = maxU; this.meanUSpeed = sumUV / insideList.length;
+    this.computeDensity();
+    this.updateLagFields(dt, visc);
+
+    if (c) this.trackContact(dt);
+    // recovery = everything back near rest
+    const near = Math.max(maxD, maxU);
+    if (this.recovery && near < SETTLE_DISP && this.meanSpeed < SETTLE_SPEED && this.meanUSpeed < SETTLE_SPEED) {
       this.totals.recoveries++;
       this.emit('recovery', { durationMs: this.timeMs - this.recovery.startMs, metadata: { kind: 'settle', completed: true } });
       this.recovery = null;
     }
-    // final settle: once nearly at rest and untouched, ease the last few pixels out
-    // instead of creeping toward rest for many seconds
-    if (!this.contact && maxD < FINAL_DISP && this.meanSpeed < FINAL_SPEED) {
-      for (let i = 0; i < n; i++) {
-        px[i] = rx[i] + (px[i] - rx[i]) * FINAL_EASE; py[i] = ry[i] + (py[i] - ry[i]) * FINAL_EASE;
-        vx[i] *= 0.9; vy[i] *= 0.9;
-      }
-      this.maxDisp = maxD * FINAL_EASE;
+    // final ease + exact rest snap (no autonomous motion after settling)
+    if (!c && this.pInt < 0.02 && near < FINAL_DISP && this.meanSpeed < FINAL_SPEED && this.meanUSpeed < FINAL_SPEED) {
+      for (let i = 0; i < n; i++) { px[i] = rx[i] + (px[i] - rx[i]) * FINAL_EASE; py[i] = ry[i] + (py[i] - ry[i]) * FINAL_EASE; vx[i] *= 0.9; vy[i] *= 0.9; }
+      for (let q = 0; q < insideList.length; q++) { const j = insideList[q]; ux[j] *= FINAL_EASE; uy[j] *= FINAL_EASE; uvx[j] *= 0.9; uvy[j] *= 0.9; }
+      this.maxDisp = maxD * FINAL_EASE; this.maxU = maxU * FINAL_EASE;
     }
-    // exact rest once negligible (no autonomous motion after settling)
-    if (!this.contact && maxD < SNAP_DISP && this.meanSpeed < SNAP_SPEED) {
-      if (!this.settled) { px.set(rx); py.set(ry); vx.fill(0); vy.fill(0); }
+    const trailMax = this.trailMax();
+    if (!c && this.pInt < 0.002 && near < SNAP_DISP && this.meanSpeed < SNAP_SPEED && this.meanUSpeed < SNAP_SPEED && trailMax < 0.01) {
+      if (!this.settled) {
+        px.set(rx); py.set(ry); vx.fill(0); vy.fill(0);
+        for (const k of ['ux', 'uy', 'uvx', 'uvy', 'div', 'trail', 'l1x', 'l1y', 'l2x', 'l2y']) this[k].fill(0);
+        this.maxDisp = this.maxU = this.maxCompression = 0; this.pInt = 0;
+      }
       this.settled = true;
     } else this.settled = false;
-
-    this.updateVisual(dt);
   }
+
+  /** The indenter: push material away from the (lagged) contact point; carry nearby material with a drag. */
+  applyIndenter(c, flow) {
+    const { ux, uy, ufx, ufy, cx, cy, insideList } = this;
+    const R = INDENT_RADIUS, depth = INDENT_DEPTH * c.depth * (0.55 + 0.45 * Math.min(1.5, flow));
+    let ox = (c.ix - c.sx) * DRAG_FOLLOW, oy = (c.iy - c.sy) * DRAG_FOLLOW;
+    const ol = Math.hypot(ox, oy); if (ol > MAX_DRAG) { ox *= MAX_DRAG / ol; oy *= MAX_DRAG / ol; }
+    const R2 = (1.7 * R) ** 2;
+    for (let q = 0; q < insideList.length; q++) {
+      const j = insideList[q];
+      // material that started near the press is carried by the drag
+      const ex0 = cx[j] - c.sx, ey0 = cy[j] - c.sy, d0 = ex0 * ex0 + ey0 * ey0;
+      const carry = Math.exp(-d0 / ((1.2 * R) ** 2));
+      // indentation around the current (lagged) contact point: radial push, peak at ~0.7 R
+      const ex = cx[j] + ux[j] - c.ix, ey = cy[j] + uy[j] - c.iy, d2 = ex * ex + ey * ey;
+      if (d2 > R2 && carry < 0.01) continue;
+      const d = Math.sqrt(d2) || 1e-6, rr = d / R;
+      const push = depth * rr * Math.exp(0.5 - 0.5 * rr * rr * 2);   // ∝ r·e^(−r²/R²), max ≈ depth
+      const tx = (ex / d) * push + ox * carry, ty = (ey / d) * push + oy * carry;
+      const wt = Math.max(Math.exp(-d2 / R2), carry);
+      const k = K_INDENT * (1 + 1.5 * Math.exp(-(this.timeMs - c.startMs) / 120));   // quick first response, then viscous
+      ufx[j] += k * wt * (tx - ux[j]);
+      ufy[j] += k * wt * (ty - uy[j]);
+    }
+  }
+
+  /** compression = −div(u) (central differences; outside cells count as 0 displacement change) */
+  computeDensity() {
+    const { ux, uy, div, G, h, insideList, inside } = this;
+    let maxC = 0;
+    for (let q = 0; q < insideList.length; q++) {
+      const j = insideList[q];
+      const e = inside[j + 1] ? ux[j + 1] : ux[j], w = inside[j - 1] ? ux[j - 1] : ux[j];
+      const s = inside[j + G] ? uy[j + G] : uy[j], nn = inside[j - G] ? uy[j - G] : uy[j];
+      const dv = (e - w + s - nn) / (2 * h);
+      div[j] = -dv;
+      if (-dv > maxC) maxC = -dv;
+    }
+    this.maxCompression = maxC;
+  }
+
+  updateLagFields(dt, visc) {
+    const a1 = 1 - Math.exp(-LAG_RATES[0] * (1 - 0.5 * visc) * dt), a2 = 1 - Math.exp(-LAG_RATES[1] * (1 - 0.5 * visc) * dt);
+    const { ux, uy, l1x, l1y, l2x, l2y, insideList } = this;
+    for (let q = 0; q < insideList.length; q++) {
+      const j = insideList[q];
+      l1x[j] += (ux[j] - l1x[j]) * a1; l1y[j] += (uy[j] - l1y[j]) * a1;
+      l2x[j] += (ux[j] - l2x[j]) * a2; l2y[j] += (uy[j] - l2y[j]) * a2;
+    }
+  }
+
+  trailMax() { let m = 0; for (let q = 0; q < this.insideList.length; q++) m = Math.max(m, this.trail[this.insideList[q]]); return m; }
 
   beginContact() {
     const inp = this.input;
     const r = Math.hypot(inp.x, inp.y), theta = r > 1e-6 ? Math.atan2(inp.y, inp.x) : 0;
     const rb = this.radiusAt(theta), dist = r - rb;
-    if (dist > CONTACT_MARGIN) return;                       // pressed in empty space
-    if (this.recovery) {                                     // interrupted before settling
+    if (dist > CONTACT_MARGIN) return;
+    if (this.recovery) {
       this.emit('recovery', { durationMs: this.timeMs - this.recovery.startMs, metadata: { kind: 'settle', completed: false } });
       this.recovery = null;
     }
-    const cx = Math.cos(theta) * rb, cy = Math.sin(theta) * rb;
-    let wMax = 0;
+    // edge influence fades in over the last 0.3 units before the edge
+    const edge = clamp((dist + 0.3) / 0.35, 0, 1);
+    const bx = Math.cos(theta) * rb, by = Math.sin(theta) * rb;
     for (let i = 0; i < this.n; i++) {
-      const d = Math.hypot(this.px[i] - cx, this.py[i] - cy) / CONTACT_WIDTH;
-      const w = Math.exp(-d * d);
+      const d = Math.hypot(this.px[i] - bx, this.py[i] - by) / EDGE_WIDTH, w = Math.exp(-d * d);
       this.w[i] = w < 0.01 ? 0 : w;
-      wMax = Math.max(wMax, w);
     }
-    const region = this.regionAt(theta);
-    this.contact = { sx: inp.x, sy: inp.y, lx: inp.x, ly: inp.y, startMs: this.timeMs, region, depth: 0, dragDist: 0, lastDragMs: this.timeMs, lastDragLogged: 0, peakDef: 0, peakRedis: 0, peakVol: 0 };
+    // the indenter starts at the press point, but never outside the body
+    const inR = Math.min(r, rb * 0.97), ix = Math.cos(theta) * inR, iy = Math.sin(theta) * inR;
+    const region = this.regionAt(theta), interior = dist < -0.05;
+    this.contact = {
+      sx: ix, sy: iy, ix, iy, lx: inp.x, ly: inp.y, startMs: this.timeMs, region, edge, depth: TOUCH_DEPTH, interior,
+      dragDist: 0, lastDragMs: this.timeMs, lastDragLogged: 0,
+      peakDef: 0, peakRedis: 0, peakVol: 0, peakComp: 0, peakU: 0, boundaryAtMs: null,
+    };
     this.totals.contactEpisodes++;
-    this.emit('contact_start', { region, distance: dist, speed: Math.hypot(inp.vx, inp.vy), metadata: { x: +inp.x.toFixed(3), y: +inp.y.toFixed(3) } });
+    if (interior) this.totals.interiorContacts++;
+    this.emit('contact_start', {
+      region, distance: dist, speed: Math.hypot(inp.vx, inp.vy),
+      metadata: { x: +inp.x.toFixed(3), y: +inp.y.toFixed(3), interior, depthFromEdge: +Math.max(0, -dist).toFixed(3) },
+    });
     if (this.regionContacts[region] > 0) { this.totals.revisits++; this.emit('region_revisit', { region, metadata: { previousContacts: this.regionContacts[region] } }); }
     this.regionContacts[region]++;
     this.settled = false;
-  }
-
-  applyContact(dt) {
-    const c = this.contact, inp = this.input;
-    c.depth += (PRESS_DEPTH - c.depth) * (1 - Math.exp(-dt / PRESS_TAU));
-    let ox = (inp.x - c.sx) * DRAG_FOLLOW, oy = (inp.y - c.sy) * DRAG_FOLLOW;
-    const ol = Math.hypot(ox, oy);
-    if (ol > MAX_DRAG) { ox *= MAX_DRAG / ol; oy *= MAX_DRAG / ol; }
-    for (let i = 0; i < this.n; i++) {
-      const w = this.w[i];
-      if (!w) continue;
-      const tx = this.rx[i] + w * (-this.cos[i] * c.depth + ox), ty = this.ry[i] + w * (-this.sin[i] * c.depth + oy);
-      this.fx[i] += K_CONTACT * w * (tx - this.px[i]);
-      this.fy[i] += K_CONTACT * w * (ty - this.py[i]);
-    }
   }
 
   trackContact(dt) {
     const c = this.contact, inp = this.input, t = this.totals;
     const moved = Math.hypot(inp.x - c.lx, inp.y - c.ly);
     c.lx = inp.x; c.ly = inp.y; c.dragDist += moved; t.dragDistance += moved; t.contactMs += dt * 1000;
-    // peak deformation: deepest inward motion within the footprint;
-    // redistribution: mean outward expansion of material outside it
-    let inward = 0, outSum = 0, outN = 0;
+    let inward = 0, outSum = 0, outN = 0, outAll = 0;
     for (let i = 0; i < this.n; i++) {
-      if (this.w[i] > 0.5) inward = Math.max(inward, -this.radial[i]);
-      else if (this.w[i] < 0.05) { outSum += Math.max(0, this.radial[i]); outN++; }
+      if (this.w[i] > 0.5 && c.edge > 0.05) inward = Math.max(inward, -this.radial[i]);
+      else if (this.w[i] < 0.05 || c.edge <= 0.05) { outSum += Math.max(0, this.radial[i]); outN++; }
+      outAll += Math.max(0, this.radial[i]);
     }
-    c.peakDef = Math.max(c.peakDef, inward);
+    // local compression / displacement within ~1.5 R of the contact
+    let comp = 0, um = 0;
+    const R2 = (1.5 * INDENT_RADIUS) ** 2;
+    for (let q = 0; q < this.insideList.length; q++) {
+      const j = this.insideList[q], ex = this.cx[j] - c.ix, ey = this.cy[j] - c.iy;
+      if (ex * ex + ey * ey > R2) continue;
+      comp = Math.max(comp, this.div[j]); um = Math.max(um, Math.hypot(this.ux[j], this.uy[j]));
+    }
+    c.peakComp = Math.max(c.peakComp, comp);
+    c.peakU = Math.max(c.peakU, this.maxU);
+    c.peakDef = Math.max(c.peakDef, inward, um);
     c.peakRedis = Math.max(c.peakRedis, outN ? outSum / outN : 0);
     c.peakVol = Math.max(c.peakVol, Math.abs(this.area / this.A0 - 1));
+    if (c.boundaryAtMs === null && outAll / this.n > BOUNDARY_RESPONSE) c.boundaryAtMs = this.timeMs - c.startMs;
     if (this.timeMs - c.lastDragMs >= 400 && c.dragDist - c.lastDragLogged > 0.01) {
-      this.emit('drag', { region: c.region, distance: c.dragDist, speed: Math.hypot(inp.vx, inp.vy) });
+      this.emit('drag', { region: c.region, distance: c.dragDist, speed: Math.hypot(inp.vx, inp.vy), metadata: { interior: c.interior } });
       c.lastDragMs = this.timeMs; c.lastDragLogged = c.dragDist;
     }
   }
@@ -265,57 +427,28 @@ export class GelBody {
     const c = this.contact, t = this.totals;
     t.peakDeformation = Math.max(t.peakDeformation, c.peakDef);
     t.peakRedistribution = Math.max(t.peakRedistribution, c.peakRedis);
+    t.peakCompression = Math.max(t.peakCompression, c.peakComp);
+    t.peakInternalDisplacement = Math.max(t.peakInternalDisplacement, c.peakU);
     this.emit('contact_end', {
       region: c.region, durationMs: this.timeMs - c.startMs, distance: c.dragDist,
-      metadata: { peakDeformation: +c.peakDef.toFixed(4), redistribution: +c.peakRedis.toFixed(4), peakVolumeChange: +c.peakVol.toFixed(4) },
+      metadata: {
+        interior: c.interior,
+        peakDeformation: +c.peakDef.toFixed(4),            // max(edge indent, interior displacement near the contact)
+        localCompression: +c.peakComp.toFixed(4),          // peak −div(u) near the contact
+        internalDisplacement: +c.peakU.toFixed(4),         // peak |u| anywhere inside
+        redistribution: +c.peakRedis.toFixed(4),           // peak mean outward boundary expansion outside the footprint
+        pressurePropagationMs: c.boundaryAtMs === null ? null : Math.round(c.boundaryAtMs), // time until the contour responded
+        peakVolumeChange: +c.peakVol.toFixed(4),
+      },
     });
     this.w.fill(0);
     this.contact = null;
     this.recovery = { startMs: this.timeMs };
   }
 
-  /** Interior layers and flow lines, derived from the boundary (coherent with deformation). */
-  updateVisual(dt) {
-    const n = this.n, p = this.params, visc = clamp(p.viscosity, 0, 1), flow = Math.max(0, p.flow);
-    for (const L of this.layers) {
-      const a = 1 - Math.exp(-LAYER_RATE[L.k] * (1 - 0.5 * visc) * dt);
-      const ds = Math.pow(L.s, 0.8) * (0.6 + 0.4 * Math.min(1, flow));
-      for (let i = 0; i < n; i++) {
-        const bx = this.px[i] - this.rx[i], by = this.py[i] - this.ry[i];
-        L.dx[i] += (bx - L.dx[i]) * a; L.dy[i] += (by - L.dy[i]) * a;
-        const ang = (i / n) * TAU, rr = Math.hypot(this.rx[i], this.ry[i]) * (L.s + L.amp * Math.sin(L.m * ang + L.phase));
-        L.x[i] = this.cos[i] * rr + L.ox + L.dx[i] * ds;
-        L.y[i] = this.sin[i] * rr + L.oy + L.dy[i] * ds;
-      }
-    }
-    // flow lines: carried by boundary velocities, follow the mean deformation, relax to rest
-    const T = this.trRestX.length, relax = Math.exp(-FLOW_RELAX * dt), s2 = FLOW_SIGMA * FLOW_SIGMA;
-    const moving = this.meanSpeed > SNAP_SPEED || !this.settled;
-    for (let j = 0; j < T; j++) {
-      const qx = this.trRestX[j], qy = this.trRestY[j];
-      let fxs = 0, fys = 0, dxs = 0, dys = 0, ws = 0;
-      if (moving) {
-        for (let i = 0; i < n; i++) {
-          const ex = this.px[i] - qx, ey = this.py[i] - qy;
-          const k = Math.exp(-(ex * ex + ey * ey) / s2);
-          fxs += k * this.vx[i]; fys += k * this.vy[i];
-          dxs += k * (this.px[i] - this.rx[i]); dys += k * (this.py[i] - this.ry[i]);
-          ws += k;
-        }
-      }
-      if (ws > 1e-9) { fxs /= ws; fys /= ws; dxs /= ws; dys /= ws; }
-      this.trOX[j] = this.trOX[j] * relax + fxs * flow * 2.2;
-      this.trOY[j] = this.trOY[j] * relax + fys * flow * 2.2;
-      const depth = Math.min(1, Math.hypot(qx, qy));
-      this.trX[j] = qx + dxs * (0.3 + 0.6 * depth) + this.trOX[j];
-      this.trY[j] = qy + dys * (0.3 + 0.6 * depth) + this.trOY[j];
-    }
-    if (this.settled) { this.trOX.fill(0); this.trOY.fill(0); }
-  }
-
-  /** Smoothed 0..1 signals for the shared sound engine. */
+  /** 0..1 signals for the shared sound engine. */
   signals() {
-    return { tension: clamp(this.maxDisp / 0.3, 0, 1), motion: clamp(this.meanSpeed * 160, 0, 1), sweep: 0, kinetic: clamp(this.meanSpeed * 160, 0, 1) };
+    return { tension: clamp(Math.max(this.maxDisp, this.maxU) / 0.3, 0, 1), motion: clamp((this.meanSpeed + this.meanUSpeed) * 120, 0, 1), sweep: 0, kinetic: clamp((this.meanSpeed + this.meanUSpeed) * 120, 0, 1) };
   }
 }
 

@@ -1,6 +1,6 @@
 # Project Handoff — ONE OBJECT / MANY ENCOUNTERS
 
-*Current as of 2026-11-12, version 5.0.0-alpha.2 (V5 Phase 03: Gel / Flow implemented).* This document supersedes `../PROJECT_HANDOFF.md` (5 Nov), which describes the earlier single-file build.
+*Current as of 2026-11-12, version 5.0.0-alpha.4 (Gel and Silicone implemented; Plastic still a placeholder).* This document supersedes `../PROJECT_HANDOFF.md` (5 Nov), which describes the earlier single-file build.
 
 Every claim below is labelled:
 
@@ -16,7 +16,7 @@ Every claim below is labelled:
 |---|---|
 | **Canonical project** | `iris_workz/mdp/one-object/` (ES modules, no build step, no dependencies) |
 | **Launch** | VS Code Live Server → `http://127.0.0.1:5501/iris_workz/mdp/one-object/index.html`. Or `cd one-object && python3 -m http.server 8000` → `http://localhost:8000/`. **`file://` does not work** (modules need a server); the page shows a warning. |
-| **Version** | `APP_VERSION = '5.0.0-alpha.2'` in `src/config.js`. The tab title shows "· V5". |
+| **Version** | `APP_VERSION = '5.0.0-alpha.4'` in `src/config.js`. The tab title shows "· V5". |
 | **Repository** | `github.com/irisxu10/IrisXu` (the artist's portfolio site); branch `prototype/homepage-soft-glass-atmosphere` |
 | **Archived, not edited** | `../one_object_three_encounters_v2.html` (4.1 + Stage 1, single file), `../one-object-v4/` (4.1), `../one-object-v4.0/` (4.0), `../one-object-v3/` (3.0). Original V2 is in git `9a361d3`. A tarball of all of these is at `~/Desktop/IrisXu/one-object-backups/one-object-pre-consolidation-2026-11-12.tar.gz` (outside the repository). |
 
@@ -86,8 +86,9 @@ The research question: *How do repeated sensory encounters shape expectations, i
 | **Logging / export** | Events: `session_start`, `approach`, `contact_start/end`, `drag`, `region_revisit`, `adaptation_threshold`, `recovery`, `parameter_change`, `reflection`, `sweep`, `sound_toggle`, `dwell`, `session_end`. Throttled, timed on the simulation clock. JSON schema v2 with a summary. | Implemented, verified |
 | **Bilingual interface and reflection** | English and Simplified Chinese; switching keeps the session. Three hints. FINISH opens five optional neutral questions. | Implemented, verified |
 | **Material framework (V5 Phase 02)** | Four conditions behind one interface. Selector shows only 01–04. Research session keeps every encounter. Order can be configured and locked. | Implemented, verified (52 browser checks, 36 tests) |
-| **Gel / Flow (02)** | `GelBody`: 80-node boundary with area-deficit pressure along normals (redistribution, volume ≈ conserved), displacement smoothing, weak shape return, heavy overdamped integration plus viscous neighbour coupling, and a final ease to exact rest. Interior: 3 lagged liquid layers and flow lines carried by a kernel-interpolated boundary velocity field. `GelRenderer`: translucent body, layers, flow lines, compression rim highlight, drifting specular highlight. | Implemented, verified (9 node tests, 19 browser checks). **Not yet tested by a human.** |
-| **Plastic (03) / Silicone (04) behaviour** | Placeholders only: static textures plus pointer logging. | **Physics not implemented** |
+| **Gel / Flow (02)** | **Boundary:** an 80-node pressure boundary with a delayed target-area rise driven by interior displacement, so the footprint spreads under a press. **Interior:** a 31 × 31 displacement grid, coupled both ways to the boundary (Dirichlet edge values; boundary pulled toward the interior just inside it). An indenter anywhere inside pushes material away (dimple plus compressed ring), deepening under a hold; drag carries material with viscous lag; two lag fields give deeper layers; a decaying flow trail; exact rest afterwards. **`GelRenderer`:** volume glow, blurred compression density map, 10 field-warped folded membranes (trough plus compression-lit ridge), Fresnel rim, field-driven speculars. | Implemented, verified (12 node tests, 21 browser checks with pixel-change measurements). **Not yet tested by a human.** |
+| **Silicone / Elasticity (04)** | `SiliconeBody`: a triangulated mass-spring disk (469 nodes, 864 triangles). Strain-stiffening springs, an oriented area constraint (resists squeezing, unfolds flips), a weak shape tether, and a soft-limited gaussian grab. Underdamped, with 2 sub-steps; no simulation while settled. `SiliconeRenderer`: mapped elastic bands (thin and brighten with stretch), area-driven thickness shading, two sheets, inner rim, strain-lengthened satin highlight. | Implemented, verified (11 node tests, 20 browser checks). **Not yet tested by a human.** |
+| **Plastic (03) behaviour** | Placeholder only: static texture plus pointer logging. | **Physics not implemented** (Phase 04 not done) |
 | **Click ripple, directional drag traces, autonomy (Stages 2–4)** | — | **Not implemented** |
 
 ## 4. Visual design
@@ -163,6 +164,59 @@ The research question: *How do repeated sensory encounters shape expectations, i
 **Needs manual testing:** look and feel, the noticeability of memory and dwell, sound quality and loudness, iOS Safari audio unlock, Android, pen input, the OS reduced-motion setting, and screen readers.
 
 ## 7. Verification
+
+### Phase 05 — Silicone (12 Nov 2026, 5.0.0-alpha.4)
+
+- **`npm test`:** 59 of 59 pass. The 11 Silicone tests cover:
+  - a valid mesh with no drift at rest;
+  - local stretch with no rigid translation;
+  - progressive, delayed neighbour response;
+  - resistance increasing with stretch, and the maxDeformation cap;
+  - release overshoot of 5–50% with 1–4 crossings, recovery under 4 s, and an exact return;
+  - 10 repeated stretches identical within 1%;
+  - a direct difference from Gel (Silicone springs back past rest, Gel does not);
+  - normal stretching folding zero triangles;
+  - extreme flailing staying bounded, with momentary folds under 1% and full recovery;
+  - all logged metrics;
+  - parameters, reset and determinism.
+- **Browser:** 20 of 20 Silicone checks pass, with no console errors.
+  - Rest brightness 32.9 (01: 31.3), static.
+  - Edge stretch follows 65 px (strain 0.33, no folds).
+  - Release overshoots about 15 px past rest and returns to a pixel-identical rest.
+  - Centre stretch follows 58 px.
+  - 5 repeated stretches: 52 px each.
+  - Extreme mouse movement stays bounded and recovers.
+  - Researcher controls are logged, export fields are present, and RESET and switching work.
+- **Regression:** 52 of 52 (Condition 01 unchanged) and Gel 21 of 21.
+- **Engineering notes (bugs found and fixed during development):**
+  - The first polar-quad mesh had a 48-link centre node that was numerically unstable. It was replaced by the 6k triangulated disk.
+  - Edge-length springs alone let triangles fold over. An oriented, signed-area constraint fixed that.
+  - An area constraint whose stiffness was normalized by 1/√A0 pumped energy into small triangles. Its stiffness is now size-independent, and integration runs in 2 sub-steps.
+  - The stiffness slider was initially masked by the spring cap and a strong finger coupling. They were rebalanced so stiffness measurably changes resistance and spring-back speed.
+
+### Gel refinement — volumetric interior (12 Nov 2026, 5.0.0-alpha.3)
+
+- **`npm test`:** 48 of 48 pass. The 12 Gel tests cover:
+  - rest;
+  - a center press producing a meaningful visible deformation (perceptible within 0.1 s; outward push of more than 0.04 R on all sides at r = 0.22; interior displacement over 18 px; a compressed ring; no translation);
+  - the center press reaching the contour with a delay (interior first, contour later; propagation 100–800 ms);
+  - interior–boundary coherence (correlation above 0.8 for center and edge presses; an edge dent pushes interior material);
+  - off-center and edge presses;
+  - center drag (lag, carried material, deep layer lagging the surface, trail, no translation);
+  - slow versus fast drag;
+  - a long hold reaching a stable state;
+  - release to exact rest with no later motion;
+  - repeated pressing and abuse;
+  - all logged metrics;
+  - parameters, determinism and reset.
+- **Browser:** 21 of 21 Gel checks pass, with no console errors.
+  - Rest brightness 32.1 (01: 31.3).
+  - Center press: 61% of in-form pixels change within 0.1 s and 51% at full press (interior about 25 px, contour +6.8 px). Recovery returns to a pixel-identical rest.
+  - Center drag: lag about 12 px, flow trace, 57% of pixels changed.
+  - Edge press: dent about 33 px, far side about +8 px.
+  - The long hold is stable, 30 rapid taps stay stable, RESET and switching work, Researcher readouts are shown, and the export carries the new fields.
+- **Regression:** 52 of 52 pass. Condition 01 is unchanged (adaptation 0.233 → 0.096; dwell works).
+- **Screenshots:** five states in `research/screenshots/gel/`.
 
 ### V5 Phase 03 — Gel (12 Nov 2026)
 

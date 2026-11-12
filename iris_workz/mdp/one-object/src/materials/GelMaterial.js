@@ -4,12 +4,16 @@
 // is heavy and delayed; after release the material flows back and settles.
 //
 // Research logging (all values derived directly from the simulation):
-//   contact_start   region, distance to the surface, pointer speed, location (x, y)
+//   contact_start   region, distance to the surface, pointer speed, location (x, y),
+//                   interior (pressed inside the body), depthFromEdge
 //   drag            cumulative drag distance (≈ every 400 ms while dragging)
 //   contact_end     durationMs, drag distance, and metadata:
-//                     peakDeformation    deepest inward radial displacement in the footprint (object units)
-//                     redistribution     peak mean outward displacement of material outside the footprint
-//                     peakVolumeChange   peak |area / restArea − 1| during the contact
+//                     peakDeformation        max(edge indent, interior displacement near the contact)
+//                     localCompression       peak compression (−div u) near the contact
+//                     internalDisplacement   peak interior displacement |u| anywhere
+//                     redistribution         peak mean outward boundary expansion outside the footprint
+//                     pressurePropagationMs  time from press until the contour's mean outward motion > 0.004
+//                     peakVolumeChange       peak |area / restArea − 1| (includes intended footprint spread)
 //   recovery        kind 'settle': durationMs from release until max displacement < 0.01
 //                   (completed: false if a new press interrupted it)
 //   region_revisit, approach, recovery (kind 'stillness') as in the other conditions
@@ -75,7 +79,7 @@ export default class GelMaterial extends Material {
     const b = this.body;
     return {
       timeMs: b.timeMs, totals: b.totals, proximity: this.tracker.proximity, grabbing: !!b.contact,
-      gel: { maxDisp: b.maxDisp, volumeChange: b.area / b.A0 - 1, settled: b.settled, recovering: !!b.recovery },
+      gel: { maxDisp: b.maxDisp, maxU: b.maxU, compression: b.maxCompression, pressure: b.pInt, volumeChange: b.area / b.A0 - 1, settled: b.settled, recovering: !!b.recovery },
     };
   }
 
@@ -85,12 +89,15 @@ export default class GelMaterial extends Material {
     const tracker = { timeMs: b.timeMs, totals: { ...tr, contactMs: t.contactMs, contactEpisodes: t.contactEpisodes, dragDistance: t.dragDistance, revisits: t.revisits } };
     return buildBasicPayload(tracker, this.ctx.logger, {
       condition, seed: this.seed, materialKey: this.key, endReason, exportedAt,
-      materialStatus: 'gel v1 (pressure-redistribution soft boundary + viscous flow)',
+      materialStatus: 'gel v2 (volumetric interior displacement field coupled to a pressure boundary)',
       parameters: { ...b.params },
       summaryExtra: {
         peakDeformation: Math.round(t.peakDeformation * 1e4) / 1e4,
         peakRedistribution: Math.round(t.peakRedistribution * 1e4) / 1e4,
         completedRecoveries: t.recoveries,
+        interiorContacts: t.interiorContacts,
+        peakCompression: Math.round(t.peakCompression * 1e4) / 1e4,
+        peakInternalDisplacement: Math.round(t.peakInternalDisplacement * 1e4) / 1e4,
       },
       methodNote: 'Gel condition: a programmed viscous, approximately volume-conserving soft boundary. Logged values describe observed pointer behaviour and simulated deformation only.',
     });

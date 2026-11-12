@@ -2,7 +2,7 @@
 // the object's base radius is 1.0 and its centre is the origin.
 // All per-step forces assume the fixed physics step below.
 
-export const APP_VERSION = '5.0.0-alpha.2';
+export const APP_VERSION = '5.0.0-alpha.4';
 export const STEP = 1 / 60;          // fixed physics timestep (s)
 export const MAX_SUBSTEPS = 5;       // cap on catch-up steps per frame
 export const NODE_COUNT = 80;        // perimeter nodes
@@ -73,6 +73,15 @@ export const GEL_DEFAULTS = Object.freeze({
   pressure: 1.0,      // 0..2   redistribution strength (0 = no volume conservation)
   recovery: 0.5,      // 0..1   speed of the return toward the circle
   flow: 0.7,          // 0..1.5 internal flow intensity (visual layers + flow lines)
+});
+
+// Condition 04 (Silicone / Elasticity) researcher parameters — defaults
+export const SILICONE_DEFAULTS = Object.freeze({
+  stiffness: 0.5,       // 0..1  elastic stiffness of the membrane springs
+  resistance: 0.5,      // 0..1  stretch resistance (springs stiffen with strain)
+  damping: 0.75,        // 0..1  more damping → less overshoot / oscillation
+  recovery: 0.5,        // 0..1  pull back toward the rest form (recovery speed)
+  maxDeformation: 0.45, // 0.15..0.8  how far a grabbed region can be pulled (object units)
 });
 
 export const PRESETS = Object.freeze({
