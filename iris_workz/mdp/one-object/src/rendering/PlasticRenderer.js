@@ -75,13 +75,13 @@ export class PlasticRenderer {
     g.clip();
     // flat-film sheen: straight, parallel — reads as a stiff flat sheet
     const a = this.sheenAngle, ux = Math.cos(a), uy = Math.sin(a), vx = -uy, vy = ux, o = this.sheenOffset;
-    const gl = g.createLinearGradient(vx * (o - 0.22), vy * (o - 0.22), vx * (o + 0.22), vy * (o + 0.22));
-    gl.addColorStop(0, rgba(P.pale, 0)); gl.addColorStop(0.5, rgba(P.pale, 0.075 * mo)); gl.addColorStop(1, rgba(P.pale, 0));
-    g.fillStyle = gl; g.fillRect(-1.3, -1.3, 2.6, 2.6);
-    g.lineWidth = 0.9 * px;
-    for (const [d, al] of [[o + 0.3, 0.16], [o + 0.37, 0.09], [o - 0.55, 0.06]]) {
-      g.beginPath(); g.moveTo(vx * d - ux * 1.3, vy * d - uy * 1.3); g.lineTo(vx * d + ux * 1.3, vy * d + uy * 1.3);
-      g.strokeStyle = rgba(P.white, al * mo); g.stroke();
+    // milky film: an even translucent layer (plastic is uniformly dense, unlike gel or silicone)
+    g.fillStyle = rgba(P.main, 0.085 * mo); g.fillRect(-1.3, -1.3, 2.6, 2.6);
+    // reflections: soft straight bands across the whole sheet, never crisp lines (crisp lines = creases only)
+    for (const [d, wd, al] of [[o, 0.26, 0.13], [o + 0.42, 0.09, 0.08], [o - 0.62, 0.16, 0.05]]) {
+      const gl = g.createLinearGradient(vx * (d - wd), vy * (d - wd), vx * (d + wd), vy * (d + wd));
+      gl.addColorStop(0, rgba(P.pale, 0)); gl.addColorStop(0.5, rgba(P.pale, al * mo)); gl.addColorStop(1, rgba(P.pale, 0));
+      g.fillStyle = gl; g.fillRect(-1.3, -1.3, 2.6, 2.6);
     }
     g.restore();
   }
@@ -106,9 +106,11 @@ export class PlasticRenderer {
       }
       this.facetTexture(g, f, mo, px);
       // tilt shading from the facet normal; the back of the film is milkier
-      const lum = Math.abs(N[0] * LIGHT[0] + N[1] * LIGHT[1] + N[2] * LIGHT[2]), dl = lum - lum0;
-      if (Math.abs(dl) > 0.01 || N[2] < 0) {
+      const lum = Math.abs(N[0] * LIGHT[0] + N[1] * LIGHT[1] + N[2] * LIGHT[2]), dl = lum - lum0, lift = 1 - Math.abs(N[2]);
+      if (Math.abs(dl) > 0.01 || N[2] < 0 || lift > 0.01) {
         this.screenPath(g, f);
+        // any lifted plane reads as lifted, whatever its direction: it turns milkier (seen at a grazing angle)
+        if (lift > 0.01) { g.fillStyle = rgba(P.pale, Math.min(0.16, lift * 0.3) * mo); g.fill(); }
         if (dl > 0) { g.fillStyle = rgba(P.pale, Math.min(0.2, dl * 0.45) * mo); g.fill(); }
         else if (dl < 0) { g.fillStyle = `rgba(1,3,8,${Math.min(0.35, -dl * 0.6 * mo).toFixed(3)})`; g.fill(); }
         if (N[2] < 0) { g.fillStyle = rgba(P.main, 0.05 * mo); g.fill(); }

@@ -28,10 +28,10 @@ import { buildBasicPayload } from '../research/Exporter.js';
 
 /** Researcher-only parameters (labels in translations: researcher.params.<key>). */
 export const GEL_PARAM_SPEC = Object.freeze([
-  { key: 'viscosity', label: 'gelViscosity', min: 0, max: 1, step: 0.01 },
-  { key: 'pressure', label: 'gelPressure', min: 0, max: 2, step: 0.01 },
-  { key: 'recovery', label: 'gelRecovery', min: 0, max: 1, step: 0.01 },
-  { key: 'flow', label: 'gelFlow', min: 0, max: 1.5, step: 0.01 },
+  { key: 'viscosity', label: 'gelViscosity', min: 0, max: 1, step: 0.01, group: 'material' },
+  { key: 'pressure', label: 'gelPressure', min: 0, max: 2, step: 0.01, group: 'material' },
+  { key: 'recovery', label: 'gelRecovery', min: 0, max: 1, step: 0.01, group: 'behaviour' },
+  { key: 'flow', label: 'gelFlow', min: 0, max: 1.5, step: 0.01, group: 'material' },
 ]);
 
 export default class GelMaterial extends Material {

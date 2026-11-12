@@ -2,6 +2,65 @@
 
 All notable changes to ONE OBJECT / MANY ENCOUNTERS. Dates are 2026.
 
+## 5.0.0-beta.1 — 12 Nov · Phase 06: integration, Plastic, Researcher Mode, participant testing
+
+**All four conditions are now implemented.** Condition 01 is unchanged (its source files are untouched). Gel and Silicone are unchanged apart from tagging their researcher parameters with a panel group.
+
+**Condition 03 — Plastic / Crease** (`physics/PlasticBody.js`, `rendering/PlasticRenderer.js`, `materials/PlasticMaterial.js`, replacing the placeholder). The sheet is a set of flat facets, each with an affine map, a 3D normal and a layer.
+
+- **Yield:** the sheet resists until a drag passes a yield distance; a stress line previews the fold.
+- **Classification**, made once per gesture:
+  - *edge*: the flap folds over along the bisector and follows the pointer;
+  - *ridge*: an interior press buckles into a raised band with two creases;
+  - *resist*: an outward pull does nothing.
+- **Release:** an overdamped *partial* spring-back to a residual angle, then baked in permanently. Creases accumulate; only RESET restores the sheet. No adaptation.
+- **Researcher parameters:** stiffness (yield), spring-back speed, plasticity (permanent bend), fold limit.
+- **Logging:**
+  - new `fold` event (mode, direction, flap fraction, time to yield);
+  - `contact_end` outcome, peak fold angle and fold distance;
+  - `recovery` kind `springback` (residual angle, creases, facets, projected area, mean tilt).
+- **Visual:** brightness matched to the other conditions (32.6, against 31.1–32.0).
+
+**Researcher Mode** is reorganised into four collapsible sections:
+
+- **Material properties**
+- **Behaviour & memory**, with live metrics
+- **Encounter conditions:** switch, order, shuffle, lock, seed, *reset current condition*, encounter list
+- **Research data:** anonymous session ID, **participant notes**, **live interaction log**, **session timeline**, reflection status, export, **new participant session**
+
+Material names appear only here. The panel is full-width on phones.
+
+**Research logging** (export schema v4):
+
+- `participant.anonymousSessionId`
+- a session **`timeline`**: switches from → to, resets, order and lock changes, parameter changes, sound, language, notes, reflection and export, each with ISO time and ms since start
+- `notes`
+- a session-level `reflection` (with question wording and language)
+- `parameterSettings` for every material
+- `materials`
+- an updated method note: logs describe pointer behaviour and simulated state only, and do not infer emotion or interpretation
+
+**Reflection:** the five neutral Phase 06 questions, about *each object*, in English and Chinese. The privacy text now mentions the anonymous code.
+
+**Tests:** 76 (12 Plastic, 5 integration, including one identical gesture applied to all four models). Browser QA has 56 checks:
+
+- visual consistency;
+- the identical gesture in all four conditions;
+- switching and reset;
+- participant text;
+- Researcher Mode;
+- reflection;
+- language and sound;
+- export;
+- touch;
+- five screen sizes.
+
+A 3-minute extended-session performance run was also done.
+
+**New documents and files:** `RESEARCH_PROTOCOL.md`, `examples/research-session-export-example.json`, and screenshots in `research/screenshots/plastic/` and `research/screenshots/phase06/`.
+
+**Known:** in headless Chrome at 2× density, Gel runs at about 30 fps during interaction (needs checking on real hardware). Conditions do not keep state across switches (by design; documented).
+
 ## 5.0.0-alpha.4 — 12 Nov · Phase 05: Silicone / Elasticity (condition 04)
 
 **Condition 04 is now a real material.** Conditions 01, 02 and 03 are unchanged: 01 and 02 pass their regression and Gel checks (52/52 and 21/21), and 03 remains a placeholder.

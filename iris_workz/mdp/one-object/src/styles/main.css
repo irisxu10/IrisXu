@@ -173,6 +173,26 @@ textarea {
 .r-warn { color: #e8b4a0; font-size: 11px; margin: 0; }
 .r-actions button.primary { color: var(--bg); }
 
+/* V5 Phase 06: four collapsible sections */
+.r-current { display: grid; gap: 4px; padding: 6px 0 10px; }
+.r-current strong { font-weight: 500; letter-spacing: .04em; }
+.r-badge { font-family: ui-monospace, Menlo, monospace; font-size: 10px; color: var(--muted); }
+.r-sec { border-top: 1px solid var(--line); padding: 4px 0 10px; }
+.r-sec > summary { cursor: pointer; padding: 8px 0; font-size: 10px; letter-spacing: .14em; text-transform: uppercase; color: var(--ink); list-style-position: inside; }
+.r-sec > summary::marker { color: var(--muted); }
+.r-sec[open] > summary { margin-bottom: 4px; }
+.r-sec, .r-sec > div, .r-sub { display: grid; gap: 8px; }
+.r-sec > :not(summary) { margin-left: 0; }
+.researcher h4 { font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); margin: 8px 0 0; font-weight: 500; }
+.r-sub { border-top: 1px dashed var(--line); padding-top: 6px; }
+.researcher textarea { width: 100%; font: inherit; padding: 6px 8px; background: var(--field); color: var(--ink); border: 1px solid var(--line); border-radius: 2px; resize: vertical; }
+.r-notes { margin: 0; padding-left: 16px; display: grid; gap: 4px; font-size: 11px; line-height: 1.5; }
+.r-log { margin: 0; padding: 6px 8px; list-style: none; max-height: 180px; overflow: auto; background: var(--field); border: 1px solid var(--line); border-radius: 2px;
+  font-family: ui-monospace, Menlo, monospace; font-size: 10px; line-height: 1.55; color: var(--muted); }
+.r-log b { color: var(--ink); font-weight: 500; }
+.r-meta { color: var(--faint); font-variant-numeric: tabular-nums; }
+#r-session-id { font-size: 10px; word-break: break-all; text-align: right; max-width: 60%; }
+
 .boot-warning {
   position: fixed; left: 16px; right: 16px; top: 40%; z-index: 9;
   max-width: 520px; margin: 0 auto; padding: 16px;
@@ -187,6 +207,7 @@ textarea {
 [hidden] { display: none !important; }
 
 @media (max-width: 640px) {
+  .researcher { width: 100vw; border-left: 0; }
   .conditions { left: 6px; gap: 4px; }
   .conditions button { width: 34px; height: 30px; min-height: 30px; font-size: 10px; }
   .title { font-size: 10px; letter-spacing: .12em; max-width: 44vw; line-height: 1.5; }

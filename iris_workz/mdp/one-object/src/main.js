@@ -11,7 +11,8 @@ import { ResearchSession } from './research/ResearchSession.js';
 import { downloadJSON } from './research/Exporter.js';
 import { ExhibitionUI } from './ui/ExhibitionUI.js';
 import { ResearcherPanel } from './ui/ResearcherPanel.js';
-import { materialById } from './materials/registry.js';
+import { materialById, MATERIALS } from './materials/registry.js';
+import { translations } from './ui/translations.js';
 import { Material } from './materials/Material.js';
 import { clientToObject } from './materials/sharedForm.js';
 
@@ -41,6 +42,11 @@ const clock = () => (material ? material.clockMs() : 0);
 const conditionLabel = (d) => (d.key === 'structural' ? presetLabel() : d.status === 'placeholder' ? 'placeholder' : d.key);
 function logParam(param, from, to, scope = 'behaviour') {
   logger?.log('parameter_change', clock(), { metadata: { param, from, to, scope } });
+  research.mark('parameter_change', { conditionId: def?.id ?? null, param, from, to, scope });
+}
+/** Every researcher setting in force (for the export). */
+function parameterSettings() {
+  return { seed, structural: { preset: presetLabel(), behaviour: { ...params }, display: { ...visual } }, ...structuredClone(materialParams) };
 }
 function snapshot(endReason) {
   return material.buildEncounterPayload({ condition: conditionLabel(def), visual, endReason });
@@ -103,7 +109,7 @@ function refresh() {
 
 const ui = new ExhibitionUI({
   lang,
-  onLangChange: (l) => { lang = l; researcher.relabel(); },
+  onLangChange: (l) => { lang = l; research.mark('language_change', { lang: l }); researcher.relabel(); },
   onCondition: (id) => {
     if (!def || id === def.id || !research.allowedConditions().has(id)) return;
     activate(id, 'participant_switch');
@@ -113,13 +119,18 @@ const ui = new ExhibitionUI({
     const prev = research.current?.encounterIndex;
     activate(def.id, 'participant_reset', { event: { type: 'reset', fields: { metadata: { by: 'participant', previousEncounterIndex: prev } } } });
   },
-  onReflection: (answers) => logger?.setReflection(answers, clock()),
+  onReflection: (answers) => {
+    logger?.setReflection(answers, clock());                                  // timing within the open encounter
+    research.setReflection(answers, { lang, text: translations[lang].questions, en: translations.en.questions });  // session level
+    refresh();
+  },
   onOpenResearcher: () => researcher.show(),
   onSound: async () => {
     if (audio.enabled) audio.disable();
     else if (!(await audio.enable())) { ui.setSound('unavailable'); return; }
     ui.setSound(audio.enabled ? 'on' : 'off');
     logger?.log('sound_toggle', clock(), { metadata: { enabled: audio.enabled } });
+    research.mark('sound_toggle', { enabled: audio.enabled });
   },
 });
 ui.setSound(audio.supported ? 'off' : 'unavailable');
@@ -181,9 +192,13 @@ const researcher = new ResearcherPanel(document.getElementById('researcher'), {
   onLock: (on) => { research.setLocked(on); logParam('orderLocked', !on, on, 'research'); refresh(); },
   onExport: () => {
     if (!material) return;
-    downloadJSON(research.buildExport(snapshot('export_snapshot')), `research-session-${research.id.slice(0, 8)}.json`);
+    research.mark('export', { encounters: research.encounters.length + 1 });
+    const materials = Object.fromEntries(MATERIALS.map((m) => [m.id, { key: m.key, name: m.name, status: m.status }]));
+    downloadJSON(research.buildExport(snapshot('export_snapshot'), undefined, { parameterSettings: parameterSettings(), materials }), `research-session-${research.id.slice(0, 8)}.json`);
+    refresh();
   },
-  onNewResearch: () => { research.start(); activate(research.firstCondition(), 'new_research_session', { archive: false }); },
+  onNote: (text) => { research.addNote(text); refresh(); },
+  onNewResearch: () => { research.start(); ui.clearReflection(); activate(research.firstCondition(), 'new_research_session', { archive: false }); },
 });
 
 // ---------- global input ----------
@@ -215,7 +230,7 @@ function frame(now) {
   material.render(pointer.state);
   audio.update(material.audioSignals() || SILENT, material.isGrabbing());
   ui.update(material.hintSource(), dt * 1000);
-  researcher.update(material, fps, dt * 1000, logger.events.length, {
+  researcher.update(material, fps, dt * 1000, logger, {
     audioPeak: audio.enabled ? audio.peak.toFixed(3) : undefined,
   });
 }

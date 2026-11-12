@@ -1,6 +1,6 @@
 # Project Handoff — ONE OBJECT / MANY ENCOUNTERS
 
-*Current as of 2026-11-12, version 5.0.0-alpha.4 (Gel and Silicone implemented; Plastic still a placeholder).* This document supersedes `../PROJECT_HANDOFF.md` (5 Nov), which describes the earlier single-file build.
+*Current as of 2026-11-12, version 5.0.0-beta.1 (Phase 06: all four conditions implemented; Researcher Mode reorganised; session export with timeline, notes and reflection; research protocol in `RESEARCH_PROTOCOL.md`).* This document supersedes `../PROJECT_HANDOFF.md` (5 Nov), which describes the earlier single-file build.
 
 Every claim below is labelled:
 
@@ -16,7 +16,7 @@ Every claim below is labelled:
 |---|---|
 | **Canonical project** | `iris_workz/mdp/one-object/` (ES modules, no build step, no dependencies) |
 | **Launch** | VS Code Live Server → `http://127.0.0.1:5501/iris_workz/mdp/one-object/index.html`. Or `cd one-object && python3 -m http.server 8000` → `http://localhost:8000/`. **`file://` does not work** (modules need a server); the page shows a warning. |
-| **Version** | `APP_VERSION = '5.0.0-alpha.4'` in `src/config.js`. The tab title shows "· V5". |
+| **Version** | `APP_VERSION = '5.0.0-beta.1'` in `src/config.js`. The tab title shows "· V5". |
 | **Repository** | `github.com/irisxu10/IrisXu` (the artist's portfolio site); branch `prototype/homepage-soft-glass-atmosphere` |
 | **Archived, not edited** | `../one_object_three_encounters_v2.html` (4.1 + Stage 1, single file), `../one-object-v4/` (4.1), `../one-object-v4.0/` (4.0), `../one-object-v3/` (3.0). Original V2 is in git `9a361d3`. A tarball of all of these is at `~/Desktop/IrisXu/one-object-backups/one-object-pre-consolidation-2026-11-12.tar.gz` (outside the repository). |
 
@@ -36,14 +36,10 @@ The research question: *How do repeated sensory encounters shape expectations, i
 - **No DOM listeners in materials.** Materials never add their own event listeners. `Material.live` counts live instances and should always be 1.
 - **Lazy loading.** `materials/registry.js` lists the four conditions; each module loads on demand through `import()`. A switch token discards superseded switches.
 - **Condition 01** = `StructuralMaterial`, an adapter around the unchanged `Simulation` and `FilamentRenderer`.
-- **Conditions 02–04** = `PlaceholderMaterial` subclasses:
-  - the shared form (outline, centre, diameter, fill, edge from `sharedForm.js`),
-  - a static, seeded texture cached offscreen,
-  - pointer logging through `PointerTracker`,
-  - no motion.
+- **Conditions 02–04** each have their own pure physics module (`physics/GelBody.js`, `PlasticBody.js`, `SiliconeBody.js`), a renderer, and a `Material` subclass that exposes researcher parameters (`getParamSpec` / `setParam`, each tagged `group: 'material' | 'behaviour'`). All start from the shared form in `sharedForm.js`. `PointerTracker` adds approach, proximity and stillness logging. (`PlaceholderMaterial.js` is no longer used by any condition.)
 - **Switching** (participant selector, researcher override, RESET, preset, seed): the current encounter's payload is frozen into the research session, then the material is disposed, then a new material and logger are created. Hints and reflection are reset.
 
-**Export schema v3** contains: `researchSessionId`, `conditionOrder`, `orderLocked`, `orderLog`, `conditionSequence`, and `encounters[]`. Each encounter has:
+**Export schema v4** contains: `researchSessionId` / `participant.anonymousSessionId`, `conditionOrder`, `orderLocked`, `orderLog`, `conditionSequence`, `materials`, `parameterSettings`, `timeline[]` (switches, resets, order changes, parameter changes, sound, language, notes, reflection, export; ISO time + ms since start), `notes[]`, `reflection`, and `encounters[]`. See `RESEARCH_PROTOCOL.md` §5. Each encounter has:
 
 - `encounterIndex`, `conditionId`, `materialKey`, `materialName`
 - `orderPosition`, `conditionOrder`
@@ -69,6 +65,18 @@ The research question: *How do repeated sensory encounters shape expectations, i
 
 ## 3. What is implemented
 
+### Complete vs experimental (Phase 06)
+
+| Complete (verified, ready for pilot use) | Experimental (works, needs human testing or design decisions) |
+|---|---|
+| All four material conditions and their distinct primary behaviours | How each material *feels*, and whether differences are noticed without explanation |
+| Shared form, palette, centre, diameter and brightness across conditions | Sound design per material (all use the shared engine and voices) |
+| Participant UI: only 01–04, neutral text, optional reflection | Gel frame rate on high-DPI exhibition hardware |
+| Researcher Mode: 4 sections, parameters, order and lock, reset, notes, log, timeline, export, new session | Locked-order greying (D2), very short encounters (D1), no autosave (D3) |
+| Session export (schema v4), anonymous, no identifying fields | Touch on real phones and tablets (emulated touch verified only) |
+| Bilingual UI (EN / 简体中文) | Plastic: straight folds only, no snapping to existing creases |
+
+
 | Feature | How it works | Status |
 |---|---|---|
 | **Soft-body physics** | 80 perimeter nodes. Each is pulled back toward its rest position (`stiffness` 0.014), coupled to its neighbours (`tension` 0.22), and subject to area preservation (press one side, the other bulges slightly). Damping 0.95 per step; displacement clamped at 0.36 R; recovery about 1–2 s. Ambient motion is non-rhythmic and amplitude 0.008. | Implemented, verified (automated) |
@@ -82,13 +90,14 @@ The research question: *How do repeated sensory encounters shape expectations, i
 | **Rendering** | Deep-blue translucent body, 4 seeded fold sheets, and about 600 drawn filaments (of about 860 visible plus about 160 dormant). Edge strain drives straightening and brightening; memory drives fibre alignment and reveals dormant fibres. Bucketed into about 36 strokes per frame; device pixel ratio ≤ 2; automatic reduced-detail fallback. | Implemented, verified (headless) |
 | **Sound** | Stretch, friction and settle voices driven by simulation signals; contact and release one-shot sounds; a limiter. Off by default; suspends when hidden or muted. | Implemented. Context states and peak 0.06 verified; **how it actually sounds is unverified** |
 | **Conditions** | A `A_stable` (memory and adaptation off) and B `B_adaptive` (default). Applying a preset or seed starts a new session; behaviour sliders mark `+custom`; visual sliders never change the condition. | Implemented, verified |
-| **Researcher Mode** | Opens with Shift + R or INFO → Researcher mode. Presets, seed, 11 behaviour sliders, 2 toggles, 5 visual sliders plus low-detail, state flags, statistics, heatmap, reset, export. | Implemented, verified |
+| **Researcher Mode** | Opens with Shift + R or INFO → Researcher mode. The active condition's name and live state at the top, then four collapsible sections. **Material properties**: material parameters, plus physics and display for 01. **Behaviour & memory**: behaviour parameters, 01 presets and memory/adaptation, live metrics, heatmap. **Encounter conditions**: switch, order (apply, shuffle, lock), seed, reset the current condition, encounter list. **Research data**: anonymous session ID, participant notes, live interaction log, session timeline, reflection status, export, new participant session. Full-width on phones. | Implemented, verified (Phase 06 browser checks) |
 | **Logging / export** | Events: `session_start`, `approach`, `contact_start/end`, `drag`, `region_revisit`, `adaptation_threshold`, `recovery`, `parameter_change`, `reflection`, `sweep`, `sound_toggle`, `dwell`, `session_end`. Throttled, timed on the simulation clock. JSON schema v2 with a summary. | Implemented, verified |
-| **Bilingual interface and reflection** | English and Simplified Chinese; switching keeps the session. Three hints. FINISH opens five optional neutral questions. | Implemented, verified |
+| **Bilingual interface and reflection** | English and Simplified Chinese; switching keeps the session. Three hints. FINISH opens the five optional Phase 06 questions (about *each object*), stored once per session with their wording and language. | Implemented, verified |
+| **Session timeline and notes** | `ResearchSession.mark()` records switches (from → to), resets, order and lock changes, parameter changes, sound, language, notes, reflection and export. Researcher notes are timestamped and tagged with the active condition. | Implemented, verified (node and browser) |
 | **Material framework (V5 Phase 02)** | Four conditions behind one interface. Selector shows only 01–04. Research session keeps every encounter. Order can be configured and locked. | Implemented, verified (52 browser checks, 36 tests) |
 | **Gel / Flow (02)** | **Boundary:** an 80-node pressure boundary with a delayed target-area rise driven by interior displacement, so the footprint spreads under a press. **Interior:** a 31 × 31 displacement grid, coupled both ways to the boundary (Dirichlet edge values; boundary pulled toward the interior just inside it). An indenter anywhere inside pushes material away (dimple plus compressed ring), deepening under a hold; drag carries material with viscous lag; two lag fields give deeper layers; a decaying flow trail; exact rest afterwards. **`GelRenderer`:** volume glow, blurred compression density map, 10 field-warped folded membranes (trough plus compression-lit ridge), Fresnel rim, field-driven speculars. | Implemented, verified (12 node tests, 21 browser checks with pixel-change measurements). **Not yet tested by a human.** |
 | **Silicone / Elasticity (04)** | `SiliconeBody`: a triangulated mass-spring disk (469 nodes, 864 triangles). Strain-stiffening springs, an oriented area constraint (resists squeezing, unfolds flips), a weak shape tether, and a soft-limited gaussian grab. Underdamped, with 2 sub-steps; no simulation while settled. `SiliconeRenderer`: mapped elastic bands (thin and brighten with stretch), area-driven thickness shading, two sheets, inner rim, strain-lengthened satin highlight. | Implemented, verified (11 node tests, 20 browser checks). **Not yet tested by a human.** |
-| **Plastic (03) behaviour** | Placeholder only: static texture plus pointer logging. | **Physics not implemented** (Phase 04 not done) |
+| **Plastic / Crease (03)** | `PlasticBody`: a sheet of flat **facets**, each a rest-space polygon with an affine map, a 3D normal and a layer. A drag must pass a **yield distance** before anything moves (a faint stress line previews the fold). The gesture is then classified once. **Edge:** the flap behind the press point folds over along the bisector, so the press point lands under the pointer. **Ridge:** an interior press buckles into a raised band with two creases, ahead of the finger. **Resist:** pulling outward does nothing. On release the fold springs back **only partly** (overdamped, no overshoot) to `peak × (0.12 + 0.3·plasticity)` (≤ 78°), and is then **baked in permanently**. Creases accumulate; only RESET restores the flat sheet. `PlasticRenderer`: per-facet affine texture (body, milky film, straight soft reflections), tilt and lift shading, milkier back face, cast shadow under raised facets, crisp crease lines. | Implemented, verified (12 node tests, browser checks). **Not yet tested by a human.** |
 | **Click ripple, directional drag traces, autonomy (Stages 2–4)** | — | **Not implemented** |
 
 ## 4. Visual design
@@ -150,7 +159,13 @@ The research question: *How do repeated sensory encounters shape expectations, i
 
 **V5-specific:**
 
-- Conditions 02–04 do not deform. Participants touching them get no material response yet, only the pointer mark.
+- **Every encounter starts from the initial form.** Conditions do not carry state across switches. For example, Plastic creases or Structural memory do not survive leaving a condition and coming back, and "reset an individual condition" resets the active one. This keeps encounters comparable; change it only as a deliberate design decision.
+- **Plastic:**
+  - only straight folds perpendicular to the drag (no curved creases or crumpling);
+  - a new fold does not snap to an existing crease;
+  - after about 360 facets the sheet is "saturated" and further gestures are resisted (reached only after dozens of folds; RESET clears it);
+  - pulling outward produces no deformation by design.
+- **Gel performance:** during interaction at 1440×900 with 2× pixel density, headless Chrome (software rasterisation on this Mac) drops Gel to about 30 fps; the other three conditions hold 60 fps. JavaScript cost is about 0.35 ms per frame; the time is spent rasterising the stretched density images. **Check on the exhibition machine** (manual).
 - Three further issues are tracked as deferred items **D1–D3** below.
 
 ### Deferred issues (logged 2026-11-12, to address in a later phase)
@@ -164,6 +179,65 @@ The research question: *How do repeated sensory encounters shape expectations, i
 **Needs manual testing:** look and feel, the noticeability of memory and dwell, sound quality and loudness, iOS Safari audio unlock, Android, pen input, the OS reduced-motion setting, and screen readers.
 
 ## 7. Verification
+
+### Phase 06 — integration (12 Nov 2026, 5.0.0-beta.1)
+
+- **`npm test`:** 76 of 76 pass.
+  - 12 Plastic tests:
+    - rest stability;
+    - no change below the yield distance;
+    - edge fold tracks the pointer;
+    - partial spring-back with a permanent bend that lasts 30 s;
+    - creases accumulate;
+    - ridge versus resisted pulls;
+    - no adaptation (identical yield timing);
+    - differs from Gel and Silicone;
+    - violent flailing stays bounded and invertible;
+    - logging, parameters, reset.
+  - 5 integration tests:
+    - export (anonymous ID, order, timeline with switch, reset, note, reflection and export, monotone timestamps, no identifying field names, clean new session);
+    - the five reflection questions;
+    - participant text containing no material names and no life, learning, feeling or memory words (English and Chinese);
+    - every parameter grouped and translated;
+    - **one identical gesture applied to all four material models** shows four different primary behaviours.
+- **Browser (`verify-p6`): 56 of 56 checks pass.**
+  - **Visual consistency:** same diameter (1136–1140 device px), same centre, same background `rgb(5, 7, 11)`, in-form brightness 31.1–32.6.
+  - **Identical edge drag in all four conditions:**
+    - every condition responds visibly;
+    - Plastic keeps 5.5% of pixels changed 6 s later (crease plus bent flap);
+    - Gel and Silicone return to rest (0.3% and 0.4%);
+    - four different response profiles;
+    - logged recovery signatures: Gel `settle` (slow), Plastic `springback`, Silicone `settle` with overshoots.
+  - **Switching and reset:** rapid switching leaves exactly one live material; RESET restores the flat sheet and logs it.
+  - **Participant UI:** no material names visible in English or Chinese; the selector shows only 01–04.
+  - **Researcher Mode:** four sections, parameters split by group for every condition, changes logged, order apply and lock, notes, live log, timeline, anonymous ID.
+  - **Reflection:** the five questions are shown and saved at session level.
+  - **Language and sound:** Chinese UI; sound on, audible peak about 0.06, then off.
+  - **Export:** downloaded JSON (schema 4) with every required field.
+  - **New participant session:** works.
+  - **Touch (390×844 at 3×):** a finger folds Plastic and stretches Silicone; no page scroll or zoom.
+  - **Screen sizes 375×667, 768×1024, 1280×800, 1920×1080 and 2560×1440:** the object fits, controls stay on screen, no horizontal scroll, the selector stays clear of the object; Researcher Mode is full-width on phones.
+  - No console errors.
+- **Extended session (`perf`, 3.1 min, 25 encounters of continuous scripted dragging):**
+  - 01, 03 and 04 at 16.7 ms per frame (p95 16.8 ms);
+  - Gel at 33–50 ms per frame in headless Chrome (see §6);
+  - heap 1.5 → 2.9 MB;
+  - one live material throughout;
+  - no errors.
+- **Screenshots:** `research/screenshots/plastic/` and `research/screenshots/phase06/`.
+
+**Needs manual testing:**
+
+- how the four materials feel to people, and whether the differences are noticed without explanation;
+- sound on real speakers;
+- iOS Safari audio unlock;
+- Android Chrome;
+- pen input;
+- exhibition hardware and projector brightness;
+- Gel frame rate on the target machine;
+- OS reduced-motion setting;
+- downloads in kiosk or private modes.
+
 
 ### Phase 05 — Silicone (12 Nov 2026, 5.0.0-alpha.4)
 
@@ -279,7 +353,8 @@ The one failure was frame rate under heavy system load (see §6).
 2. **Stages 2–3:** a click ripple with a persistent trace, and directional drag traces stored in memory. Files: `Simulation.js`, `MemorySystem.js`, `FilamentNetwork.js`, `FilamentRenderer.js`, `config.js`.
 3. **Material depth:** a less circular silhouette, true folds, pseudo-lighting, denser fine strands, and optionally an interior mesh. Files: `SoftBody.js`, `FilamentNetwork.js`, `FilamentRenderer.js`.
 4. **Stage 4 autonomy** as an explicit, logged, switchable factor. Files: a new `behavior/Autonomy.js`, plus `Simulation.js`, `config.js` and `ResearcherPanel.js`.
-5. **Real behaviour for 03 (Plastic / Crease) and 04 (Silicone / Elasticity)**, following the Gel pattern: a pure physics module (`physics/*Body.js`), a renderer, a `Material` subclass exposing `getParamSpec`/`setParam`, and research events that are derivable from the simulation.
+5. ~~Real behaviour for 03 and 04~~ — done (Silicone 5.0.0-alpha.4, Plastic 5.0.0-beta.1).
+6. **Pilot study** with a few participants using `RESEARCH_PROTOCOL.md`; then decide D1–D3 and whether conditions should keep their state across switches.
 
 ## 9. Open questions for the creative director
 
@@ -299,4 +374,4 @@ The one failure was frame rate under heavy system load (see §6).
 
 ## 10. Files to share
 
-`src/config.js`, `src/simulation/Simulation.js`, `src/behavior/*.js`, `src/rendering/*.js`, `src/research/*.js`, `src/ui/translations.js`, this document, `README.md`, `CHANGELOG.md`, and `examples/session-example.json` (schema v2, version 4.2.0, including a dwell).
+`src/config.js`, `src/physics/*.js`, `src/simulation/Simulation.js`, `src/behavior/*.js`, `src/rendering/*.js`, `src/research/*.js`, `src/ui/translations.js`, this document, `README.md`, `CHANGELOG.md`, `RESEARCH_PROTOCOL.md`, `examples/session-example.json` (single encounter, schema v2) and `examples/research-session-export-example.json` (full Phase 06 export, schema v4, produced by the automated browser QA; synthetic data).

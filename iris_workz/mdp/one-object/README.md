@@ -1,19 +1,19 @@
 # ONE OBJECT / MANY ENCOUNTERS
 
-An interactive MFA thesis research prototype. It shows one unfamiliar, translucent material that responds to approach, touch, stretching, brushing, waiting and return. Repeated contact leaves traces that gradually change how each region responds.
+An interactive MFA thesis research prototype. One unfamiliar, translucent form is offered in **four material conditions** that look alike at rest but behave differently under the same gestures. The aim is to study how interaction shapes expectation, interpretation and meaning-making, not to build four decorative objects.
 
 **This folder is the canonical project.** Edit files here. Everything else in `iris_workz/mdp/` that relates to this work is an archived earlier version (see [CHANGELOG.md](CHANGELOG.md)).
 
-Current version: **5.0.0-alpha.4** ("V5 — Same Form, Different Materialities"; Gel and Silicone implemented, Plastic still a placeholder). The tab title shows "· V5".
+Current version: **5.0.0-beta.1** ("V5 — Same Form, Different Materialities"; all four conditions implemented, Researcher Mode and session export ready for pilot testing). The tab title shows "· V5".
 
 **Four conditions** share the same initial form. Participants see only **01 / 02 / 03 / 04**, in a narrow selector on the left:
 
-| ID | Name (researchers only) | Status |
-|---|---|---|
-| 01 | Structural / Memory | Full system (V4.2 physics, memory, adaptation, filaments, sound) |
-| 02 | Gel / Flow | Full: thick translucent hydrogel; press, hold or drag anywhere inside (interior field coupled to a pressure boundary) |
-| 03 | Plastic / Crease | Placeholder |
-| 04 | Silicone / Elasticity | Full: elastic membrane; stretch anywhere, resistance rises, springs back with a slight overshoot; no memory |
+| ID | Name (researchers only) | Primary behaviour | Status |
+|---|---|---|---|
+| 01 | Structural / Memory | Local adaptation and memory: repeated contact makes a region respond less | Complete (V4.2, unchanged) |
+| 02 | Gel / Flow | Viscous flow and pressure redistribution: press anywhere, the volume flows and recovers slowly | Complete |
+| 03 | Plastic / Crease | Folding and persistent creases: resists, gives, springs back only partly, keeps every crease | Complete (new in 5.0.0-beta.1) |
+| 04 | Silicone / Elasticity | Elastic stretching and recovery: stretches with rising resistance, springs back with a slight overshoot | Complete |
 
 ---
 
@@ -47,7 +47,8 @@ Tests need Node 18 or later:
 
 ```bash
 cd iris_workz/mdp/one-object
-npm test            # 59 tests (incl. 12 Gel and 11 Silicone acceptance tests): physics, memory, adaptation, sweep, filaments, proximity/dwell, shared form, research session, logging, export
+npm test            # 76 tests: 12 Gel, 12 Plastic, 11 Silicone acceptance tests; Phase 06 integration (export, participant text,
+                    # cross-material gesture comparison); physics, memory, adaptation, filaments, shared form, logging
 npm run example     # regenerates examples/session-example.json (deterministic)
 ```
 
@@ -63,6 +64,7 @@ one-object/
 │   ├── config.js                 ALL parameters, presets, slider definitions, version
 │   ├── util/math.js              seeded PRNG, smoothstep, ids
 │   ├── physics/SoftBody.js       material behaviour (01): 80-node perimeter soft body
+│   ├── physics/PlasticBody.js    material behaviour (03): faceted sheet — yield, fold along straight lines, partial spring-back, permanent creases
 │   ├── physics/SiliconeBody.js   material behaviour (04): triangulated mass-spring membrane (stiffening springs, area constraint)
 │   ├── physics/GelBody.js        material behaviour (02): pressure boundary ⇄ interior displacement grid (indenter, lag fields, trail)
 │   ├── behavior/
@@ -75,36 +77,38 @@ one-object/
 │   │   ├── registry.js           conditions 01–04 (researcher-only names, lazy module loaders)
 │   │   ├── sharedForm.js         shared outline, centre, diameter, body fill (identical for all four)
 │   │   ├── StructuralMaterial.js 01 — adapter around Simulation + FilamentRenderer (unchanged)
-│   │   ├── PlaceholderMaterial.js  base for 02–04: shared form + static texture + pointer logging
+│   │   ├── PlaceholderMaterial.js  former placeholder base (no condition uses it any more; kept for reference)
 │   │   ├── GelMaterial.js        02 — wires GelBody + GelRenderer, research logging, parameters
 │   │   ├── SiliconeMaterial.js   04 — wires SiliconeBody + SiliconeRenderer, research logging, parameters
-│   │   ├── PlasticMaterial.js    03 placeholder texture
+│   │   ├── PlasticMaterial.js    03 — wires PlasticBody + PlasticRenderer, research logging, parameters
 │   │   └── PointerTracker.js     pointer event logging for materials without their own physics
 │   ├── rendering/
 │   │   ├── FilamentNetwork.js    seeded filament anchors/edges mapped through the deformation
 │   │   ├── FilamentRenderer.js   Canvas 2D (01): membrane, folds, filaments, tension, memory traces
+│   │   ├── PlasticRenderer.js    Canvas 2D (03): per-facet affine texture, tilt shading, back-face tint, crease lines, stress preview
 │   │   ├── SiliconeRenderer.js   Canvas 2D (04): mapped elastic bands, thickness shading, sheets, satin highlight
 │   │   └── GelRenderer.js        Canvas 2D (02): volume, density map, folded membranes, Fresnel rim, field-driven speculars
 │   ├── interaction/PointerController.js   Pointer Events (mouse/touch/pen) → object units
 │   ├── audio/AudioEngine.js      procedural Web Audio (off by default)
 │   ├── research/
 │   │   ├── SessionLogger.js      in-memory event log (one per encounter)
-│   │   ├── ResearchSession.js    every encounter in order, condition order and lock, export (schema v3)
+│   │   ├── ResearchSession.js    every encounter in order, condition order and lock, export (schema v4: timeline, notes, reflection, parameter settings)
 │   │   └── Exporter.js           encounter payloads (schema v2) + download
 │   ├── ui/
 │   │   ├── translations.js       every interface string (English / 简体中文)
 │   │   ├── ExhibitionUI.js       hints, INFO, reflection, language, sound button
-│   │   └── ResearcherPanel.js    Researcher Mode
+│   │   └── ResearcherPanel.js    Researcher Mode (4 sections: material · behaviour & memory · encounter conditions · research data)
 │   └── styles/main.css
 ├── tests/                        node:test suites + example generator
 ├── examples/session-example.json
 ├── package.json
-├── README.md · CHANGELOG.md · PROJECT_HANDOFF.md
+├── README.md · CHANGELOG.md · PROJECT_HANDOFF.md · RESEARCH_PROTOCOL.md
+├── research/screenshots/          verified reference screenshots (gel, plastic, silicone, phase06)
 ```
 
 The code is split into **material behaviour** (physics, behaviour, simulation), **rendering**, **interaction input**, **interface** (ui, styles) and **research logging** (research). The simulation has no DOM access, so it can run headlessly in tests.
 
-## What it does
+## What it does — condition 01 (Structural)
 
 | Gesture | Response |
 |---|---|
@@ -116,7 +120,16 @@ The code is split into **material behaviour** (physics, behaviour, simulation), 
 | Repeat contact on one region | That region gradually responds less (stiffer and broader), and its fibres change. Other regions keep their original behaviour. |
 | Wait | Motion settles and memory decays, so the region recovers. |
 
-**Encounters and export.** A *research session* holds every encounter in order. Switching condition, RESET, applying a preset, or changing the seed closes the current encounter (its record is kept) and starts a new one. Use **Researcher Mode → Export research session** to download all of them in one JSON file. Data lives only in the tab, so export before closing.
+**The same edge drag in each condition** (press at the edge, pull 0.4 inward, hold, release):
+
+| | During the drag | 0.25 s after release | 6 s later |
+|---|---|---|---|
+| 01 Structural | filaments deform locally, tension lines | springing back | shape back, a **memory trace** stays in that region |
+| 02 Gel | the volume flows away from the press, slowly | still deformed (viscous lag) | back to rest |
+| 03 Plastic | nothing until it yields, then the edge **folds over** | springs back only partly | **bent flap and crease stay** |
+| 04 Silicone | stretches, resistance rises | **overshoots** past rest | back to rest exactly |
+
+**Encounters and export.** A *participant session* holds every encounter in order. Switching condition, RESET, applying a preset, or changing the seed closes the current encounter (its record is kept) and starts a new one; every encounter starts from the same initial form. **Researcher Mode → Research data → Export** downloads everything in one JSON file: every encounter with its event log, the session timeline (switches, resets, order changes, sound, language, notes, reflection), researcher notes, the optional reflection, and all parameter settings. Data lives only in the tab, so export before closing. See [RESEARCH_PROTOCOL.md](RESEARCH_PROTOCOL.md) for running sessions.
 
 **Condition order.** In Researcher Mode, set an order such as `03, 01, 04, 02`, or shuffle it. Then optionally lock it: participants can then choose only the current condition and the next one in the order.
 
@@ -137,6 +150,7 @@ All live in `src/config.js`. ★ means the parameter is also a Researcher Mode s
 | Proximity / sweep | `proximityRadius`, `proximityPush`, `proximitySpeedGain`, `proximityWake`, `sweepSpeed`, `sweepGain`, `sweepDent`, `sweepMemory` |
 | Immediate response | `interactionRadius`★, `proximityResponse`★, `proximityGlow`, `responseRate`, `dwellRadius`, `dwellDelay`★, `dwellRamp`, `dwellRelease`, `dwellAttraction`★, `dwellGlow`, `dwellActivity` |
 | Memory / adaptation | `memoryEnabled`★, `learningRate`★, `decayRate`★, `plasticity`, `adaptiveEnabled`★, `adaptationStrength`★, `adaptationThreshold`★, `adaptationHysteresis`, `adaptationTau`, `adaptStiffen`, `adaptWiden` |
+| Plastic (03, researcher-only) | `stiffness` (0.5, yield threshold), `springBack` (0.5), `plasticity` (0.5, permanent bend), `foldLimit` (0.45) — `PLASTIC_DEFAULTS` |
 | Silicone (04, researcher-only) | `stiffness` (0.5), `resistance` (0.5), `damping` (0.75), `recovery` (0.5), `maxDeformation` (0.45) — defaults in `config.js` `SILICONE_DEFAULTS` |
 | Gel (02, researcher-only) | `viscosity` (0.6), `pressure` redistribution (1.0), `recovery` speed (0.5), `flow` intensity (0.7) — defaults in `config.js` `GEL_DEFAULTS` |
 | Display only (never changes the condition) | `filamentDensity`★, `membraneOpacity`★, `structuralContrast`★, `tensionHighlight`★, `visualMemory`★, `lowDetail`★ |

@@ -30,11 +30,11 @@ import { buildBasicPayload } from '../research/Exporter.js';
 
 /** Researcher-only parameters (labels in translations: researcher.params.<label>). */
 export const SILICONE_PARAM_SPEC = Object.freeze([
-  { key: 'stiffness', label: 'siliconeStiffness', min: 0, max: 1, step: 0.01 },
-  { key: 'resistance', label: 'siliconeResistance', min: 0, max: 1, step: 0.01 },
-  { key: 'damping', label: 'siliconeDamping', min: 0, max: 1, step: 0.01 },
-  { key: 'recovery', label: 'siliconeRecovery', min: 0, max: 1, step: 0.01 },
-  { key: 'maxDeformation', label: 'siliconeMaxDeformation', min: 0.15, max: 0.8, step: 0.01 },
+  { key: 'stiffness', label: 'siliconeStiffness', min: 0, max: 1, step: 0.01, group: 'material' },
+  { key: 'resistance', label: 'siliconeResistance', min: 0, max: 1, step: 0.01, group: 'material' },
+  { key: 'damping', label: 'siliconeDamping', min: 0, max: 1, step: 0.01, group: 'behaviour' },
+  { key: 'recovery', label: 'siliconeRecovery', min: 0, max: 1, step: 0.01, group: 'behaviour' },
+  { key: 'maxDeformation', label: 'siliconeMaxDeformation', min: 0.15, max: 0.8, step: 0.01, group: 'behaviour' },
 ]);
 
 export default class SiliconeMaterial extends Material {

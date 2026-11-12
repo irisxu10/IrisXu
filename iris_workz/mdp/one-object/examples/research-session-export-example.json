@@ -1,0 +1,3169 @@
+{
+  "schema": "one-object-many-encounters/research-session",
+  "schemaVersion": 4,
+  "appVersion": "5.0.0-beta.1",
+  "researchSessionId": "05683d63-50de-4aaf-a429-393d14d07c0a",
+  "participant": {
+    "anonymousSessionId": "05683d63-50de-4aaf-a429-393d14d07c0a",
+    "identifyingData": "none collected"
+  },
+  "startedAt": "2026-11-12T18:30:34.263Z",
+  "exportedAt": "2026-11-12T18:31:52.894Z",
+  "conditionOrder": [
+    "04",
+    "02",
+    "03",
+    "01"
+  ],
+  "orderLocked": false,
+  "orderLog": [
+    {
+      "at": "2026-11-12T18:31:47.482Z",
+      "order": [
+        "04",
+        "02",
+        "03",
+        "01"
+      ],
+      "locked": false,
+      "by": "researcher"
+    },
+    {
+      "at": "2026-11-12T18:31:47.482Z",
+      "order": [
+        "04",
+        "02",
+        "03",
+        "01"
+      ],
+      "locked": true,
+      "by": "researcher"
+    },
+    {
+      "at": "2026-11-12T18:31:47.718Z",
+      "order": [
+        "04",
+        "02",
+        "03",
+        "01"
+      ],
+      "locked": false,
+      "by": "researcher"
+    }
+  ],
+  "encounterCount": 16,
+  "conditionSequence": [
+    "01",
+    "02",
+    "03",
+    "04",
+    "01",
+    "02",
+    "03",
+    "04",
+    "03",
+    "02",
+    "01",
+    "04",
+    "03",
+    "03",
+    "01",
+    "04"
+  ],
+  "materials": {
+    "01": {
+      "key": "structural",
+      "name": "Structural / Memory",
+      "status": "full"
+    },
+    "02": {
+      "key": "gel",
+      "name": "Gel / Flow",
+      "status": "full"
+    },
+    "03": {
+      "key": "plastic",
+      "name": "Plastic / Crease",
+      "status": "full"
+    },
+    "04": {
+      "key": "silicone",
+      "name": "Silicone / Elasticity",
+      "status": "full"
+    }
+  },
+  "parameterSettings": {
+    "seed": 20261105,
+    "structural": {
+      "preset": "B_adaptive",
+      "behaviour": {
+        "responsiveness": 1,
+        "stiffness": 0.014,
+        "damping": 0.95,
+        "tension": 0.22,
+        "volume": 0.015,
+        "maxDisplacement": 0.36,
+        "contactRadius": 0.36,
+        "contactMargin": 0.3,
+        "grip": 0.18,
+        "pressDepth": 0.07,
+        "flingGain": 0.05,
+        "proximityRadius": 0.8,
+        "proximityPush": 0.0012,
+        "proximitySpeedGain": 0.0006,
+        "proximityWake": 0.035,
+        "sweepSpeed": 1.4,
+        "sweepGain": 0.035,
+        "sweepDent": 0.004,
+        "sweepMemory": 0.2,
+        "memoryEnabled": true,
+        "learningRate": 0.35,
+        "decayRate": 0.05,
+        "plasticity": 0.3,
+        "adaptiveEnabled": true,
+        "adaptationStrength": 0.72,
+        "adaptationThreshold": 0.65,
+        "adaptationHysteresis": 0.2,
+        "adaptationTau": 1.2,
+        "adaptStiffen": 1.5,
+        "adaptWiden": 0.8,
+        "ambientAmplitude": 0.008,
+        "interactionRadius": 0.45,
+        "proximityResponse": 0.025,
+        "proximityGlow": 0.12,
+        "responseRate": 6,
+        "dwellRadius": 0.12,
+        "dwellDelay": 2.2,
+        "dwellRamp": 1.5,
+        "dwellRelease": 0.6,
+        "dwellAttraction": 0.05,
+        "dwellGlow": 0.3,
+        "dwellActivity": 0.006
+      },
+      "display": {
+        "filamentDensity": 0.7,
+        "membraneOpacity": 1,
+        "structuralContrast": 1,
+        "tensionHighlight": 1,
+        "visualMemory": 1,
+        "lowDetail": false
+      }
+    },
+    "gel": {
+      "viscosity": 0.6,
+      "pressure": 1,
+      "recovery": 0.5,
+      "flow": 0.7
+    },
+    "plastic": {
+      "stiffness": 0.5,
+      "plasticity": 0.8,
+      "springBack": 0.5,
+      "foldLimit": 0.45
+    },
+    "silicone": {
+      "stiffness": 0.5,
+      "resistance": 0.5,
+      "damping": 0.75,
+      "recovery": 0.5,
+      "maxDeformation": 0.45
+    }
+  },
+  "timeline": [
+    {
+      "at": "2026-11-12T18:30:34.265Z",
+      "tMs": 0,
+      "type": "session_start"
+    },
+    {
+      "at": "2026-11-12T18:30:34.302Z",
+      "tMs": 37,
+      "type": "encounter_start",
+      "encounterIndex": 0,
+      "conditionId": "01",
+      "from": null,
+      "reason": "initial"
+    },
+    {
+      "at": "2026-11-12T18:30:38.116Z",
+      "tMs": 3851,
+      "type": "condition_switch",
+      "encounterIndex": 1,
+      "conditionId": "02",
+      "from": "01",
+      "reason": "participant_switch"
+    },
+    {
+      "at": "2026-11-12T18:30:41.397Z",
+      "tMs": 7132,
+      "type": "condition_switch",
+      "encounterIndex": 2,
+      "conditionId": "03",
+      "from": "02",
+      "reason": "participant_switch"
+    },
+    {
+      "at": "2026-11-12T18:30:44.642Z",
+      "tMs": 10377,
+      "type": "condition_switch",
+      "encounterIndex": 3,
+      "conditionId": "04",
+      "from": "03",
+      "reason": "participant_switch"
+    },
+    {
+      "at": "2026-11-12T18:30:48.240Z",
+      "tMs": 13975,
+      "type": "condition_switch",
+      "encounterIndex": 4,
+      "conditionId": "01",
+      "from": "04",
+      "reason": "participant_switch"
+    },
+    {
+      "at": "2026-11-12T18:30:50.752Z",
+      "tMs": 16487,
+      "type": "parameter_change",
+      "conditionId": "01",
+      "param": "autoDetail",
+      "from": 1,
+      "to": 0.6,
+      "scope": "visual"
+    },
+    {
+      "at": "2026-11-12T18:30:59.046Z",
+      "tMs": 24781,
+      "type": "condition_switch",
+      "encounterIndex": 5,
+      "conditionId": "02",
+      "from": "01",
+      "reason": "participant_switch"
+    },
+    {
+      "at": "2026-11-12T18:31:09.371Z",
+      "tMs": 35106,
+      "type": "condition_switch",
+      "encounterIndex": 6,
+      "conditionId": "03",
+      "from": "02",
+      "reason": "participant_switch"
+    },
+    {
+      "at": "2026-11-12T18:31:19.423Z",
+      "tMs": 45158,
+      "type": "condition_switch",
+      "encounterIndex": 7,
+      "conditionId": "04",
+      "from": "03",
+      "reason": "participant_switch"
+    },
+    {
+      "at": "2026-11-12T18:31:30.091Z",
+      "tMs": 55826,
+      "type": "condition_switch",
+      "encounterIndex": 8,
+      "conditionId": "03",
+      "from": "04",
+      "reason": "participant_switch"
+    },
+    {
+      "at": "2026-11-12T18:31:30.363Z",
+      "tMs": 56098,
+      "type": "condition_switch",
+      "encounterIndex": 9,
+      "conditionId": "02",
+      "from": "03",
+      "reason": "participant_switch"
+    },
+    {
+      "at": "2026-11-12T18:31:30.694Z",
+      "tMs": 56429,
+      "type": "condition_switch",
+      "encounterIndex": 10,
+      "conditionId": "01",
+      "from": "02",
+      "reason": "participant_switch"
+    },
+    {
+      "at": "2026-11-12T18:31:31.020Z",
+      "tMs": 56755,
+      "type": "condition_switch",
+      "encounterIndex": 11,
+      "conditionId": "04",
+      "from": "01",
+      "reason": "participant_switch"
+    },
+    {
+      "at": "2026-11-12T18:31:31.771Z",
+      "tMs": 57506,
+      "type": "condition_switch",
+      "encounterIndex": 12,
+      "conditionId": "03",
+      "from": "04",
+      "reason": "participant_switch"
+    },
+    {
+      "at": "2026-11-12T18:31:33.710Z",
+      "tMs": 59445,
+      "type": "reset",
+      "encounterIndex": 13,
+      "conditionId": "03",
+      "from": "03",
+      "reason": "participant_reset"
+    },
+    {
+      "at": "2026-11-12T18:31:34.217Z",
+      "tMs": 59952,
+      "type": "parameter_change",
+      "conditionId": "03",
+      "param": "plastic.plasticity",
+      "from": 0.5,
+      "to": 0.8,
+      "scope": "material"
+    },
+    {
+      "at": "2026-11-12T18:31:34.403Z",
+      "tMs": 60138,
+      "type": "condition_switch",
+      "encounterIndex": 14,
+      "conditionId": "01",
+      "from": "03",
+      "reason": "researcher_switch"
+    },
+    {
+      "at": "2026-11-12T18:31:37.316Z",
+      "tMs": 63051,
+      "type": "parameter_change",
+      "conditionId": "01",
+      "param": "autoDetail",
+      "from": 1,
+      "to": 0.6,
+      "scope": "visual"
+    },
+    {
+      "at": "2026-11-12T18:31:47.482Z",
+      "tMs": 73217,
+      "type": "order_change",
+      "order": [
+        "04",
+        "02",
+        "03",
+        "01"
+      ],
+      "by": "researcher"
+    },
+    {
+      "at": "2026-11-12T18:31:47.482Z",
+      "tMs": 73217,
+      "type": "parameter_change",
+      "conditionId": "01",
+      "param": "conditionOrder",
+      "from": "01,02,03,04",
+      "to": "04,02,03,01",
+      "scope": "research"
+    },
+    {
+      "at": "2026-11-12T18:31:47.482Z",
+      "tMs": 73217,
+      "type": "order_lock",
+      "locked": true
+    },
+    {
+      "at": "2026-11-12T18:31:47.482Z",
+      "tMs": 73217,
+      "type": "parameter_change",
+      "conditionId": "01",
+      "param": "orderLocked",
+      "from": false,
+      "to": true,
+      "scope": "research"
+    },
+    {
+      "at": "2026-11-12T18:31:47.718Z",
+      "tMs": 73453,
+      "type": "order_lock",
+      "locked": false
+    },
+    {
+      "at": "2026-11-12T18:31:47.718Z",
+      "tMs": 73453,
+      "type": "parameter_change",
+      "conditionId": "01",
+      "param": "orderLocked",
+      "from": true,
+      "to": false,
+      "scope": "research"
+    },
+    {
+      "at": "2026-11-12T18:31:47.749Z",
+      "tMs": 73484,
+      "type": "note",
+      "encounterIndex": 14,
+      "conditionId": "01"
+    },
+    {
+      "at": "2026-11-12T18:31:47.997Z",
+      "tMs": 73732,
+      "type": "condition_switch",
+      "encounterIndex": 15,
+      "conditionId": "04",
+      "from": "01",
+      "reason": "participant_switch"
+    },
+    {
+      "at": "2026-11-12T18:31:50.439Z",
+      "tMs": 76174,
+      "type": "reflection",
+      "skipped": false,
+      "answered": 2
+    },
+    {
+      "at": "2026-11-12T18:31:50.474Z",
+      "tMs": 76209,
+      "type": "language_change",
+      "lang": "zh"
+    },
+    {
+      "at": "2026-11-12T18:31:50.707Z",
+      "tMs": 76442,
+      "type": "language_change",
+      "lang": "en"
+    },
+    {
+      "at": "2026-11-12T18:31:50.954Z",
+      "tMs": 76689,
+      "type": "sound_toggle",
+      "enabled": true
+    },
+    {
+      "at": "2026-11-12T18:31:52.691Z",
+      "tMs": 78426,
+      "type": "sound_toggle",
+      "enabled": false
+    },
+    {
+      "at": "2026-11-12T18:31:52.894Z",
+      "tMs": 78629,
+      "type": "export",
+      "encounters": 16
+    }
+  ],
+  "notes": [
+    {
+      "at": "2026-11-12T18:31:47.749Z",
+      "tMs": 73484,
+      "encounterIndex": 14,
+      "conditionId": "01",
+      "text": "P paused at first fold"
+    }
+  ],
+  "reflection": {
+    "at": "2026-11-12T18:31:50.439Z",
+    "tMs": 76174,
+    "skipped": false,
+    "answered": 2,
+    "questions": {
+      "lang": "en",
+      "text": [
+        "What did you notice about each object?",
+        "Did you expect any of them to behave differently?",
+        "Did you change how you interacted with any object?",
+        "What did the objects remind you of?",
+        "Was there anything you found difficult to understand?"
+      ],
+      "en": [
+        "What did you notice about each object?",
+        "Did you expect any of them to behave differently?",
+        "Did you change how you interacted with any object?",
+        "What did the objects remind you of?",
+        "Was there anything you found difficult to understand?"
+      ]
+    },
+    "answers": {
+      "q1": "they felt different",
+      "q2": "",
+      "q3": "",
+      "q4": "glass, film",
+      "q5": ""
+    }
+  },
+  "encounters": [
+    {
+      "encounterIndex": 0,
+      "conditionId": "01",
+      "materialKey": "structural",
+      "materialName": "Structural / Memory",
+      "orderPosition": 1,
+      "conditionOrder": [
+        "01",
+        "02",
+        "03",
+        "04"
+      ],
+      "orderLocked": false,
+      "startReason": "initial",
+      "previousConditionId": null,
+      "preset": "B_adaptive",
+      "startedAt": "2026-11-12T18:30:34.302Z",
+      "endedAt": "2026-11-12T18:30:38.115Z",
+      "endReason": "participant_switch",
+      "payload": {
+        "schema": "one-object-many-encounters/session",
+        "schemaVersion": 2,
+        "appVersion": "5.0.0-beta.1",
+        "sessionId": "950c49d3-913f-427b-845d-443a9c98a5ec",
+        "startedAt": "2026-11-12T18:30:34.356Z",
+        "exportedAt": "2026-11-12T18:30:38.115Z",
+        "durationMs": 3767,
+        "clock": "simulation milliseconds since session start (pauses while the tab is hidden)",
+        "condition": "B_adaptive",
+        "seed": 20261105,
+        "parameters": {
+          "responsiveness": 1,
+          "stiffness": 0.014,
+          "damping": 0.95,
+          "tension": 0.22,
+          "volume": 0.015,
+          "maxDisplacement": 0.36,
+          "contactRadius": 0.36,
+          "contactMargin": 0.3,
+          "grip": 0.18,
+          "pressDepth": 0.07,
+          "flingGain": 0.05,
+          "proximityRadius": 0.8,
+          "proximityPush": 0.0012,
+          "proximitySpeedGain": 0.0006,
+          "proximityWake": 0.035,
+          "sweepSpeed": 1.4,
+          "sweepGain": 0.035,
+          "sweepDent": 0.004,
+          "sweepMemory": 0.2,
+          "memoryEnabled": true,
+          "learningRate": 0.35,
+          "decayRate": 0.05,
+          "plasticity": 0.3,
+          "adaptiveEnabled": true,
+          "adaptationStrength": 0.72,
+          "adaptationThreshold": 0.65,
+          "adaptationHysteresis": 0.2,
+          "adaptationTau": 1.2,
+          "adaptStiffen": 1.5,
+          "adaptWiden": 0.8,
+          "ambientAmplitude": 0.008,
+          "interactionRadius": 0.45,
+          "proximityResponse": 0.025,
+          "proximityGlow": 0.12,
+          "responseRate": 6,
+          "dwellRadius": 0.12,
+          "dwellDelay": 2.2,
+          "dwellRamp": 1.5,
+          "dwellRelease": 0.6,
+          "dwellAttraction": 0.05,
+          "dwellGlow": 0.3,
+          "dwellActivity": 0.006
+        },
+        "visualParameters": {
+          "filamentDensity": 0.7,
+          "membraneOpacity": 1,
+          "structuralContrast": 1,
+          "tensionHighlight": 1,
+          "visualMemory": 1,
+          "lowDetail": false
+        },
+        "summary": {
+          "totalContactMs": 0,
+          "totalInteractionMs": 0,
+          "contactEpisodes": 0,
+          "dragDistance": 0,
+          "regionRevisits": 0,
+          "adaptationEvents": 0,
+          "regionRecoveries": 0,
+          "stillnessPeriods": 0,
+          "sweeps": 0,
+          "totalSweepMs": 0,
+          "dwells": 0,
+          "totalDwellMs": 0,
+          "soundToggles": 0,
+          "parameterChanges": 0,
+          "finalMeanMemory": 0,
+          "droppedEvents": 0
+        },
+        "units": {
+          "distance": "object units (base radius = 1)",
+          "speed": "object units per second",
+          "coordinates": "object units relative to the object centre",
+          "region": "12 perimeter regions; region r is centred at r × 30°, 0° = right, clockwise on screen"
+        },
+        "events": [
+          {
+            "timestampMs": 0,
+            "type": "session_start",
+            "metadata": {
+              "appVersion": "5.0.0-beta.1",
+              "researchSessionId": "05683d63-50de-4aaf-a429-393d14d07c0a",
+              "encounterIndex": 0,
+              "conditionId": "01",
+              "materialKey": "structural",
+              "orderPosition": 1,
+              "conditionOrder": [
+                "01",
+                "02",
+                "03",
+                "04"
+              ],
+              "orderLocked": false,
+              "startReason": "initial",
+              "previousConditionId": null,
+              "preset": "B_adaptive",
+              "condition": "B_adaptive",
+              "seed": 20261105,
+              "parameters": {
+                "responsiveness": 1,
+                "stiffness": 0.014,
+                "damping": 0.95,
+                "tension": 0.22,
+                "volume": 0.015,
+                "maxDisplacement": 0.36,
+                "contactRadius": 0.36,
+                "contactMargin": 0.3,
+                "grip": 0.18,
+                "pressDepth": 0.07,
+                "flingGain": 0.05,
+                "proximityRadius": 0.8,
+                "proximityPush": 0.0012,
+                "proximitySpeedGain": 0.0006,
+                "proximityWake": 0.035,
+                "sweepSpeed": 1.4,
+                "sweepGain": 0.035,
+                "sweepDent": 0.004,
+                "sweepMemory": 0.2,
+                "memoryEnabled": true,
+                "learningRate": 0.35,
+                "decayRate": 0.05,
+                "plasticity": 0.3,
+                "adaptiveEnabled": true,
+                "adaptationStrength": 0.72,
+                "adaptationThreshold": 0.65,
+                "adaptationHysteresis": 0.2,
+                "adaptationTau": 1.2,
+                "adaptStiffen": 1.5,
+                "adaptWiden": 0.8,
+                "ambientAmplitude": 0.008,
+                "interactionRadius": 0.45,
+                "proximityResponse": 0.025,
+                "proximityGlow": 0.12,
+                "responseRate": 6,
+                "dwellRadius": 0.12,
+                "dwellDelay": 2.2,
+                "dwellRamp": 1.5,
+                "dwellRelease": 0.6,
+                "dwellAttraction": 0.05,
+                "dwellGlow": 0.3,
+                "dwellActivity": 0.006
+              },
+              "visualParameters": {
+                "filamentDensity": 0.7,
+                "membraneOpacity": 1,
+                "structuralContrast": 1,
+                "tensionHighlight": 1,
+                "visualMemory": 1,
+                "lowDetail": false
+              },
+              "reducedMotion": false,
+              "sound": false
+            }
+          },
+          {
+            "timestampMs": 3767,
+            "type": "session_end",
+            "metadata": {
+              "exported": true,
+              "reason": "participant_switch"
+            }
+          }
+        ],
+        "reflection": null,
+        "methodNote": "Programmed generative simulation. Logged values describe observed pointer behaviour and system state; they do not establish participant expectation, interpretation, or object agency."
+      }
+    },
+    {
+      "encounterIndex": 1,
+      "conditionId": "02",
+      "materialKey": "gel",
+      "materialName": "Gel / Flow",
+      "orderPosition": 2,
+      "conditionOrder": [
+        "01",
+        "02",
+        "03",
+        "04"
+      ],
+      "orderLocked": false,
+      "startReason": "participant_switch",
+      "previousConditionId": "01",
+      "preset": "B_adaptive",
+      "startedAt": "2026-11-12T18:30:38.116Z",
+      "endedAt": "2026-11-12T18:30:41.396Z",
+      "endReason": "participant_switch",
+      "payload": {
+        "schema": "one-object-many-encounters/session",
+        "schemaVersion": 2,
+        "appVersion": "5.0.0-beta.1",
+        "sessionId": "eb8be135-789e-4f2d-bffd-520bc7cc8a3b",
+        "startedAt": "2026-11-12T18:30:38.118Z",
+        "exportedAt": "2026-11-12T18:30:41.396Z",
+        "durationMs": 3250,
+        "clock": "material clock: milliseconds since encounter start (pauses while the tab is hidden)",
+        "condition": "gel",
+        "seed": 20261105,
+        "materialKey": "gel",
+        "materialStatus": "gel v2 (volumetric interior displacement field coupled to a pressure boundary)",
+        "parameters": {
+          "viscosity": 0.6,
+          "pressure": 1,
+          "recovery": 0.5,
+          "flow": 0.7
+        },
+        "visualParameters": null,
+        "summary": {
+          "totalContactMs": 0,
+          "totalInteractionMs": 0,
+          "contactEpisodes": 0,
+          "dragDistance": 0,
+          "regionRevisits": 0,
+          "stillnessPeriods": 0,
+          "soundToggles": 0,
+          "parameterChanges": 0,
+          "droppedEvents": 0,
+          "peakDeformation": 0,
+          "peakRedistribution": 0,
+          "completedRecoveries": 0,
+          "interiorContacts": 0,
+          "peakCompression": 0,
+          "peakInternalDisplacement": 0
+        },
+        "units": {
+          "distance": "object units (base radius = 1)",
+          "speed": "object units per second",
+          "coordinates": "object units relative to the object centre",
+          "region": "12 perimeter regions; region r is centred at r × 30°, 0° = right, clockwise on screen"
+        },
+        "events": [
+          {
+            "timestampMs": 0,
+            "type": "session_start",
+            "metadata": {
+              "appVersion": "5.0.0-beta.1",
+              "researchSessionId": "05683d63-50de-4aaf-a429-393d14d07c0a",
+              "encounterIndex": 1,
+              "conditionId": "02",
+              "materialKey": "gel",
+              "orderPosition": 2,
+              "conditionOrder": [
+                "01",
+                "02",
+                "03",
+                "04"
+              ],
+              "orderLocked": false,
+              "startReason": "participant_switch",
+              "previousConditionId": "01",
+              "preset": "B_adaptive",
+              "condition": "gel",
+              "seed": 20261105,
+              "parameters": {
+                "viscosity": 0.6,
+                "pressure": 1,
+                "recovery": 0.5,
+                "flow": 0.7
+              },
+              "visualParameters": null,
+              "reducedMotion": false,
+              "sound": false
+            }
+          },
+          {
+            "timestampMs": 3250,
+            "type": "session_end",
+            "metadata": {
+              "exported": true,
+              "reason": "participant_switch"
+            }
+          }
+        ],
+        "reflection": null,
+        "methodNote": "Gel condition: a programmed viscous, approximately volume-conserving soft boundary. Logged values describe observed pointer behaviour and simulated deformation only."
+      }
+    },
+    {
+      "encounterIndex": 2,
+      "conditionId": "03",
+      "materialKey": "plastic",
+      "materialName": "Plastic / Crease",
+      "orderPosition": 3,
+      "conditionOrder": [
+        "01",
+        "02",
+        "03",
+        "04"
+      ],
+      "orderLocked": false,
+      "startReason": "participant_switch",
+      "previousConditionId": "02",
+      "preset": "B_adaptive",
+      "startedAt": "2026-11-12T18:30:41.396Z",
+      "endedAt": "2026-11-12T18:30:44.642Z",
+      "endReason": "participant_switch",
+      "payload": {
+        "schema": "one-object-many-encounters/session",
+        "schemaVersion": 2,
+        "appVersion": "5.0.0-beta.1",
+        "sessionId": "810bf088-51ed-4787-acf0-324a5dcac964",
+        "startedAt": "2026-11-12T18:30:41.397Z",
+        "exportedAt": "2026-11-12T18:30:44.642Z",
+        "durationMs": 3167,
+        "clock": "material clock: milliseconds since encounter start (pauses while the tab is hidden)",
+        "condition": "plastic",
+        "seed": 20261105,
+        "materialKey": "plastic",
+        "materialStatus": "plastic v1 (faceted sheet: yield, fold along straight lines, partial spring-back, permanent creases)",
+        "parameters": {
+          "stiffness": 0.5,
+          "plasticity": 0.5,
+          "springBack": 0.5,
+          "foldLimit": 0.45
+        },
+        "visualParameters": null,
+        "summary": {
+          "totalContactMs": 0,
+          "totalInteractionMs": 0,
+          "contactEpisodes": 0,
+          "dragDistance": 0,
+          "regionRevisits": 0,
+          "stillnessPeriods": 0,
+          "soundToggles": 0,
+          "parameterChanges": 0,
+          "droppedEvents": 0,
+          "interiorContacts": 0,
+          "folds": 0,
+          "edgeFolds": 0,
+          "ridgeFolds": 0,
+          "resistedPulls": 0,
+          "creases": 0,
+          "totalCreaseLength": 0,
+          "peakFoldAngle": 0,
+          "finalProjectedArea": 1,
+          "finalMeanTilt": 0,
+          "finalFacets": 1
+        },
+        "units": {
+          "distance": "object units (base radius = 1)",
+          "speed": "object units per second",
+          "coordinates": "object units relative to the object centre",
+          "region": "12 perimeter regions; region r is centred at r × 30°, 0° = right, clockwise on screen"
+        },
+        "events": [
+          {
+            "timestampMs": 0,
+            "type": "session_start",
+            "metadata": {
+              "appVersion": "5.0.0-beta.1",
+              "researchSessionId": "05683d63-50de-4aaf-a429-393d14d07c0a",
+              "encounterIndex": 2,
+              "conditionId": "03",
+              "materialKey": "plastic",
+              "orderPosition": 3,
+              "conditionOrder": [
+                "01",
+                "02",
+                "03",
+                "04"
+              ],
+              "orderLocked": false,
+              "startReason": "participant_switch",
+              "previousConditionId": "02",
+              "preset": "B_adaptive",
+              "condition": "plastic",
+              "seed": 20261105,
+              "parameters": {
+                "stiffness": 0.5,
+                "plasticity": 0.5,
+                "springBack": 0.5,
+                "foldLimit": 0.45
+              },
+              "visualParameters": null,
+              "reducedMotion": false,
+              "sound": false
+            }
+          },
+          {
+            "timestampMs": 3167,
+            "type": "session_end",
+            "metadata": {
+              "exported": true,
+              "reason": "participant_switch"
+            }
+          }
+        ],
+        "reflection": null,
+        "methodNote": "Plastic condition: a programmed faceted sheet that folds and keeps its creases. Logged values describe observed pointer behaviour and simulated deformation only."
+      }
+    },
+    {
+      "encounterIndex": 3,
+      "conditionId": "04",
+      "materialKey": "silicone",
+      "materialName": "Silicone / Elasticity",
+      "orderPosition": 4,
+      "conditionOrder": [
+        "01",
+        "02",
+        "03",
+        "04"
+      ],
+      "orderLocked": false,
+      "startReason": "participant_switch",
+      "previousConditionId": "03",
+      "preset": "B_adaptive",
+      "startedAt": "2026-11-12T18:30:44.642Z",
+      "endedAt": "2026-11-12T18:30:48.240Z",
+      "endReason": "participant_switch",
+      "payload": {
+        "schema": "one-object-many-encounters/session",
+        "schemaVersion": 2,
+        "appVersion": "5.0.0-beta.1",
+        "sessionId": "6b76d626-957c-4cd0-a40b-d62c97cd8f05",
+        "startedAt": "2026-11-12T18:30:44.645Z",
+        "exportedAt": "2026-11-12T18:30:48.240Z",
+        "durationMs": 3250,
+        "clock": "material clock: milliseconds since encounter start (pauses while the tab is hidden)",
+        "condition": "silicone",
+        "seed": 20261105,
+        "materialKey": "silicone",
+        "materialStatus": "silicone v1 (triangulated mass-spring membrane, stretch-stiffening, underdamped recovery)",
+        "parameters": {
+          "stiffness": 0.5,
+          "resistance": 0.5,
+          "damping": 0.75,
+          "recovery": 0.5,
+          "maxDeformation": 0.45
+        },
+        "visualParameters": null,
+        "summary": {
+          "totalContactMs": 0,
+          "totalInteractionMs": 0,
+          "contactEpisodes": 0,
+          "dragDistance": 0,
+          "regionRevisits": 0,
+          "stillnessPeriods": 0,
+          "soundToggles": 0,
+          "parameterChanges": 0,
+          "droppedEvents": 0,
+          "interiorContacts": 0,
+          "peakStretch": 0,
+          "peakDeformation": 0,
+          "peakStrain": 0,
+          "peakReleaseVelocity": 0,
+          "completedRecoveries": 0
+        },
+        "units": {
+          "distance": "object units (base radius = 1)",
+          "speed": "object units per second",
+          "coordinates": "object units relative to the object centre",
+          "region": "12 perimeter regions; region r is centred at r × 30°, 0° = right, clockwise on screen"
+        },
+        "events": [
+          {
+            "timestampMs": 0,
+            "type": "session_start",
+            "metadata": {
+              "appVersion": "5.0.0-beta.1",
+              "researchSessionId": "05683d63-50de-4aaf-a429-393d14d07c0a",
+              "encounterIndex": 3,
+              "conditionId": "04",
+              "materialKey": "silicone",
+              "orderPosition": 4,
+              "conditionOrder": [
+                "01",
+                "02",
+                "03",
+                "04"
+              ],
+              "orderLocked": false,
+              "startReason": "participant_switch",
+              "previousConditionId": "03",
+              "preset": "B_adaptive",
+              "condition": "silicone",
+              "seed": 20261105,
+              "parameters": {
+                "stiffness": 0.5,
+                "resistance": 0.5,
+                "damping": 0.75,
+                "recovery": 0.5,
+                "maxDeformation": 0.45
+              },
+              "visualParameters": null,
+              "reducedMotion": false,
+              "sound": false
+            }
+          },
+          {
+            "timestampMs": 3250,
+            "type": "session_end",
+            "metadata": {
+              "exported": true,
+              "reason": "participant_switch"
+            }
+          }
+        ],
+        "reflection": null,
+        "methodNote": "Silicone condition: a programmed elastic membrane (mass-spring). Logged values describe observed pointer behaviour and simulated deformation only."
+      }
+    },
+    {
+      "encounterIndex": 4,
+      "conditionId": "01",
+      "materialKey": "structural",
+      "materialName": "Structural / Memory",
+      "orderPosition": 1,
+      "conditionOrder": [
+        "01",
+        "02",
+        "03",
+        "04"
+      ],
+      "orderLocked": false,
+      "startReason": "participant_switch",
+      "previousConditionId": "04",
+      "preset": "B_adaptive",
+      "startedAt": "2026-11-12T18:30:48.240Z",
+      "endedAt": "2026-11-12T18:30:59.046Z",
+      "endReason": "participant_switch",
+      "payload": {
+        "schema": "one-object-many-encounters/session",
+        "schemaVersion": 2,
+        "appVersion": "5.0.0-beta.1",
+        "sessionId": "1c3c6bcc-b459-4c7f-aff9-bd36763dd663",
+        "startedAt": "2026-11-12T18:30:48.283Z",
+        "exportedAt": "2026-11-12T18:30:59.046Z",
+        "durationMs": 10783,
+        "clock": "simulation milliseconds since session start (pauses while the tab is hidden)",
+        "condition": "B_adaptive",
+        "seed": 20261105,
+        "parameters": {
+          "responsiveness": 1,
+          "stiffness": 0.014,
+          "damping": 0.95,
+          "tension": 0.22,
+          "volume": 0.015,
+          "maxDisplacement": 0.36,
+          "contactRadius": 0.36,
+          "contactMargin": 0.3,
+          "grip": 0.18,
+          "pressDepth": 0.07,
+          "flingGain": 0.05,
+          "proximityRadius": 0.8,
+          "proximityPush": 0.0012,
+          "proximitySpeedGain": 0.0006,
+          "proximityWake": 0.035,
+          "sweepSpeed": 1.4,
+          "sweepGain": 0.035,
+          "sweepDent": 0.004,
+          "sweepMemory": 0.2,
+          "memoryEnabled": true,
+          "learningRate": 0.35,
+          "decayRate": 0.05,
+          "plasticity": 0.3,
+          "adaptiveEnabled": true,
+          "adaptationStrength": 0.72,
+          "adaptationThreshold": 0.65,
+          "adaptationHysteresis": 0.2,
+          "adaptationTau": 1.2,
+          "adaptStiffen": 1.5,
+          "adaptWiden": 0.8,
+          "ambientAmplitude": 0.008,
+          "interactionRadius": 0.45,
+          "proximityResponse": 0.025,
+          "proximityGlow": 0.12,
+          "responseRate": 6,
+          "dwellRadius": 0.12,
+          "dwellDelay": 2.2,
+          "dwellRamp": 1.5,
+          "dwellRelease": 0.6,
+          "dwellAttraction": 0.05,
+          "dwellGlow": 0.3,
+          "dwellActivity": 0.006
+        },
+        "visualParameters": {
+          "filamentDensity": 0.7,
+          "membraneOpacity": 1,
+          "structuralContrast": 1,
+          "tensionHighlight": 1,
+          "visualMemory": 1,
+          "lowDetail": false
+        },
+        "summary": {
+          "totalContactMs": 1667,
+          "totalInteractionMs": 2467,
+          "contactEpisodes": 1,
+          "dragDistance": 0.4,
+          "regionRevisits": 0,
+          "adaptationEvents": 0,
+          "regionRecoveries": 0,
+          "stillnessPeriods": 0,
+          "sweeps": 0,
+          "totalSweepMs": 0,
+          "dwells": 0,
+          "totalDwellMs": 0,
+          "soundToggles": 0,
+          "parameterChanges": 1,
+          "finalMeanMemory": 0.033,
+          "droppedEvents": 0
+        },
+        "units": {
+          "distance": "object units (base radius = 1)",
+          "speed": "object units per second",
+          "coordinates": "object units relative to the object centre",
+          "region": "12 perimeter regions; region r is centred at r × 30°, 0° = right, clockwise on screen"
+        },
+        "events": [
+          {
+            "timestampMs": 0,
+            "type": "session_start",
+            "metadata": {
+              "appVersion": "5.0.0-beta.1",
+              "researchSessionId": "05683d63-50de-4aaf-a429-393d14d07c0a",
+              "encounterIndex": 4,
+              "conditionId": "01",
+              "materialKey": "structural",
+              "orderPosition": 1,
+              "conditionOrder": [
+                "01",
+                "02",
+                "03",
+                "04"
+              ],
+              "orderLocked": false,
+              "startReason": "participant_switch",
+              "previousConditionId": "04",
+              "preset": "B_adaptive",
+              "condition": "B_adaptive",
+              "seed": 20261105,
+              "parameters": {
+                "responsiveness": 1,
+                "stiffness": 0.014,
+                "damping": 0.95,
+                "tension": 0.22,
+                "volume": 0.015,
+                "maxDisplacement": 0.36,
+                "contactRadius": 0.36,
+                "contactMargin": 0.3,
+                "grip": 0.18,
+                "pressDepth": 0.07,
+                "flingGain": 0.05,
+                "proximityRadius": 0.8,
+                "proximityPush": 0.0012,
+                "proximitySpeedGain": 0.0006,
+                "proximityWake": 0.035,
+                "sweepSpeed": 1.4,
+                "sweepGain": 0.035,
+                "sweepDent": 0.004,
+                "sweepMemory": 0.2,
+                "memoryEnabled": true,
+                "learningRate": 0.35,
+                "decayRate": 0.05,
+                "plasticity": 0.3,
+                "adaptiveEnabled": true,
+                "adaptationStrength": 0.72,
+                "adaptationThreshold": 0.65,
+                "adaptationHysteresis": 0.2,
+                "adaptationTau": 1.2,
+                "adaptStiffen": 1.5,
+                "adaptWiden": 0.8,
+                "ambientAmplitude": 0.008,
+                "interactionRadius": 0.45,
+                "proximityResponse": 0.025,
+                "proximityGlow": 0.12,
+                "responseRate": 6,
+                "dwellRadius": 0.12,
+                "dwellDelay": 2.2,
+                "dwellRamp": 1.5,
+                "dwellRelease": 0.6,
+                "dwellAttraction": 0.05,
+                "dwellGlow": 0.3,
+                "dwellActivity": 0.006
+              },
+              "visualParameters": {
+                "filamentDensity": 0.7,
+                "membraneOpacity": 1,
+                "structuralContrast": 1,
+                "tensionHighlight": 1,
+                "visualMemory": 1,
+                "lowDetail": false
+              },
+              "reducedMotion": false,
+              "sound": false
+            }
+          },
+          {
+            "timestampMs": 1917,
+            "type": "contact_start",
+            "region": 0,
+            "distance": -0.029,
+            "speed": 0,
+            "memoryLevel": 0,
+            "metadata": {
+              "x": 0.95,
+              "y": 0
+            }
+          },
+          {
+            "timestampMs": 2333,
+            "type": "drag",
+            "region": 0,
+            "distance": 0.217,
+            "speed": 0.521
+          },
+          {
+            "timestampMs": 2517,
+            "type": "parameter_change",
+            "metadata": {
+              "param": "autoDetail",
+              "from": 1,
+              "to": 0.6,
+              "scope": "visual"
+            }
+          },
+          {
+            "timestampMs": 2750,
+            "type": "drag",
+            "region": 0,
+            "distance": 0.4,
+            "speed": 0.281
+          },
+          {
+            "timestampMs": 3583,
+            "type": "contact_end",
+            "region": 0,
+            "durationMs": 1667,
+            "distance": 0.4,
+            "memoryLevel": 0.402
+          },
+          {
+            "timestampMs": 3583,
+            "type": "approach",
+            "distance": 0,
+            "speed": 0
+          },
+          {
+            "timestampMs": 10783,
+            "type": "session_end",
+            "metadata": {
+              "exported": true,
+              "reason": "participant_switch"
+            }
+          }
+        ],
+        "reflection": null,
+        "methodNote": "Programmed generative simulation. Logged values describe observed pointer behaviour and system state; they do not establish participant expectation, interpretation, or object agency."
+      }
+    },
+    {
+      "encounterIndex": 5,
+      "conditionId": "02",
+      "materialKey": "gel",
+      "materialName": "Gel / Flow",
+      "orderPosition": 2,
+      "conditionOrder": [
+        "01",
+        "02",
+        "03",
+        "04"
+      ],
+      "orderLocked": false,
+      "startReason": "participant_switch",
+      "previousConditionId": "01",
+      "preset": "B_adaptive",
+      "startedAt": "2026-11-12T18:30:59.046Z",
+      "endedAt": "2026-11-12T18:31:09.371Z",
+      "endReason": "participant_switch",
+      "payload": {
+        "schema": "one-object-many-encounters/session",
+        "schemaVersion": 2,
+        "appVersion": "5.0.0-beta.1",
+        "sessionId": "02fd733f-9ae8-430a-a689-b650daf24eff",
+        "startedAt": "2026-11-12T18:30:59.047Z",
+        "exportedAt": "2026-11-12T18:31:09.371Z",
+        "durationMs": 10167,
+        "clock": "material clock: milliseconds since encounter start (pauses while the tab is hidden)",
+        "condition": "gel",
+        "seed": 20261105,
+        "materialKey": "gel",
+        "materialStatus": "gel v2 (volumetric interior displacement field coupled to a pressure boundary)",
+        "parameters": {
+          "viscosity": 0.6,
+          "pressure": 1,
+          "recovery": 0.5,
+          "flow": 0.7
+        },
+        "visualParameters": null,
+        "summary": {
+          "totalContactMs": 1633,
+          "totalInteractionMs": 2317,
+          "contactEpisodes": 1,
+          "dragDistance": 0.4,
+          "regionRevisits": 0,
+          "stillnessPeriods": 0,
+          "soundToggles": 0,
+          "parameterChanges": 0,
+          "droppedEvents": 0,
+          "peakDeformation": 0.2716,
+          "peakRedistribution": 0.059,
+          "completedRecoveries": 1,
+          "interiorContacts": 0,
+          "peakCompression": 0.4451,
+          "peakInternalDisplacement": 0.203
+        },
+        "units": {
+          "distance": "object units (base radius = 1)",
+          "speed": "object units per second",
+          "coordinates": "object units relative to the object centre",
+          "region": "12 perimeter regions; region r is centred at r × 30°, 0° = right, clockwise on screen"
+        },
+        "events": [
+          {
+            "timestampMs": 0,
+            "type": "session_start",
+            "metadata": {
+              "appVersion": "5.0.0-beta.1",
+              "researchSessionId": "05683d63-50de-4aaf-a429-393d14d07c0a",
+              "encounterIndex": 5,
+              "conditionId": "02",
+              "materialKey": "gel",
+              "orderPosition": 2,
+              "conditionOrder": [
+                "01",
+                "02",
+                "03",
+                "04"
+              ],
+              "orderLocked": false,
+              "startReason": "participant_switch",
+              "previousConditionId": "01",
+              "preset": "B_adaptive",
+              "condition": "gel",
+              "seed": 20261105,
+              "parameters": {
+                "viscosity": 0.6,
+                "pressure": 1,
+                "recovery": 0.5,
+                "flow": 0.7
+              },
+              "visualParameters": null,
+              "reducedMotion": false,
+              "sound": false
+            }
+          },
+          {
+            "timestampMs": 1700,
+            "type": "contact_start",
+            "region": 0,
+            "distance": -0.021,
+            "speed": 0,
+            "metadata": {
+              "x": 0.95,
+              "y": 0,
+              "interior": false,
+              "depthFromEdge": 0.021
+            }
+          },
+          {
+            "timestampMs": 2100,
+            "type": "drag",
+            "region": 0,
+            "distance": 0.2,
+            "speed": 0.502,
+            "metadata": {
+              "interior": false
+            }
+          },
+          {
+            "timestampMs": 2517,
+            "type": "drag",
+            "region": 0,
+            "distance": 0.4,
+            "speed": 0.522,
+            "metadata": {
+              "interior": false
+            }
+          },
+          {
+            "timestampMs": 3333,
+            "type": "approach",
+            "distance": 0,
+            "speed": 0
+          },
+          {
+            "timestampMs": 3333,
+            "type": "contact_end",
+            "region": 0,
+            "durationMs": 1633,
+            "distance": 0.4,
+            "metadata": {
+              "interior": false,
+              "peakDeformation": 0.2716,
+              "localCompression": 0.4451,
+              "internalDisplacement": 0.203,
+              "redistribution": 0.059,
+              "pressurePropagationMs": 150,
+              "peakVolumeChange": 0.0327
+            }
+          },
+          {
+            "timestampMs": 6333,
+            "type": "recovery",
+            "durationMs": 3000,
+            "metadata": {
+              "kind": "settle",
+              "completed": true
+            }
+          },
+          {
+            "timestampMs": 10167,
+            "type": "session_end",
+            "metadata": {
+              "exported": true,
+              "reason": "participant_switch"
+            }
+          }
+        ],
+        "reflection": null,
+        "methodNote": "Gel condition: a programmed viscous, approximately volume-conserving soft boundary. Logged values describe observed pointer behaviour and simulated deformation only."
+      }
+    },
+    {
+      "encounterIndex": 6,
+      "conditionId": "03",
+      "materialKey": "plastic",
+      "materialName": "Plastic / Crease",
+      "orderPosition": 3,
+      "conditionOrder": [
+        "01",
+        "02",
+        "03",
+        "04"
+      ],
+      "orderLocked": false,
+      "startReason": "participant_switch",
+      "previousConditionId": "02",
+      "preset": "B_adaptive",
+      "startedAt": "2026-11-12T18:31:09.371Z",
+      "endedAt": "2026-11-12T18:31:19.423Z",
+      "endReason": "participant_switch",
+      "payload": {
+        "schema": "one-object-many-encounters/session",
+        "schemaVersion": 2,
+        "appVersion": "5.0.0-beta.1",
+        "sessionId": "4faab96d-8a11-4ad9-b71f-a9ff1bb2cf84",
+        "startedAt": "2026-11-12T18:31:09.371Z",
+        "exportedAt": "2026-11-12T18:31:19.423Z",
+        "durationMs": 9950,
+        "clock": "material clock: milliseconds since encounter start (pauses while the tab is hidden)",
+        "condition": "plastic",
+        "seed": 20261105,
+        "materialKey": "plastic",
+        "materialStatus": "plastic v1 (faceted sheet: yield, fold along straight lines, partial spring-back, permanent creases)",
+        "parameters": {
+          "stiffness": 0.5,
+          "plasticity": 0.5,
+          "springBack": 0.5,
+          "foldLimit": 0.45
+        },
+        "visualParameters": null,
+        "summary": {
+          "totalContactMs": 1450,
+          "totalInteractionMs": 2183,
+          "contactEpisodes": 1,
+          "dragDistance": 0.4,
+          "regionRevisits": 0,
+          "stillnessPeriods": 0,
+          "soundToggles": 0,
+          "parameterChanges": 0,
+          "droppedEvents": 0,
+          "interiorContacts": 0,
+          "folds": 1,
+          "edgeFolds": 1,
+          "ridgeFolds": 0,
+          "resistedPulls": 0,
+          "creases": 1,
+          "totalCreaseLength": 1.3442,
+          "peakFoldAngle": 180,
+          "finalProjectedArea": 0.9773,
+          "finalMeanTilt": 3.25,
+          "finalFacets": 2
+        },
+        "units": {
+          "distance": "object units (base radius = 1)",
+          "speed": "object units per second",
+          "coordinates": "object units relative to the object centre",
+          "region": "12 perimeter regions; region r is centred at r × 30°, 0° = right, clockwise on screen"
+        },
+        "events": [
+          {
+            "timestampMs": 0,
+            "type": "session_start",
+            "metadata": {
+              "appVersion": "5.0.0-beta.1",
+              "researchSessionId": "05683d63-50de-4aaf-a429-393d14d07c0a",
+              "encounterIndex": 6,
+              "conditionId": "03",
+              "materialKey": "plastic",
+              "orderPosition": 3,
+              "conditionOrder": [
+                "01",
+                "02",
+                "03",
+                "04"
+              ],
+              "orderLocked": false,
+              "startReason": "participant_switch",
+              "previousConditionId": "02",
+              "preset": "B_adaptive",
+              "condition": "plastic",
+              "seed": 20261105,
+              "parameters": {
+                "stiffness": 0.5,
+                "plasticity": 0.5,
+                "springBack": 0.5,
+                "foldLimit": 0.45
+              },
+              "visualParameters": null,
+              "reducedMotion": false,
+              "sound": false
+            }
+          },
+          {
+            "timestampMs": 1667,
+            "type": "contact_start",
+            "region": 0,
+            "distance": -0.021,
+            "speed": 0,
+            "metadata": {
+              "x": 0.95,
+              "y": 0,
+              "interior": false,
+              "depthFromEdge": 0.021
+            }
+          },
+          {
+            "timestampMs": 1783,
+            "type": "fold",
+            "region": 0,
+            "metadata": {
+              "mode": "edge",
+              "direction": 180,
+              "flapFraction": 0.011,
+              "atMs": 117
+            }
+          },
+          {
+            "timestampMs": 2067,
+            "type": "drag",
+            "region": 0,
+            "distance": 0.3,
+            "speed": 0.723,
+            "metadata": {
+              "phase": "folding",
+              "foldAngle": 178.2
+            }
+          },
+          {
+            "timestampMs": 2483,
+            "type": "drag",
+            "region": 0,
+            "distance": 0.4,
+            "speed": 0.02,
+            "metadata": {
+              "phase": "folding",
+              "foldAngle": 180
+            }
+          },
+          {
+            "timestampMs": 3117,
+            "type": "approach",
+            "distance": 0,
+            "speed": 0
+          },
+          {
+            "timestampMs": 3117,
+            "type": "contact_end",
+            "region": 0,
+            "durationMs": 1450,
+            "distance": 0.4,
+            "metadata": {
+              "interior": false,
+              "outcome": "edge",
+              "peakFoldAngle": 180,
+              "foldDistance": 0.4
+            }
+          },
+          {
+            "timestampMs": 3550,
+            "type": "recovery",
+            "durationMs": 433,
+            "metadata": {
+              "kind": "springback",
+              "completed": true,
+              "mode": "edge",
+              "peakFoldAngle": 180,
+              "residualAngle": 48.6,
+              "creases": 1,
+              "facets": 2,
+              "projectedArea": 0.9773,
+              "meanTilt": 3.25
+            }
+          },
+          {
+            "timestampMs": 9950,
+            "type": "session_end",
+            "metadata": {
+              "exported": true,
+              "reason": "participant_switch"
+            }
+          }
+        ],
+        "reflection": null,
+        "methodNote": "Plastic condition: a programmed faceted sheet that folds and keeps its creases. Logged values describe observed pointer behaviour and simulated deformation only."
+      }
+    },
+    {
+      "encounterIndex": 7,
+      "conditionId": "04",
+      "materialKey": "silicone",
+      "materialName": "Silicone / Elasticity",
+      "orderPosition": 4,
+      "conditionOrder": [
+        "01",
+        "02",
+        "03",
+        "04"
+      ],
+      "orderLocked": false,
+      "startReason": "participant_switch",
+      "previousConditionId": "03",
+      "preset": "B_adaptive",
+      "startedAt": "2026-11-12T18:31:19.423Z",
+      "endedAt": "2026-11-12T18:31:30.091Z",
+      "endReason": "participant_switch",
+      "payload": {
+        "schema": "one-object-many-encounters/session",
+        "schemaVersion": 2,
+        "appVersion": "5.0.0-beta.1",
+        "sessionId": "9052eb56-f79f-4bab-b348-b9f260d3d66e",
+        "startedAt": "2026-11-12T18:31:19.424Z",
+        "exportedAt": "2026-11-12T18:31:30.091Z",
+        "durationMs": 10517,
+        "clock": "material clock: milliseconds since encounter start (pauses while the tab is hidden)",
+        "condition": "silicone",
+        "seed": 20261105,
+        "materialKey": "silicone",
+        "materialStatus": "silicone v1 (triangulated mass-spring membrane, stretch-stiffening, underdamped recovery)",
+        "parameters": {
+          "stiffness": 0.5,
+          "resistance": 0.5,
+          "damping": 0.75,
+          "recovery": 0.5,
+          "maxDeformation": 0.45
+        },
+        "visualParameters": null,
+        "summary": {
+          "totalContactMs": 1617,
+          "totalInteractionMs": 2300,
+          "contactEpisodes": 1,
+          "dragDistance": 0.4,
+          "regionRevisits": 0,
+          "stillnessPeriods": 0,
+          "soundToggles": 0,
+          "parameterChanges": 0,
+          "droppedEvents": 0,
+          "interiorContacts": 0,
+          "peakStretch": 0.2429,
+          "peakDeformation": 0.2841,
+          "peakStrain": 0.2802,
+          "peakReleaseVelocity": 0.0056,
+          "completedRecoveries": 1
+        },
+        "units": {
+          "distance": "object units (base radius = 1)",
+          "speed": "object units per second",
+          "coordinates": "object units relative to the object centre",
+          "region": "12 perimeter regions; region r is centred at r × 30°, 0° = right, clockwise on screen"
+        },
+        "events": [
+          {
+            "timestampMs": 0,
+            "type": "session_start",
+            "metadata": {
+              "appVersion": "5.0.0-beta.1",
+              "researchSessionId": "05683d63-50de-4aaf-a429-393d14d07c0a",
+              "encounterIndex": 7,
+              "conditionId": "04",
+              "materialKey": "silicone",
+              "orderPosition": 4,
+              "conditionOrder": [
+                "01",
+                "02",
+                "03",
+                "04"
+              ],
+              "orderLocked": false,
+              "startReason": "participant_switch",
+              "previousConditionId": "03",
+              "preset": "B_adaptive",
+              "condition": "silicone",
+              "seed": 20261105,
+              "parameters": {
+                "stiffness": 0.5,
+                "resistance": 0.5,
+                "damping": 0.75,
+                "recovery": 0.5,
+                "maxDeformation": 0.45
+              },
+              "visualParameters": null,
+              "reducedMotion": false,
+              "sound": false
+            }
+          },
+          {
+            "timestampMs": 1700,
+            "type": "contact_start",
+            "region": 0,
+            "distance": -0.021,
+            "speed": 0,
+            "metadata": {
+              "x": 0.95,
+              "y": 0,
+              "interior": false,
+              "depthFromEdge": 0.021
+            }
+          },
+          {
+            "timestampMs": 2100,
+            "type": "drag",
+            "region": 0,
+            "distance": 0.2,
+            "speed": 0.499,
+            "metadata": {
+              "stretch": 0.1371
+            }
+          },
+          {
+            "timestampMs": 2517,
+            "type": "drag",
+            "region": 0,
+            "distance": 0.4,
+            "speed": 0.497,
+            "metadata": {
+              "stretch": 0.2381
+            }
+          },
+          {
+            "timestampMs": 3317,
+            "type": "approach",
+            "distance": 0,
+            "speed": 0
+          },
+          {
+            "timestampMs": 3317,
+            "type": "contact_end",
+            "region": 0,
+            "durationMs": 1617,
+            "distance": 0.4,
+            "metadata": {
+              "interior": false,
+              "stretchDistance": 0.2429,
+              "peakDeformation": 0.2841,
+              "peakStrain": 0.2802,
+              "releaseDisplacement": 0.2353
+            }
+          },
+          {
+            "timestampMs": 5133,
+            "type": "recovery",
+            "durationMs": 1817,
+            "metadata": {
+              "kind": "settle",
+              "completed": true,
+              "releaseVelocity": 0.0056,
+              "overshoots": 3,
+              "maxOvershoot": 0.0804
+            }
+          },
+          {
+            "timestampMs": 10517,
+            "type": "session_end",
+            "metadata": {
+              "exported": true,
+              "reason": "participant_switch"
+            }
+          }
+        ],
+        "reflection": null,
+        "methodNote": "Silicone condition: a programmed elastic membrane (mass-spring). Logged values describe observed pointer behaviour and simulated deformation only."
+      }
+    },
+    {
+      "encounterIndex": 8,
+      "conditionId": "03",
+      "materialKey": "plastic",
+      "materialName": "Plastic / Crease",
+      "orderPosition": 3,
+      "conditionOrder": [
+        "01",
+        "02",
+        "03",
+        "04"
+      ],
+      "orderLocked": false,
+      "startReason": "participant_switch",
+      "previousConditionId": "04",
+      "preset": "B_adaptive",
+      "startedAt": "2026-11-12T18:31:30.091Z",
+      "endedAt": "2026-11-12T18:31:30.363Z",
+      "endReason": "participant_switch",
+      "payload": {
+        "schema": "one-object-many-encounters/session",
+        "schemaVersion": 2,
+        "appVersion": "5.0.0-beta.1",
+        "sessionId": "254edaf6-b636-40fe-b174-08b7c27e35d5",
+        "startedAt": "2026-11-12T18:31:30.092Z",
+        "exportedAt": "2026-11-12T18:31:30.363Z",
+        "durationMs": 267,
+        "clock": "material clock: milliseconds since encounter start (pauses while the tab is hidden)",
+        "condition": "plastic",
+        "seed": 20261105,
+        "materialKey": "plastic",
+        "materialStatus": "plastic v1 (faceted sheet: yield, fold along straight lines, partial spring-back, permanent creases)",
+        "parameters": {
+          "stiffness": 0.5,
+          "plasticity": 0.5,
+          "springBack": 0.5,
+          "foldLimit": 0.45
+        },
+        "visualParameters": null,
+        "summary": {
+          "totalContactMs": 0,
+          "totalInteractionMs": 0,
+          "contactEpisodes": 0,
+          "dragDistance": 0,
+          "regionRevisits": 0,
+          "stillnessPeriods": 0,
+          "soundToggles": 0,
+          "parameterChanges": 0,
+          "droppedEvents": 0,
+          "interiorContacts": 0,
+          "folds": 0,
+          "edgeFolds": 0,
+          "ridgeFolds": 0,
+          "resistedPulls": 0,
+          "creases": 0,
+          "totalCreaseLength": 0,
+          "peakFoldAngle": 0,
+          "finalProjectedArea": 1,
+          "finalMeanTilt": 0,
+          "finalFacets": 1
+        },
+        "units": {
+          "distance": "object units (base radius = 1)",
+          "speed": "object units per second",
+          "coordinates": "object units relative to the object centre",
+          "region": "12 perimeter regions; region r is centred at r × 30°, 0° = right, clockwise on screen"
+        },
+        "events": [
+          {
+            "timestampMs": 0,
+            "type": "session_start",
+            "metadata": {
+              "appVersion": "5.0.0-beta.1",
+              "researchSessionId": "05683d63-50de-4aaf-a429-393d14d07c0a",
+              "encounterIndex": 8,
+              "conditionId": "03",
+              "materialKey": "plastic",
+              "orderPosition": 3,
+              "conditionOrder": [
+                "01",
+                "02",
+                "03",
+                "04"
+              ],
+              "orderLocked": false,
+              "startReason": "participant_switch",
+              "previousConditionId": "04",
+              "preset": "B_adaptive",
+              "condition": "plastic",
+              "seed": 20261105,
+              "parameters": {
+                "stiffness": 0.5,
+                "plasticity": 0.5,
+                "springBack": 0.5,
+                "foldLimit": 0.45
+              },
+              "visualParameters": null,
+              "reducedMotion": false,
+              "sound": false
+            }
+          },
+          {
+            "timestampMs": 267,
+            "type": "session_end",
+            "metadata": {
+              "exported": true,
+              "reason": "participant_switch"
+            }
+          }
+        ],
+        "reflection": null,
+        "methodNote": "Plastic condition: a programmed faceted sheet that folds and keeps its creases. Logged values describe observed pointer behaviour and simulated deformation only."
+      }
+    },
+    {
+      "encounterIndex": 9,
+      "conditionId": "02",
+      "materialKey": "gel",
+      "materialName": "Gel / Flow",
+      "orderPosition": 2,
+      "conditionOrder": [
+        "01",
+        "02",
+        "03",
+        "04"
+      ],
+      "orderLocked": false,
+      "startReason": "participant_switch",
+      "previousConditionId": "03",
+      "preset": "B_adaptive",
+      "startedAt": "2026-11-12T18:31:30.363Z",
+      "endedAt": "2026-11-12T18:31:30.694Z",
+      "endReason": "participant_switch",
+      "payload": {
+        "schema": "one-object-many-encounters/session",
+        "schemaVersion": 2,
+        "appVersion": "5.0.0-beta.1",
+        "sessionId": "f92577d6-d833-4ad4-845f-a3ccf3c5f1c2",
+        "startedAt": "2026-11-12T18:31:30.364Z",
+        "exportedAt": "2026-11-12T18:31:30.694Z",
+        "durationMs": 300,
+        "clock": "material clock: milliseconds since encounter start (pauses while the tab is hidden)",
+        "condition": "gel",
+        "seed": 20261105,
+        "materialKey": "gel",
+        "materialStatus": "gel v2 (volumetric interior displacement field coupled to a pressure boundary)",
+        "parameters": {
+          "viscosity": 0.6,
+          "pressure": 1,
+          "recovery": 0.5,
+          "flow": 0.7
+        },
+        "visualParameters": null,
+        "summary": {
+          "totalContactMs": 0,
+          "totalInteractionMs": 0,
+          "contactEpisodes": 0,
+          "dragDistance": 0,
+          "regionRevisits": 0,
+          "stillnessPeriods": 0,
+          "soundToggles": 0,
+          "parameterChanges": 0,
+          "droppedEvents": 0,
+          "peakDeformation": 0,
+          "peakRedistribution": 0,
+          "completedRecoveries": 0,
+          "interiorContacts": 0,
+          "peakCompression": 0,
+          "peakInternalDisplacement": 0
+        },
+        "units": {
+          "distance": "object units (base radius = 1)",
+          "speed": "object units per second",
+          "coordinates": "object units relative to the object centre",
+          "region": "12 perimeter regions; region r is centred at r × 30°, 0° = right, clockwise on screen"
+        },
+        "events": [
+          {
+            "timestampMs": 0,
+            "type": "session_start",
+            "metadata": {
+              "appVersion": "5.0.0-beta.1",
+              "researchSessionId": "05683d63-50de-4aaf-a429-393d14d07c0a",
+              "encounterIndex": 9,
+              "conditionId": "02",
+              "materialKey": "gel",
+              "orderPosition": 2,
+              "conditionOrder": [
+                "01",
+                "02",
+                "03",
+                "04"
+              ],
+              "orderLocked": false,
+              "startReason": "participant_switch",
+              "previousConditionId": "03",
+              "preset": "B_adaptive",
+              "condition": "gel",
+              "seed": 20261105,
+              "parameters": {
+                "viscosity": 0.6,
+                "pressure": 1,
+                "recovery": 0.5,
+                "flow": 0.7
+              },
+              "visualParameters": null,
+              "reducedMotion": false,
+              "sound": false
+            }
+          },
+          {
+            "timestampMs": 300,
+            "type": "session_end",
+            "metadata": {
+              "exported": true,
+              "reason": "participant_switch"
+            }
+          }
+        ],
+        "reflection": null,
+        "methodNote": "Gel condition: a programmed viscous, approximately volume-conserving soft boundary. Logged values describe observed pointer behaviour and simulated deformation only."
+      }
+    },
+    {
+      "encounterIndex": 10,
+      "conditionId": "01",
+      "materialKey": "structural",
+      "materialName": "Structural / Memory",
+      "orderPosition": 1,
+      "conditionOrder": [
+        "01",
+        "02",
+        "03",
+        "04"
+      ],
+      "orderLocked": false,
+      "startReason": "participant_switch",
+      "previousConditionId": "02",
+      "preset": "B_adaptive",
+      "startedAt": "2026-11-12T18:31:30.694Z",
+      "endedAt": "2026-11-12T18:31:31.020Z",
+      "endReason": "participant_switch",
+      "payload": {
+        "schema": "one-object-many-encounters/session",
+        "schemaVersion": 2,
+        "appVersion": "5.0.0-beta.1",
+        "sessionId": "0efec898-60cd-41ac-b54e-8bc01e7b27c4",
+        "startedAt": "2026-11-12T18:31:30.730Z",
+        "exportedAt": "2026-11-12T18:31:31.020Z",
+        "durationMs": 333,
+        "clock": "simulation milliseconds since session start (pauses while the tab is hidden)",
+        "condition": "B_adaptive",
+        "seed": 20261105,
+        "parameters": {
+          "responsiveness": 1,
+          "stiffness": 0.014,
+          "damping": 0.95,
+          "tension": 0.22,
+          "volume": 0.015,
+          "maxDisplacement": 0.36,
+          "contactRadius": 0.36,
+          "contactMargin": 0.3,
+          "grip": 0.18,
+          "pressDepth": 0.07,
+          "flingGain": 0.05,
+          "proximityRadius": 0.8,
+          "proximityPush": 0.0012,
+          "proximitySpeedGain": 0.0006,
+          "proximityWake": 0.035,
+          "sweepSpeed": 1.4,
+          "sweepGain": 0.035,
+          "sweepDent": 0.004,
+          "sweepMemory": 0.2,
+          "memoryEnabled": true,
+          "learningRate": 0.35,
+          "decayRate": 0.05,
+          "plasticity": 0.3,
+          "adaptiveEnabled": true,
+          "adaptationStrength": 0.72,
+          "adaptationThreshold": 0.65,
+          "adaptationHysteresis": 0.2,
+          "adaptationTau": 1.2,
+          "adaptStiffen": 1.5,
+          "adaptWiden": 0.8,
+          "ambientAmplitude": 0.008,
+          "interactionRadius": 0.45,
+          "proximityResponse": 0.025,
+          "proximityGlow": 0.12,
+          "responseRate": 6,
+          "dwellRadius": 0.12,
+          "dwellDelay": 2.2,
+          "dwellRamp": 1.5,
+          "dwellRelease": 0.6,
+          "dwellAttraction": 0.05,
+          "dwellGlow": 0.3,
+          "dwellActivity": 0.006
+        },
+        "visualParameters": {
+          "filamentDensity": 0.7,
+          "membraneOpacity": 1,
+          "structuralContrast": 1,
+          "tensionHighlight": 1,
+          "visualMemory": 1,
+          "lowDetail": false
+        },
+        "summary": {
+          "totalContactMs": 0,
+          "totalInteractionMs": 0,
+          "contactEpisodes": 0,
+          "dragDistance": 0,
+          "regionRevisits": 0,
+          "adaptationEvents": 0,
+          "regionRecoveries": 0,
+          "stillnessPeriods": 0,
+          "sweeps": 0,
+          "totalSweepMs": 0,
+          "dwells": 0,
+          "totalDwellMs": 0,
+          "soundToggles": 0,
+          "parameterChanges": 0,
+          "finalMeanMemory": 0,
+          "droppedEvents": 0
+        },
+        "units": {
+          "distance": "object units (base radius = 1)",
+          "speed": "object units per second",
+          "coordinates": "object units relative to the object centre",
+          "region": "12 perimeter regions; region r is centred at r × 30°, 0° = right, clockwise on screen"
+        },
+        "events": [
+          {
+            "timestampMs": 0,
+            "type": "session_start",
+            "metadata": {
+              "appVersion": "5.0.0-beta.1",
+              "researchSessionId": "05683d63-50de-4aaf-a429-393d14d07c0a",
+              "encounterIndex": 10,
+              "conditionId": "01",
+              "materialKey": "structural",
+              "orderPosition": 1,
+              "conditionOrder": [
+                "01",
+                "02",
+                "03",
+                "04"
+              ],
+              "orderLocked": false,
+              "startReason": "participant_switch",
+              "previousConditionId": "02",
+              "preset": "B_adaptive",
+              "condition": "B_adaptive",
+              "seed": 20261105,
+              "parameters": {
+                "responsiveness": 1,
+                "stiffness": 0.014,
+                "damping": 0.95,
+                "tension": 0.22,
+                "volume": 0.015,
+                "maxDisplacement": 0.36,
+                "contactRadius": 0.36,
+                "contactMargin": 0.3,
+                "grip": 0.18,
+                "pressDepth": 0.07,
+                "flingGain": 0.05,
+                "proximityRadius": 0.8,
+                "proximityPush": 0.0012,
+                "proximitySpeedGain": 0.0006,
+                "proximityWake": 0.035,
+                "sweepSpeed": 1.4,
+                "sweepGain": 0.035,
+                "sweepDent": 0.004,
+                "sweepMemory": 0.2,
+                "memoryEnabled": true,
+                "learningRate": 0.35,
+                "decayRate": 0.05,
+                "plasticity": 0.3,
+                "adaptiveEnabled": true,
+                "adaptationStrength": 0.72,
+                "adaptationThreshold": 0.65,
+                "adaptationHysteresis": 0.2,
+                "adaptationTau": 1.2,
+                "adaptStiffen": 1.5,
+                "adaptWiden": 0.8,
+                "ambientAmplitude": 0.008,
+                "interactionRadius": 0.45,
+                "proximityResponse": 0.025,
+                "proximityGlow": 0.12,
+                "responseRate": 6,
+                "dwellRadius": 0.12,
+                "dwellDelay": 2.2,
+                "dwellRamp": 1.5,
+                "dwellRelease": 0.6,
+                "dwellAttraction": 0.05,
+                "dwellGlow": 0.3,
+                "dwellActivity": 0.006
+              },
+              "visualParameters": {
+                "filamentDensity": 0.7,
+                "membraneOpacity": 1,
+                "structuralContrast": 1,
+                "tensionHighlight": 1,
+                "visualMemory": 1,
+                "lowDetail": false
+              },
+              "reducedMotion": false,
+              "sound": false
+            }
+          },
+          {
+            "timestampMs": 333,
+            "type": "session_end",
+            "metadata": {
+              "exported": true,
+              "reason": "participant_switch"
+            }
+          }
+        ],
+        "reflection": null,
+        "methodNote": "Programmed generative simulation. Logged values describe observed pointer behaviour and system state; they do not establish participant expectation, interpretation, or object agency."
+      }
+    },
+    {
+      "encounterIndex": 11,
+      "conditionId": "04",
+      "materialKey": "silicone",
+      "materialName": "Silicone / Elasticity",
+      "orderPosition": 4,
+      "conditionOrder": [
+        "01",
+        "02",
+        "03",
+        "04"
+      ],
+      "orderLocked": false,
+      "startReason": "participant_switch",
+      "previousConditionId": "01",
+      "preset": "B_adaptive",
+      "startedAt": "2026-11-12T18:31:31.020Z",
+      "endedAt": "2026-11-12T18:31:31.771Z",
+      "endReason": "participant_switch",
+      "payload": {
+        "schema": "one-object-many-encounters/session",
+        "schemaVersion": 2,
+        "appVersion": "5.0.0-beta.1",
+        "sessionId": "83f678bc-8b80-4de6-95b3-bf8459d912e2",
+        "startedAt": "2026-11-12T18:31:31.021Z",
+        "exportedAt": "2026-11-12T18:31:31.771Z",
+        "durationMs": 733,
+        "clock": "material clock: milliseconds since encounter start (pauses while the tab is hidden)",
+        "condition": "silicone",
+        "seed": 20261105,
+        "materialKey": "silicone",
+        "materialStatus": "silicone v1 (triangulated mass-spring membrane, stretch-stiffening, underdamped recovery)",
+        "parameters": {
+          "stiffness": 0.5,
+          "resistance": 0.5,
+          "damping": 0.75,
+          "recovery": 0.5,
+          "maxDeformation": 0.45
+        },
+        "visualParameters": null,
+        "summary": {
+          "totalContactMs": 0,
+          "totalInteractionMs": 0,
+          "contactEpisodes": 0,
+          "dragDistance": 0,
+          "regionRevisits": 0,
+          "stillnessPeriods": 0,
+          "soundToggles": 0,
+          "parameterChanges": 0,
+          "droppedEvents": 0,
+          "interiorContacts": 0,
+          "peakStretch": 0,
+          "peakDeformation": 0,
+          "peakStrain": 0,
+          "peakReleaseVelocity": 0,
+          "completedRecoveries": 0
+        },
+        "units": {
+          "distance": "object units (base radius = 1)",
+          "speed": "object units per second",
+          "coordinates": "object units relative to the object centre",
+          "region": "12 perimeter regions; region r is centred at r × 30°, 0° = right, clockwise on screen"
+        },
+        "events": [
+          {
+            "timestampMs": 0,
+            "type": "session_start",
+            "metadata": {
+              "appVersion": "5.0.0-beta.1",
+              "researchSessionId": "05683d63-50de-4aaf-a429-393d14d07c0a",
+              "encounterIndex": 11,
+              "conditionId": "04",
+              "materialKey": "silicone",
+              "orderPosition": 4,
+              "conditionOrder": [
+                "01",
+                "02",
+                "03",
+                "04"
+              ],
+              "orderLocked": false,
+              "startReason": "participant_switch",
+              "previousConditionId": "01",
+              "preset": "B_adaptive",
+              "condition": "silicone",
+              "seed": 20261105,
+              "parameters": {
+                "stiffness": 0.5,
+                "resistance": 0.5,
+                "damping": 0.75,
+                "recovery": 0.5,
+                "maxDeformation": 0.45
+              },
+              "visualParameters": null,
+              "reducedMotion": false,
+              "sound": false
+            }
+          },
+          {
+            "timestampMs": 733,
+            "type": "session_end",
+            "metadata": {
+              "exported": true,
+              "reason": "participant_switch"
+            }
+          }
+        ],
+        "reflection": null,
+        "methodNote": "Silicone condition: a programmed elastic membrane (mass-spring). Logged values describe observed pointer behaviour and simulated deformation only."
+      }
+    },
+    {
+      "encounterIndex": 12,
+      "conditionId": "03",
+      "materialKey": "plastic",
+      "materialName": "Plastic / Crease",
+      "orderPosition": 3,
+      "conditionOrder": [
+        "01",
+        "02",
+        "03",
+        "04"
+      ],
+      "orderLocked": false,
+      "startReason": "participant_switch",
+      "previousConditionId": "04",
+      "preset": "B_adaptive",
+      "startedAt": "2026-11-12T18:31:31.771Z",
+      "endedAt": "2026-11-12T18:31:33.710Z",
+      "endReason": "participant_reset",
+      "payload": {
+        "schema": "one-object-many-encounters/session",
+        "schemaVersion": 2,
+        "appVersion": "5.0.0-beta.1",
+        "sessionId": "6fa0d248-af7d-4188-b1fe-7d26153466b4",
+        "startedAt": "2026-11-12T18:31:31.771Z",
+        "exportedAt": "2026-11-12T18:31:33.710Z",
+        "durationMs": 1917,
+        "clock": "material clock: milliseconds since encounter start (pauses while the tab is hidden)",
+        "condition": "plastic",
+        "seed": 20261105,
+        "materialKey": "plastic",
+        "materialStatus": "plastic v1 (faceted sheet: yield, fold along straight lines, partial spring-back, permanent creases)",
+        "parameters": {
+          "stiffness": 0.5,
+          "plasticity": 0.5,
+          "springBack": 0.5,
+          "foldLimit": 0.45
+        },
+        "visualParameters": null,
+        "summary": {
+          "totalContactMs": 800,
+          "totalInteractionMs": 1800,
+          "contactEpisodes": 1,
+          "dragDistance": 0.4,
+          "regionRevisits": 0,
+          "stillnessPeriods": 0,
+          "soundToggles": 0,
+          "parameterChanges": 0,
+          "droppedEvents": 0,
+          "interiorContacts": 0,
+          "folds": 1,
+          "edgeFolds": 1,
+          "ridgeFolds": 0,
+          "resistedPulls": 0,
+          "creases": 1,
+          "totalCreaseLength": 1.3442,
+          "peakFoldAngle": 179.9923,
+          "finalProjectedArea": 0.9773,
+          "finalMeanTilt": 3.25,
+          "finalFacets": 2
+        },
+        "units": {
+          "distance": "object units (base radius = 1)",
+          "speed": "object units per second",
+          "coordinates": "object units relative to the object centre",
+          "region": "12 perimeter regions; region r is centred at r × 30°, 0° = right, clockwise on screen"
+        },
+        "events": [
+          {
+            "timestampMs": 0,
+            "type": "session_start",
+            "metadata": {
+              "appVersion": "5.0.0-beta.1",
+              "researchSessionId": "05683d63-50de-4aaf-a429-393d14d07c0a",
+              "encounterIndex": 12,
+              "conditionId": "03",
+              "materialKey": "plastic",
+              "orderPosition": 3,
+              "conditionOrder": [
+                "01",
+                "02",
+                "03",
+                "04"
+              ],
+              "orderLocked": false,
+              "startReason": "participant_switch",
+              "previousConditionId": "04",
+              "preset": "B_adaptive",
+              "condition": "plastic",
+              "seed": 20261105,
+              "parameters": {
+                "stiffness": 0.5,
+                "plasticity": 0.5,
+                "springBack": 0.5,
+                "foldLimit": 0.45
+              },
+              "visualParameters": null,
+              "reducedMotion": false,
+              "sound": false
+            }
+          },
+          {
+            "timestampMs": 67,
+            "type": "contact_start",
+            "region": 0,
+            "distance": -0.018,
+            "speed": 0,
+            "metadata": {
+              "x": 0.95,
+              "y": -0.2,
+              "interior": false,
+              "depthFromEdge": 0.018
+            }
+          },
+          {
+            "timestampMs": 200,
+            "type": "fold",
+            "region": 0,
+            "metadata": {
+              "mode": "edge",
+              "direction": 180,
+              "flapFraction": 0.011,
+              "atMs": 133
+            }
+          },
+          {
+            "timestampMs": 467,
+            "type": "drag",
+            "region": 0,
+            "distance": 0.3,
+            "speed": 0.698,
+            "metadata": {
+              "phase": "folding",
+              "foldAngle": 177.7
+            }
+          },
+          {
+            "timestampMs": 867,
+            "type": "approach",
+            "distance": 0,
+            "speed": 0.04
+          },
+          {
+            "timestampMs": 867,
+            "type": "contact_end",
+            "region": 0,
+            "durationMs": 800,
+            "distance": 0.4,
+            "metadata": {
+              "interior": false,
+              "outcome": "edge",
+              "peakFoldAngle": 180,
+              "foldDistance": 0.4
+            }
+          },
+          {
+            "timestampMs": 1300,
+            "type": "recovery",
+            "durationMs": 433,
+            "metadata": {
+              "kind": "springback",
+              "completed": true,
+              "mode": "edge",
+              "peakFoldAngle": 180,
+              "residualAngle": 48.6,
+              "creases": 1,
+              "facets": 2,
+              "projectedArea": 0.9773,
+              "meanTilt": 3.25
+            }
+          },
+          {
+            "timestampMs": 1917,
+            "type": "session_end",
+            "metadata": {
+              "exported": true,
+              "reason": "participant_reset"
+            }
+          }
+        ],
+        "reflection": null,
+        "methodNote": "Plastic condition: a programmed faceted sheet that folds and keeps its creases. Logged values describe observed pointer behaviour and simulated deformation only."
+      }
+    },
+    {
+      "encounterIndex": 13,
+      "conditionId": "03",
+      "materialKey": "plastic",
+      "materialName": "Plastic / Crease",
+      "orderPosition": 3,
+      "conditionOrder": [
+        "01",
+        "02",
+        "03",
+        "04"
+      ],
+      "orderLocked": false,
+      "startReason": "participant_reset",
+      "previousConditionId": "03",
+      "preset": "B_adaptive",
+      "startedAt": "2026-11-12T18:31:33.710Z",
+      "endedAt": "2026-11-12T18:31:34.403Z",
+      "endReason": "researcher_switch",
+      "payload": {
+        "schema": "one-object-many-encounters/session",
+        "schemaVersion": 2,
+        "appVersion": "5.0.0-beta.1",
+        "sessionId": "49ecf7aa-6da9-4a70-986f-1cfc0490c034",
+        "startedAt": "2026-11-12T18:31:33.710Z",
+        "exportedAt": "2026-11-12T18:31:34.403Z",
+        "durationMs": 700,
+        "clock": "material clock: milliseconds since encounter start (pauses while the tab is hidden)",
+        "condition": "plastic",
+        "seed": 20261105,
+        "materialKey": "plastic",
+        "materialStatus": "plastic v1 (faceted sheet: yield, fold along straight lines, partial spring-back, permanent creases)",
+        "parameters": {
+          "stiffness": 0.5,
+          "plasticity": 0.8,
+          "springBack": 0.5,
+          "foldLimit": 0.45
+        },
+        "visualParameters": null,
+        "summary": {
+          "totalContactMs": 0,
+          "totalInteractionMs": 0,
+          "contactEpisodes": 0,
+          "dragDistance": 0,
+          "regionRevisits": 0,
+          "stillnessPeriods": 0,
+          "soundToggles": 0,
+          "parameterChanges": 1,
+          "droppedEvents": 0,
+          "interiorContacts": 0,
+          "folds": 0,
+          "edgeFolds": 0,
+          "ridgeFolds": 0,
+          "resistedPulls": 0,
+          "creases": 0,
+          "totalCreaseLength": 0,
+          "peakFoldAngle": 0,
+          "finalProjectedArea": 1,
+          "finalMeanTilt": 0,
+          "finalFacets": 1
+        },
+        "units": {
+          "distance": "object units (base radius = 1)",
+          "speed": "object units per second",
+          "coordinates": "object units relative to the object centre",
+          "region": "12 perimeter regions; region r is centred at r × 30°, 0° = right, clockwise on screen"
+        },
+        "events": [
+          {
+            "timestampMs": 0,
+            "type": "session_start",
+            "metadata": {
+              "appVersion": "5.0.0-beta.1",
+              "researchSessionId": "05683d63-50de-4aaf-a429-393d14d07c0a",
+              "encounterIndex": 13,
+              "conditionId": "03",
+              "materialKey": "plastic",
+              "orderPosition": 3,
+              "conditionOrder": [
+                "01",
+                "02",
+                "03",
+                "04"
+              ],
+              "orderLocked": false,
+              "startReason": "participant_reset",
+              "previousConditionId": "03",
+              "preset": "B_adaptive",
+              "condition": "plastic",
+              "seed": 20261105,
+              "parameters": {
+                "stiffness": 0.5,
+                "plasticity": 0.5,
+                "springBack": 0.5,
+                "foldLimit": 0.45
+              },
+              "visualParameters": null,
+              "reducedMotion": false,
+              "sound": false
+            }
+          },
+          {
+            "timestampMs": 0,
+            "type": "reset",
+            "metadata": {
+              "by": "participant",
+              "previousEncounterIndex": 12
+            }
+          },
+          {
+            "timestampMs": 500,
+            "type": "parameter_change",
+            "metadata": {
+              "param": "plastic.plasticity",
+              "from": 0.5,
+              "to": 0.8,
+              "scope": "material"
+            }
+          },
+          {
+            "timestampMs": 700,
+            "type": "session_end",
+            "metadata": {
+              "exported": true,
+              "reason": "researcher_switch"
+            }
+          }
+        ],
+        "reflection": null,
+        "methodNote": "Plastic condition: a programmed faceted sheet that folds and keeps its creases. Logged values describe observed pointer behaviour and simulated deformation only."
+      }
+    },
+    {
+      "encounterIndex": 14,
+      "conditionId": "01",
+      "materialKey": "structural",
+      "materialName": "Structural / Memory",
+      "orderPosition": 1,
+      "conditionOrder": [
+        "01",
+        "02",
+        "03",
+        "04"
+      ],
+      "orderLocked": false,
+      "startReason": "researcher_switch",
+      "previousConditionId": "03",
+      "preset": "B_adaptive",
+      "startedAt": "2026-11-12T18:31:34.403Z",
+      "endedAt": "2026-11-12T18:31:47.997Z",
+      "endReason": "participant_switch",
+      "payload": {
+        "schema": "one-object-many-encounters/session",
+        "schemaVersion": 2,
+        "appVersion": "5.0.0-beta.1",
+        "sessionId": "bd053f1e-8ae6-4a27-81a1-387a1beab883",
+        "startedAt": "2026-11-12T18:31:34.455Z",
+        "exportedAt": "2026-11-12T18:31:47.997Z",
+        "durationMs": 13550,
+        "clock": "simulation milliseconds since session start (pauses while the tab is hidden)",
+        "condition": "B_adaptive",
+        "seed": 20261105,
+        "parameters": {
+          "responsiveness": 1,
+          "stiffness": 0.014,
+          "damping": 0.95,
+          "tension": 0.22,
+          "volume": 0.015,
+          "maxDisplacement": 0.36,
+          "contactRadius": 0.36,
+          "contactMargin": 0.3,
+          "grip": 0.18,
+          "pressDepth": 0.07,
+          "flingGain": 0.05,
+          "proximityRadius": 0.8,
+          "proximityPush": 0.0012,
+          "proximitySpeedGain": 0.0006,
+          "proximityWake": 0.035,
+          "sweepSpeed": 1.4,
+          "sweepGain": 0.035,
+          "sweepDent": 0.004,
+          "sweepMemory": 0.2,
+          "memoryEnabled": true,
+          "learningRate": 0.35,
+          "decayRate": 0.05,
+          "plasticity": 0.3,
+          "adaptiveEnabled": true,
+          "adaptationStrength": 0.72,
+          "adaptationThreshold": 0.65,
+          "adaptationHysteresis": 0.2,
+          "adaptationTau": 1.2,
+          "adaptStiffen": 1.5,
+          "adaptWiden": 0.8,
+          "ambientAmplitude": 0.008,
+          "interactionRadius": 0.45,
+          "proximityResponse": 0.025,
+          "proximityGlow": 0.12,
+          "responseRate": 6,
+          "dwellRadius": 0.12,
+          "dwellDelay": 2.2,
+          "dwellRamp": 1.5,
+          "dwellRelease": 0.6,
+          "dwellAttraction": 0.05,
+          "dwellGlow": 0.3,
+          "dwellActivity": 0.006
+        },
+        "visualParameters": {
+          "filamentDensity": 0.7,
+          "membraneOpacity": 1,
+          "structuralContrast": 1,
+          "tensionHighlight": 1,
+          "visualMemory": 1,
+          "lowDetail": false
+        },
+        "summary": {
+          "totalContactMs": 0,
+          "totalInteractionMs": 0,
+          "contactEpisodes": 0,
+          "dragDistance": 0,
+          "regionRevisits": 0,
+          "adaptationEvents": 0,
+          "regionRecoveries": 0,
+          "stillnessPeriods": 0,
+          "sweeps": 0,
+          "totalSweepMs": 0,
+          "dwells": 0,
+          "totalDwellMs": 0,
+          "soundToggles": 0,
+          "parameterChanges": 4,
+          "finalMeanMemory": 0,
+          "droppedEvents": 0
+        },
+        "units": {
+          "distance": "object units (base radius = 1)",
+          "speed": "object units per second",
+          "coordinates": "object units relative to the object centre",
+          "region": "12 perimeter regions; region r is centred at r × 30°, 0° = right, clockwise on screen"
+        },
+        "events": [
+          {
+            "timestampMs": 0,
+            "type": "session_start",
+            "metadata": {
+              "appVersion": "5.0.0-beta.1",
+              "researchSessionId": "05683d63-50de-4aaf-a429-393d14d07c0a",
+              "encounterIndex": 14,
+              "conditionId": "01",
+              "materialKey": "structural",
+              "orderPosition": 1,
+              "conditionOrder": [
+                "01",
+                "02",
+                "03",
+                "04"
+              ],
+              "orderLocked": false,
+              "startReason": "researcher_switch",
+              "previousConditionId": "03",
+              "preset": "B_adaptive",
+              "condition": "B_adaptive",
+              "seed": 20261105,
+              "parameters": {
+                "responsiveness": 1,
+                "stiffness": 0.014,
+                "damping": 0.95,
+                "tension": 0.22,
+                "volume": 0.015,
+                "maxDisplacement": 0.36,
+                "contactRadius": 0.36,
+                "contactMargin": 0.3,
+                "grip": 0.18,
+                "pressDepth": 0.07,
+                "flingGain": 0.05,
+                "proximityRadius": 0.8,
+                "proximityPush": 0.0012,
+                "proximitySpeedGain": 0.0006,
+                "proximityWake": 0.035,
+                "sweepSpeed": 1.4,
+                "sweepGain": 0.035,
+                "sweepDent": 0.004,
+                "sweepMemory": 0.2,
+                "memoryEnabled": true,
+                "learningRate": 0.35,
+                "decayRate": 0.05,
+                "plasticity": 0.3,
+                "adaptiveEnabled": true,
+                "adaptationStrength": 0.72,
+                "adaptationThreshold": 0.65,
+                "adaptationHysteresis": 0.2,
+                "adaptationTau": 1.2,
+                "adaptStiffen": 1.5,
+                "adaptWiden": 0.8,
+                "ambientAmplitude": 0.008,
+                "interactionRadius": 0.45,
+                "proximityResponse": 0.025,
+                "proximityGlow": 0.12,
+                "responseRate": 6,
+                "dwellRadius": 0.12,
+                "dwellDelay": 2.2,
+                "dwellRamp": 1.5,
+                "dwellRelease": 0.6,
+                "dwellAttraction": 0.05,
+                "dwellGlow": 0.3,
+                "dwellActivity": 0.006
+              },
+              "visualParameters": {
+                "filamentDensity": 0.7,
+                "membraneOpacity": 1,
+                "structuralContrast": 1,
+                "tensionHighlight": 1,
+                "visualMemory": 1,
+                "lowDetail": false
+              },
+              "reducedMotion": false,
+              "sound": false
+            }
+          },
+          {
+            "timestampMs": 2900,
+            "type": "parameter_change",
+            "metadata": {
+              "param": "autoDetail",
+              "from": 1,
+              "to": 0.6,
+              "scope": "visual"
+            }
+          },
+          {
+            "timestampMs": 13033,
+            "type": "parameter_change",
+            "metadata": {
+              "param": "conditionOrder",
+              "from": "01,02,03,04",
+              "to": "04,02,03,01",
+              "scope": "research"
+            }
+          },
+          {
+            "timestampMs": 13033,
+            "type": "parameter_change",
+            "metadata": {
+              "param": "orderLocked",
+              "from": false,
+              "to": true,
+              "scope": "research"
+            }
+          },
+          {
+            "timestampMs": 13283,
+            "type": "parameter_change",
+            "metadata": {
+              "param": "orderLocked",
+              "from": true,
+              "to": false,
+              "scope": "research"
+            }
+          },
+          {
+            "timestampMs": 13550,
+            "type": "session_end",
+            "metadata": {
+              "exported": true,
+              "reason": "participant_switch"
+            }
+          }
+        ],
+        "reflection": null,
+        "methodNote": "Programmed generative simulation. Logged values describe observed pointer behaviour and system state; they do not establish participant expectation, interpretation, or object agency."
+      }
+    },
+    {
+      "encounterIndex": 15,
+      "conditionId": "04",
+      "materialKey": "silicone",
+      "materialName": "Silicone / Elasticity",
+      "orderPosition": 1,
+      "conditionOrder": [
+        "04",
+        "02",
+        "03",
+        "01"
+      ],
+      "orderLocked": false,
+      "startReason": "participant_switch",
+      "previousConditionId": "01",
+      "preset": "B_adaptive",
+      "startedAt": "2026-11-12T18:31:47.997Z",
+      "endedAt": null,
+      "endReason": "open_at_export",
+      "payload": {
+        "schema": "one-object-many-encounters/session",
+        "schemaVersion": 2,
+        "appVersion": "5.0.0-beta.1",
+        "sessionId": "3f04377a-6c5f-48a7-94fa-ca88a74d96cd",
+        "startedAt": "2026-11-12T18:31:47.999Z",
+        "exportedAt": "2026-11-12T18:31:52.894Z",
+        "durationMs": 4800,
+        "clock": "material clock: milliseconds since encounter start (pauses while the tab is hidden)",
+        "condition": "silicone",
+        "seed": 20261105,
+        "materialKey": "silicone",
+        "materialStatus": "silicone v1 (triangulated mass-spring membrane, stretch-stiffening, underdamped recovery)",
+        "parameters": {
+          "stiffness": 0.5,
+          "resistance": 0.5,
+          "damping": 0.75,
+          "recovery": 0.5,
+          "maxDeformation": 0.45
+        },
+        "visualParameters": null,
+        "summary": {
+          "totalContactMs": 2000,
+          "totalInteractionMs": 2367,
+          "contactEpisodes": 2,
+          "dragDistance": 0.575,
+          "regionRevisits": 1,
+          "stillnessPeriods": 0,
+          "soundToggles": 2,
+          "parameterChanges": 0,
+          "droppedEvents": 0,
+          "interiorContacts": 2,
+          "peakStretch": 0.1936,
+          "peakDeformation": 0.229,
+          "peakStrain": 0.3047,
+          "peakReleaseVelocity": 0.0059,
+          "completedRecoveries": 1
+        },
+        "units": {
+          "distance": "object units (base radius = 1)",
+          "speed": "object units per second",
+          "coordinates": "object units relative to the object centre",
+          "region": "12 perimeter regions; region r is centred at r × 30°, 0° = right, clockwise on screen"
+        },
+        "events": [
+          {
+            "timestampMs": 0,
+            "type": "session_start",
+            "metadata": {
+              "appVersion": "5.0.0-beta.1",
+              "researchSessionId": "05683d63-50de-4aaf-a429-393d14d07c0a",
+              "encounterIndex": 15,
+              "conditionId": "04",
+              "materialKey": "silicone",
+              "orderPosition": 1,
+              "conditionOrder": [
+                "04",
+                "02",
+                "03",
+                "01"
+              ],
+              "orderLocked": false,
+              "startReason": "participant_switch",
+              "previousConditionId": "01",
+              "preset": "B_adaptive",
+              "condition": "silicone",
+              "seed": 20261105,
+              "parameters": {
+                "stiffness": 0.5,
+                "resistance": 0.5,
+                "damping": 0.75,
+                "recovery": 0.5,
+                "maxDeformation": 0.45
+              },
+              "visualParameters": null,
+              "reducedMotion": false,
+              "sound": false
+            }
+          },
+          {
+            "timestampMs": 117,
+            "type": "contact_start",
+            "region": 0,
+            "distance": -0.058,
+            "speed": 0.161,
+            "metadata": {
+              "x": 0.912,
+              "y": 0,
+              "interior": true,
+              "depthFromEdge": 0.058
+            }
+          },
+          {
+            "timestampMs": 517,
+            "type": "drag",
+            "region": 0,
+            "distance": 0.15,
+            "speed": 0.377,
+            "metadata": {
+              "stretch": 0.11
+            }
+          },
+          {
+            "timestampMs": 933,
+            "type": "drag",
+            "region": 0,
+            "distance": 0.287,
+            "speed": 0.263,
+            "metadata": {
+              "stretch": 0.1925
+            }
+          },
+          {
+            "timestampMs": 1117,
+            "type": "approach",
+            "distance": null,
+            "speed": 0
+          },
+          {
+            "timestampMs": 1117,
+            "type": "contact_end",
+            "region": 0,
+            "durationMs": 1000,
+            "distance": 0.287,
+            "metadata": {
+              "interior": true,
+              "stretchDistance": 0.1936,
+              "peakDeformation": 0.229,
+              "peakStrain": 0.3047,
+              "releaseDisplacement": 0.1877
+            }
+          },
+          {
+            "timestampMs": 2350,
+            "type": "reflection",
+            "metadata": {
+              "skipped": false,
+              "answered": 2
+            }
+          },
+          {
+            "timestampMs": 2833,
+            "type": "sound_toggle",
+            "metadata": {
+              "enabled": true
+            }
+          },
+          {
+            "timestampMs": 2867,
+            "type": "recovery",
+            "durationMs": 1750,
+            "metadata": {
+              "kind": "settle",
+              "completed": true,
+              "releaseVelocity": 0.0059,
+              "overshoots": 3,
+              "maxOvershoot": 0.06
+            }
+          },
+          {
+            "timestampMs": 3300,
+            "type": "contact_start",
+            "region": 0,
+            "distance": -0.058,
+            "speed": 4.375,
+            "metadata": {
+              "x": 0.912,
+              "y": 0,
+              "interior": true,
+              "depthFromEdge": 0.058
+            }
+          },
+          {
+            "timestampMs": 3300,
+            "type": "region_revisit",
+            "region": 0,
+            "metadata": {
+              "previousContacts": 1
+            }
+          },
+          {
+            "timestampMs": 3717,
+            "type": "drag",
+            "region": 0,
+            "distance": 0.15,
+            "speed": 0.393,
+            "metadata": {
+              "stretch": 0.1118
+            }
+          },
+          {
+            "timestampMs": 4133,
+            "type": "drag",
+            "region": 0,
+            "distance": 0.287,
+            "speed": 0.191,
+            "metadata": {
+              "stretch": 0.1932
+            }
+          },
+          {
+            "timestampMs": 4300,
+            "type": "approach",
+            "distance": 0.229,
+            "speed": 0.005
+          },
+          {
+            "timestampMs": 4300,
+            "type": "contact_end",
+            "region": 0,
+            "durationMs": 1000,
+            "distance": 0.287,
+            "metadata": {
+              "interior": true,
+              "stretchDistance": 0.1932,
+              "peakDeformation": 0.229,
+              "peakStrain": 0.3047,
+              "releaseDisplacement": 0.1878
+            }
+          },
+          {
+            "timestampMs": 4600,
+            "type": "sound_toggle",
+            "metadata": {
+              "enabled": false
+            }
+          },
+          {
+            "timestampMs": 4800,
+            "type": "session_end",
+            "metadata": {
+              "exported": true,
+              "reason": "export_snapshot"
+            }
+          }
+        ],
+        "reflection": {
+          "q1": "they felt different",
+          "q2": "",
+          "q3": "",
+          "q4": "glass, film",
+          "q5": ""
+        },
+        "methodNote": "Silicone condition: a programmed elastic membrane (mass-spring). Logged values describe observed pointer behaviour and simulated deformation only."
+      }
+    }
+  ],
+  "privacy": "Recorded only in this browser tab; nothing is sent anywhere. Anonymous random session id; no names, emails, IP addresses or device identifiers.",
+  "methodNote": "Each encounter is a schema-v2 session with its own event log (timestamps on that encounter's clock). The session timeline uses wall-clock time since the session started. Condition names are researcher-facing only; participants saw 01–04. Logged values describe pointer behaviour and simulated material state; they do not measure or infer emotion, expectation or interpretation."
+}

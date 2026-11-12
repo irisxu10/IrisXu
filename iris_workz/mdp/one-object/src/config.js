@@ -2,7 +2,7 @@
 // the object's base radius is 1.0 and its centre is the origin.
 // All per-step forces assume the fixed physics step below.
 
-export const APP_VERSION = '5.0.0-alpha.4';
+export const APP_VERSION = '5.0.0-beta.1';
 export const STEP = 1 / 60;          // fixed physics timestep (s)
 export const MAX_SUBSTEPS = 5;       // cap on catch-up steps per frame
 export const NODE_COUNT = 80;        // perimeter nodes
@@ -97,19 +97,20 @@ export const PRESETS = Object.freeze({
   B: Object.freeze({ id: 'B_adaptive', memoryEnabled: true, adaptiveEnabled: true }),
 });
 
-// Parameters exposed as sliders in Researcher Mode.
+// Parameters exposed as sliders in Researcher Mode (group: Researcher Mode section —
+// 'material' = Material properties, 'behaviour' = Behaviour & memory).
 export const RESEARCH_SLIDERS = Object.freeze([
-  { key: 'responsiveness', min: 0, max: 2, step: 0.01 },
-  { key: 'stiffness', min: 0.004, max: 0.12, step: 0.001 },
-  { key: 'damping', min: 0.85, max: 0.99, step: 0.001 },
-  { key: 'learningRate', min: 0, max: 1, step: 0.01 },
-  { key: 'decayRate', min: 0, max: 0.3, step: 0.005 },
-  { key: 'adaptationStrength', min: 0, max: 0.95, step: 0.01 },
-  { key: 'adaptationThreshold', min: 0.2, max: 0.95, step: 0.01 },
-  { key: 'interactionRadius', min: 0.15, max: 0.9, step: 0.01 },
-  { key: 'proximityResponse', min: 0, max: 0.08, step: 0.001 },
-  { key: 'dwellDelay', min: 0.5, max: 5, step: 0.1 },
-  { key: 'dwellAttraction', min: 0, max: 0.12, step: 0.001 },
+  { key: 'responsiveness', min: 0, max: 2, step: 0.01, group: 'material' },
+  { key: 'stiffness', min: 0.004, max: 0.12, step: 0.001, group: 'material' },
+  { key: 'damping', min: 0.85, max: 0.99, step: 0.001, group: 'material' },
+  { key: 'learningRate', min: 0, max: 1, step: 0.01, group: 'behaviour' },
+  { key: 'decayRate', min: 0, max: 0.3, step: 0.005, group: 'behaviour' },
+  { key: 'adaptationStrength', min: 0, max: 0.95, step: 0.01, group: 'behaviour' },
+  { key: 'adaptationThreshold', min: 0.2, max: 0.95, step: 0.01, group: 'behaviour' },
+  { key: 'interactionRadius', min: 0.15, max: 0.9, step: 0.01, group: 'material' },
+  { key: 'proximityResponse', min: 0, max: 0.08, step: 0.001, group: 'material' },
+  { key: 'dwellDelay', min: 0.5, max: 5, step: 0.1, group: 'behaviour' },
+  { key: 'dwellAttraction', min: 0, max: 0.12, step: 0.001, group: 'behaviour' },
 ]);
 export const RESEARCH_TOGGLES = Object.freeze(['memoryEnabled', 'adaptiveEnabled']);
 

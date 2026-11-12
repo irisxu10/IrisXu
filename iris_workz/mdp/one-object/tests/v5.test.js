@@ -51,7 +51,7 @@ test('Research session: encounters are archived in order, never overwritten', ()
   rs.endEncounter({ marker: 'second' }, 'participant_reset');
   rs.beginEncounter({ conditionId: '03', materialKey: 'plastic', startReason: 'participant_reset', preset: 'B_adaptive' });
   const out = JSON.parse(JSON.stringify(rs.buildExport({ marker: 'open' })));
-  assert.equal(out.schemaVersion, 3);
+  assert.equal(out.schemaVersion, 4);
   assert.equal(out.encounterCount, 3);
   assert.deepEqual(out.conditionSequence, ['01', '03', '03']);
   assert.deepEqual(out.encounters.map((e) => e.payload.marker), ['first', 'second', 'open']);
