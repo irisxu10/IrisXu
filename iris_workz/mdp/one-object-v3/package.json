@@ -1,0 +1,12 @@
+{
+  "name": "one-object-many-encounters-v3",
+  "version": "3.0.0",
+  "private": true,
+  "type": "module",
+  "description": "ONE OBJECT / MANY ENCOUNTERS — V3 interactive thesis prototype (no build step, no dependencies)",
+  "scripts": {
+    "serve": "python3 -m http.server 8000",
+    "test": "node --test tests/*.test.js",
+    "example": "node tests/generate-example.mjs"
+  }
+}

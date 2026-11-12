@@ -1,0 +1,2640 @@
+<!doctype html>
+<!--
+  ONE OBJECT / MANY ENCOUNTERS — interactive thesis prototype (V4.1, consolidated)
+  Single source of truth: edit this file directly.
+
+  Self-contained: all CSS and JavaScript are inline; no external dependencies.
+  Works from VS Code Live Server and when opened directly from the file system.
+  Each former source module is a labelled section in the <script> below, wrapped in
+  its own scope and exported through a small object (e.g. M_simulation_Simulation).
+  History, architecture and parameters are documented in one-object-v4/README.md
+  (a backup folder — move that README into mdp/ before deleting the backups if you want to keep it).
+-->
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#05070b">
+  <link rel="icon" href="data:,">
+  <title>One Object / Many Encounters · V4.1</title>
+  <style>
+:root {
+  --bg: #05070b;
+  --ink: #f4f9ff;
+  --muted: #a8c0d4;
+  --faint: rgba(168, 192, 212, 0.85);
+  --line: rgba(168, 192, 212, 0.18);
+  --panel: rgba(7, 11, 17, 0.94);
+  --field: rgba(117, 189, 232, 0.06);
+  --focus: #75bde8;
+  --ease: cubic-bezier(.2, .7, .2, 1);
+  --dur: 260ms;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; background: #05070b; }
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: Inter, "IBM Plex Sans", "Helvetica Neue", Arial, "Noto Sans SC", "PingFang SC", sans-serif;
+  overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+#stage {
+  position: fixed; inset: 0;
+  width: 100%; height: 100%;
+  display: block;
+  touch-action: none;
+  -webkit-user-select: none; user-select: none;
+}
+
+/* ---------- chrome: appears after the object ---------- */
+.chrome {
+  position: fixed; left: 0; right: 0;
+  display: flex; justify-content: space-between; align-items: center; gap: 12px;
+  padding: 20px max(16px, 3vw);
+  pointer-events: none;
+  z-index: 2;
+  animation: chrome-in 900ms var(--ease) 1200ms both;
+}
+@keyframes chrome-in { from { opacity: 0; } to { opacity: 1; } }
+.chrome > * { pointer-events: auto; }
+.chrome.top { top: 0; padding-top: max(20px, env(safe-area-inset-top)); }
+.chrome.bottom { bottom: 0; align-items: flex-end; padding-bottom: max(20px, env(safe-area-inset-bottom)); }
+.title { font-size: 12px; letter-spacing: .18em; font-weight: 500; color: var(--ink); opacity: .9; }
+nav, .actions { display: flex; gap: 2px; align-items: center; }
+
+button {
+  font: inherit; font-size: 11px; letter-spacing: .14em;
+  color: var(--ink);
+  background: transparent;
+  border: 0;
+  padding: 10px 10px;
+  min-height: 36px;
+  cursor: pointer;
+  white-space: nowrap;
+  opacity: .72;
+  transition: opacity var(--dur) var(--ease);
+}
+button:hover { opacity: 1; }
+button:disabled { opacity: .25; cursor: default; }
+button[aria-pressed="true"] { opacity: .9; }
+button.secondary { opacity: .5; color: var(--muted); }
+button.secondary:hover { opacity: .9; }
+button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 1px solid var(--focus); outline-offset: 2px; opacity: 1; }
+button.primary { color: var(--bg); background: var(--ink); opacity: .85; border-radius: 2px; }
+button.primary:hover { opacity: 1; }
+#langBtn span { opacity: .45; }
+#langBtn span.on { opacity: 1; }
+
+.hint {
+  margin: 0; font-size: 11px; letter-spacing: .18em; color: var(--faint);
+  opacity: 0; transform: translateY(4px);
+  transition: opacity 360ms var(--ease), transform 360ms var(--ease);
+  pointer-events: none;
+}
+.hint.visible { opacity: 1; transform: none; }
+
+/* ---------- panels ---------- */
+.panel {
+  position: fixed; z-index: 4;
+  background: var(--panel);
+  color: var(--ink);
+  padding: 24px 24px 20px;
+  overflow: auto;
+  -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
+  opacity: 0; transform: translateY(6px);
+  transition: opacity var(--dur) var(--ease), transform var(--dur) var(--ease);
+}
+.panel.open { opacity: 1; transform: none; }
+.panel h2 { font-size: 12px; letter-spacing: .14em; font-weight: 500; margin: 0 0 14px; text-transform: uppercase; }
+.panel h3 { font-size: 10px; letter-spacing: .16em; font-weight: 500; margin: 18px 0 6px; text-transform: uppercase; color: var(--muted); }
+.panel p { font-size: 13px; line-height: 1.7; margin: 0 0 10px; color: var(--ink); opacity: .88; }
+.muted { color: var(--muted) !important; }
+.small { font-size: 11px; }
+.panel-actions { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-top: 16px; }
+.panel .close { position: absolute; top: 12px; right: 12px; }
+.quiet { padding-left: 0; }
+
+.info { top: 64px; right: max(16px, 3vw); width: min(380px, calc(100vw - 32px)); max-height: calc(100vh - 140px); }
+.info h2 { padding-right: 70px; }
+
+.reflection {
+  left: 50%; top: 50%;
+  width: min(560px, calc(100vw - 32px)); max-height: calc(100vh - 48px);
+  transform: translate(-50%, calc(-50% + 6px));
+}
+.reflection.open { transform: translate(-50%, -50%); }
+.questions { display: grid; gap: 6px; }
+.questions label { font-size: 12px; line-height: 1.5; margin-top: 10px; color: var(--muted); }
+textarea {
+  width: 100%; resize: vertical; min-height: 44px;
+  font: inherit; font-size: 13px; line-height: 1.5;
+  padding: 8px 10px;
+  color: var(--ink); background: var(--field);
+  border: 1px solid var(--line); border-radius: 2px;
+}
+
+/* ---------- researcher ---------- */
+.researcher {
+  position: fixed; top: 0; right: 0; bottom: 0; z-index: 5;
+  width: min(330px, 100vw);
+  background: var(--panel);
+  border-left: 1px solid var(--line);
+  overflow-y: auto;
+  padding: 16px 18px 24px;
+  font-size: 12px;
+  -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
+}
+.researcher button { opacity: .8; border: 1px solid var(--line); border-radius: 2px; letter-spacing: .04em; }
+.researcher button:hover { opacity: 1; }
+.researcher section { border-top: 1px solid var(--line); padding: 12px 0; display: grid; gap: 8px; }
+.r-head { display: flex; justify-content: space-between; align-items: center; padding-bottom: 8px; }
+.r-head h2 { font-size: 11px; letter-spacing: .16em; margin: 0; font-weight: 500; }
+.r-head button { font-size: 18px; letter-spacing: 0; padding: 2px 10px; border: 0; }
+.researcher h3 { font-size: 10px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); margin: 6px 0 0; font-weight: 500; }
+.r-row { display: flex; justify-content: space-between; }
+.r-presets { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+.r-presets button { text-align: left; }
+.r-note { margin: 0; color: var(--muted); font-size: 11px; line-height: 1.5; }
+.r-seed { display: flex; gap: 6px; }
+.r-seed input { flex: 1; min-width: 0; font: inherit; padding: 6px 8px; background: var(--field); color: var(--ink); border: 1px solid var(--line); border-radius: 2px; }
+.r-slider label { display: flex; justify-content: space-between; color: var(--muted); margin-bottom: 2px; }
+.r-slider output { font-variant-numeric: tabular-nums; color: var(--ink); }
+.r-slider input { width: 100%; accent-color: #75bde8; }
+.r-check { display: flex; gap: 8px; align-items: center; }
+.r-check input { accent-color: #75bde8; }
+.r-state { font-family: ui-monospace, Menlo, monospace; font-size: 11px; }
+.r-stats { display: grid; grid-template-columns: 1fr auto; gap: 2px 12px; margin: 0; }
+.r-stats dt { color: var(--muted); }
+.r-stats dd { margin: 0; font-variant-numeric: tabular-nums; text-align: right; }
+.r-heat { width: 180px; height: 180px; justify-self: center; }
+.r-actions { grid-template-columns: 1fr; }
+.r-actions button.primary { color: var(--bg); }
+
+
+.sr-only {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0;
+}
+
+[hidden] { display: none !important; }
+
+@media (max-width: 640px) {
+  .title { font-size: 10px; letter-spacing: .12em; max-width: 44vw; line-height: 1.5; }
+  button { padding: 8px 6px; font-size: 10px; letter-spacing: .08em; }
+  .chrome { gap: 6px; }
+  .hint { font-size: 10px; max-width: 46vw; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition-duration: 0ms !important; animation-duration: 0ms !important; animation-delay: 0ms !important; }
+}
+</style>
+</head>
+<body>
+  <canvas id="stage" role="img" data-i18n-aria="canvasLabel" aria-label="An unfamiliar form that responds to approach, touch and time." aria-describedby="a11y-desc"></canvas>
+  <p id="a11y-desc" class="sr-only" data-i18n="howBody"></p>
+
+  <header class="chrome top">
+    <div class="title" data-i18n="title">ONE OBJECT / MANY ENCOUNTERS</div>
+    <nav>
+      <button type="button" id="soundBtn" aria-pressed="false">SOUND OFF</button>
+      <button type="button" id="infoBtn" aria-expanded="false" aria-controls="info" data-i18n="info">INFO</button>
+      <button type="button" id="langBtn"><span id="langEn" class="on">EN</span> / <span id="langZh">中文</span></button>
+    </nav>
+  </header>
+
+  <footer class="chrome bottom">
+    <p id="hint" class="hint" aria-live="polite"></p>
+    <div class="actions">
+      <button type="button" id="finishBtn" class="secondary" data-i18n="finish">FINISH</button>
+      <button type="button" id="resetBtn" data-i18n="reset">RESET</button>
+    </div>
+  </footer>
+
+  <section id="info" class="panel info" role="dialog" aria-labelledby="infoTitle" hidden>
+    <h2 id="infoTitle" data-i18n="infoTitle"></h2>
+    <p data-i18n="infoBody"></p>
+    <h3 data-i18n="howTitle"></h3>
+    <p data-i18n="howBody"></p>
+    <h3 data-i18n="soundTitle"></h3>
+    <p data-i18n="soundBody"></p>
+    <h3 data-i18n="privacyTitle"></h3>
+    <p data-i18n="privacyBody"></p>
+    <p class="muted" data-i18n="simNote"></p>
+    <div class="panel-actions">
+      <button type="button" id="openResearcher" class="quiet" data-i18n="openResearcher"></button>
+      <span class="muted small" data-i18n="shortcutNote"></span>
+    </div>
+    <button type="button" id="infoClose" class="close" data-i18n="close"></button>
+  </section>
+
+  <section id="reflection" class="panel reflection" role="dialog" aria-modal="true" aria-labelledby="reflectTitle" hidden>
+    <h2 id="reflectTitle" data-i18n="reflectTitle"></h2>
+    <form id="reflectForm">
+      <p class="muted" data-i18n="reflectIntro"></p>
+      <div id="questions" class="questions"></div>
+      <div class="panel-actions">
+        <button type="button" id="reflectSkip" data-i18n="skip"></button>
+        <button type="submit" class="primary" data-i18n="save"></button>
+      </div>
+    </form>
+    <div id="reflectThanks" hidden>
+      <p data-i18n="thanks"></p>
+      <button type="button" id="reflectContinue" class="primary" data-i18n="continue"></button>
+    </div>
+  </section>
+
+  <aside id="researcher" class="researcher" aria-labelledby="r-title" hidden></aside>
+  <script>
+"use strict";
+/* ======================= src/config.js ======================= */
+const M_config = (() => {
+  // Central configuration. All spatial values are in "object units":
+  // the object's base radius is 1.0 and its centre is the origin.
+  // All per-step forces assume the fixed physics step below.
+
+  const APP_VERSION = '4.1.0';
+  const STEP = 1 / 60;          // fixed physics timestep (s)
+  const MAX_SUBSTEPS = 5;       // cap on catch-up steps per frame
+  const NODE_COUNT = 80;        // perimeter nodes
+  const REGION_COUNT = 12;      // perimeter regions used for logging
+  const DEFAULT_SEED = 20261105;
+
+  const DEFAULT_PARAMS = Object.freeze({
+    // --- material response ---
+    responsiveness: 1.0,      // global gain on all external forces
+    stiffness: 0.014,         // per-step spring toward rest shape
+    damping: 0.95,             // per-step velocity retention
+    tension: 0.22,            // neighbour coupling (spreads deformation)
+    volume: 0.015,            // area preservation (press here, bulge there)
+    maxDisplacement: 0.36,    // fraction of base radius
+    contactRadius: 0.36,      // gaussian width of contact (≈18% of diameter)
+    contactMargin: 0.3,       // how far outside the edge a press still grabs
+    grip: 0.18,               // per-step pull toward the dragged target
+    pressDepth: 0.07,         // dent held under a press (compression)
+    flingGain: 0.05,          // extra displacement from pointer speed (s)
+
+    // --- proximity field ---
+    proximityRadius: 0.8,     // influence distance beyond the edge
+    proximityPush: 0.0012,
+    proximitySpeedGain: 0.0006,
+    proximityWake: 0.035,
+
+    // --- brush / sweep (fast movement across the surface without pressing) ---
+    sweepSpeed: 1.4,          // object units / s needed to count as a sweep
+    sweepGain: 0.035,          // tangential drag along the surface
+    sweepDent: 0.004,         // brief inward deflection under the sweep
+    sweepMemory: 0.2,         // sweeps build memory more weakly than contact
+
+    // --- behavioural memory ---
+    memoryEnabled: true,
+    learningRate: 0.35,       // memory gained per second of full contact
+    decayRate: 0.05,          // exponential decay per second
+    plasticity: 0.3,          // residual deformation retained by memory
+
+    // --- adaptation ---
+    adaptiveEnabled: true,
+    adaptationStrength: 0.72, // how much sensitivity drops when adapted
+    adaptationThreshold: 0.65,
+    adaptationHysteresis: 0.2,
+    adaptationTau: 1.2,       // seconds to ease into / out of adaptation
+    adaptStiffen: 1.5,        // adapted regions become stiffer…
+    adaptWiden: 0.8,          // …and spread contact over a wider area
+
+    // --- ambient ---
+    ambientAmplitude: 0.008,
+
+    // --- SYSTEM 1 · immediate response (temporary; never writes to memory) ---
+    interactionRadius: 0.45,  // radius of the local line response around the pointer (object units)
+    proximityResponse: 0.025, // how far nearby lines ease away from a hovering pointer
+    proximityGlow: 0.12,      // brightness lift of nearby lines while hovering
+    responseRate: 6,          // 1/s — smoothing of the local response (higher = quicker)
+    dwellRadius: 0.12,        // pointer must stay within this distance to count as dwelling
+    dwellDelay: 2.2,          // s of dwelling before the dwell response begins
+    dwellRamp: 1.5,           // s from first response to full dwell response
+    dwellRelease: 0.6,        // s for the dwell response to fade after moving away
+    dwellAttraction: 0.05,    // how far nearby lines are drawn toward a dwelling pointer
+    dwellGlow: 0.3,           // brightness lift of nearby lines while dwelling
+    dwellActivity: 0.006,     // fine local shimmer of nearby lines while dwelling
+  });
+
+  const PRESETS = Object.freeze({
+    A: Object.freeze({ id: 'A_stable', memoryEnabled: false, adaptiveEnabled: false }),
+    B: Object.freeze({ id: 'B_adaptive', memoryEnabled: true, adaptiveEnabled: true }),
+  });
+
+  // Parameters exposed as sliders in Researcher Mode.
+  const RESEARCH_SLIDERS = Object.freeze([
+    { key: 'responsiveness', min: 0, max: 2, step: 0.01 },
+    { key: 'stiffness', min: 0.004, max: 0.12, step: 0.001 },
+    { key: 'damping', min: 0.85, max: 0.99, step: 0.001 },
+    { key: 'learningRate', min: 0, max: 1, step: 0.01 },
+    { key: 'decayRate', min: 0, max: 0.3, step: 0.005 },
+    { key: 'adaptationStrength', min: 0, max: 0.95, step: 0.01 },
+    { key: 'adaptationThreshold', min: 0.2, max: 0.95, step: 0.01 },
+    { key: 'interactionRadius', min: 0.15, max: 0.9, step: 0.01 },
+    { key: 'proximityResponse', min: 0, max: 0.08, step: 0.001 },
+    { key: 'dwellDelay', min: 0.5, max: 5, step: 0.1 },
+    { key: 'dwellAttraction', min: 0, max: 0.12, step: 0.001 },
+  ]);
+  const RESEARCH_TOGGLES = Object.freeze(['memoryEnabled', 'adaptiveEnabled']);
+
+  // Display-only settings (researcher). They never change the behavioural
+  // condition; changes are logged with scope "visual".
+  const DEFAULT_VISUAL = Object.freeze({
+    filamentDensity: 0.7,     // fraction of the filament network drawn (≈600 of ~860)
+    membraneOpacity: 1.0,
+    structuralContrast: 1.0,
+    tensionHighlight: 1.0,
+    visualMemory: 1.0,        // strength of memory-driven visual change
+    lowDetail: false,         // manual reduced-detail mode
+  });
+  const VISUAL_SLIDERS = Object.freeze([
+    { key: 'filamentDensity', min: 0.2, max: 1, step: 0.01 },
+    { key: 'membraneOpacity', min: 0, max: 2, step: 0.01 },
+    { key: 'structuralContrast', min: 0.5, max: 2, step: 0.01 },
+    { key: 'tensionHighlight', min: 0, max: 2, step: 0.01 },
+    { key: 'visualMemory', min: 0, max: 2, step: 0.01 },
+  ]);
+  return { APP_VERSION, STEP, MAX_SUBSTEPS, NODE_COUNT, REGION_COUNT, DEFAULT_SEED, DEFAULT_PARAMS, PRESETS, RESEARCH_SLIDERS, RESEARCH_TOGGLES, DEFAULT_VISUAL, VISUAL_SLIDERS };
+})();
+
+/* ======================= src/util/math.js ======================= */
+const M_util_math = (() => {
+  // Small deterministic helpers shared by simulation modules.
+
+  /** Seeded PRNG (mulberry32). Same seed → same sequence. */
+  function mulberry32(seed) {
+    let a = seed >>> 0;
+    return function rng() {
+      a = (a + 0x6d2b79f5) >>> 0;
+      let t = a;
+      t = Math.imul(t ^ (t >>> 15), t | 1);
+      t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+
+  const clamp = (v, lo, hi) => (v < lo ? lo : v > hi ? hi : v);
+
+  function smoothstep(e0, e1, x) {
+    const t = clamp((x - e0) / (e1 - e0), 0, 1);
+    return t * t * (3 - 2 * t);
+  }
+
+  /** Frame-rate independent exponential approach factor. */
+  const approach = (rate, dt) => 1 - Math.exp(-rate * dt);
+
+  function randomId() {
+    if (globalThis.crypto?.randomUUID) return globalThis.crypto.randomUUID();
+    return 'xxxxxxxx-xxxx-4xxx-8xxx-xxxxxxxxxxxx'.replace(/x/g, () =>
+      Math.floor(Math.random() * 16).toString(16));
+  }
+  return { mulberry32, clamp, smoothstep, approach, randomId };
+})();
+
+/* ======================= src/physics/SoftBody.js ======================= */
+const M_physics_SoftBody = (() => {
+  // Lightweight 2D soft body: a ring of perimeter nodes, each displaced from a
+  // rest shape. Forces are expressed per fixed step (see config.STEP).
+  //
+  //   a_i = -k_i * d_i                       spring to rest shape
+  //       + tension * (d_{i-1} + d_{i+1} - 2 d_i)   neighbour coupling
+  //       - volume * mean(radial d) * n_i        area preservation
+  //       + f_i                                  external (pointer) forces
+  //   v_i = (v_i + a_i) * damping;  d_i += v_i   (semi-implicit Euler)
+  //
+  // Displacement is clamped to maxDisplacement to keep motion bounded.
+
+  const TAU = Math.PI * 2;
+
+  class SoftBody {
+    constructor(n) {
+      this.n = n;
+      this.cos = new Float32Array(n);
+      this.sin = new Float32Array(n);
+      for (let i = 0; i < n; i++) {
+        const a = (i / n) * TAU;
+        this.cos[i] = Math.cos(a);
+        this.sin[i] = Math.sin(a);
+      }
+      this.baseRest = new Float32Array(n); // seeded irregular rest radius
+      this.plastic = new Float32Array(n);  // residual offset (from memory)
+      this.ambient = new Float32Array(n);  // slow material fluctuation
+      this.dx = new Float32Array(n);
+      this.dy = new Float32Array(n);
+      this.vx = new Float32Array(n);
+      this.vy = new Float32Array(n);
+      this.fx = new Float32Array(n);
+      this.fy = new Float32Array(n);
+      this.ambientPhase = new Float32Array(3);
+      this.energy = 0;
+    }
+
+    /** Build the seeded rest shape and clear all motion. */
+    init(rng) {
+      const amps = [0.015 + rng() * 0.02, 0.01 + rng() * 0.02, 0.006 + rng() * 0.012];
+      const phases = [rng() * TAU, rng() * TAU, rng() * TAU];
+      for (let i = 0; i < this.n; i++) {
+        const a = (i / this.n) * TAU;
+        this.baseRest[i] = 1 + amps[0] * Math.cos(2 * a + phases[0])
+          + amps[1] * Math.cos(3 * a + phases[1]) + amps[2] * Math.cos(5 * a + phases[2]);
+      }
+      for (let k = 0; k < 3; k++) this.ambientPhase[k] = rng() * TAU;
+      this.dx.fill(0); this.dy.fill(0); this.vx.fill(0); this.vy.fill(0);
+      this.plastic.fill(0); this.ambient.fill(0); this.clearForces();
+      this.energy = 0;
+    }
+
+    /** Low-frequency, non-rhythmic fluctuation (angular harmonics ≥ 2, so no global "breathing"). */
+    updateAmbient(amplitude, t) {
+      const p = this.ambientPhase;
+      for (let i = 0; i < this.n; i++) {
+        const a = (i / this.n) * TAU;
+        this.ambient[i] = amplitude * (
+          0.5 * Math.sin(2 * a + t * 0.11 + p[0])
+          + 0.35 * Math.sin(3 * a - t * 0.073 + p[1])
+          + 0.15 * Math.sin(5 * a + t * 0.047 + p[2]));
+      }
+    }
+
+    restRadius(i) { return this.baseRest[i] + this.plastic[i] + this.ambient[i]; }
+    x(i) { return this.cos[i] * this.restRadius(i) + this.dx[i]; }
+    y(i) { return this.sin[i] * this.restRadius(i) + this.dy[i]; }
+    radiusAt(i) { return Math.hypot(this.x(i), this.y(i)); }
+    radialDisp(i) { return this.dx[i] * this.cos[i] + this.dy[i] * this.sin[i]; }
+
+    /** Boundary radius at an arbitrary angle, interpolated between nodes. */
+    boundaryAtAngle(theta) {
+      let u = (theta / TAU) * this.n;
+      u = ((u % this.n) + this.n) % this.n;
+      const i0 = Math.floor(u) % this.n, i1 = (i0 + 1) % this.n, f = u - Math.floor(u);
+      return this.radiusAt(i0) * (1 - f) + this.radiusAt(i1) * f;
+    }
+
+    clearForces() { this.fx.fill(0); this.fy.fill(0); }
+
+    /** One fixed step. stiffness: Float32Array of per-node k. */
+    integrate(stiffness, p) {
+      const { n, dx, dy, vx, vy, fx, fy, cos, sin } = this;
+      let meanRadial = 0;
+      for (let i = 0; i < n; i++) meanRadial += dx[i] * cos[i] + dy[i] * sin[i];
+      meanRadial /= n;
+      const vol = -p.volume * meanRadial;
+
+      // velocities first (Jacobi), using old displacements everywhere
+      for (let i = 0; i < n; i++) {
+        const im = i === 0 ? n - 1 : i - 1, ip = i === n - 1 ? 0 : i + 1;
+        const k = stiffness[i];
+        const ax = -k * dx[i] + p.tension * (dx[im] + dx[ip] - 2 * dx[i]) + vol * cos[i] + fx[i];
+        const ay = -k * dy[i] + p.tension * (dy[im] + dy[ip] - 2 * dy[i]) + vol * sin[i] + fy[i];
+        vx[i] = (vx[i] + ax) * p.damping;
+        vy[i] = (vy[i] + ay) * p.damping;
+      }
+      let e = 0;
+      const maxD = p.maxDisplacement;
+      for (let i = 0; i < n; i++) {
+        dx[i] += vx[i];
+        dy[i] += vy[i];
+        const m = Math.hypot(dx[i], dy[i]);
+        if (m > maxD) {
+          const s = maxD / m;
+          dx[i] *= s; dy[i] *= s;
+          vx[i] *= 0.5; vy[i] *= 0.5;
+        }
+        e += vx[i] * vx[i] + vy[i] * vy[i];
+      }
+      this.energy = e / n;
+    }
+  }
+  return { SoftBody };
+})();
+
+/* ======================= src/behavior/MemorySystem.js ======================= */
+const M_behavior_MemorySystem = (() => {
+  // Per-node behavioural memory in [0, 1].
+  //
+  //   memory_i += intensity_i * learningRate * dt      (only when memory enabled)
+  //   memory_i *= exp(-decayRate * dt)
+  //   + light diffusion to neighbours (spatial falloff beyond the contact gaussian)
+  //
+  // Memory also keeps a signed "residual" of the radial deformation experienced
+  // under contact. The visible residual (plastic offset) = residual × memory ×
+  // plasticity, so it fades as memory decays. Nothing here is permanent.
+
+  const DIFFUSION = 0.6;      // nodes² per second
+  const MAX_PLASTIC = 0.06;   // object units
+
+  class MemorySystem {
+    constructor(n, regionCount, regionOf) {
+      this.n = n;
+      this.regionCount = regionCount;
+      this.regionOf = regionOf;
+      this.level = new Float32Array(n);
+      this.residual = new Float32Array(n);
+      this.tmp = new Float32Array(n);
+    }
+
+    reset() { this.level.fill(0); this.residual.fill(0); }
+
+    update(intensity, radialDisp, contactW, p, dt) {
+      const { n, level, residual, tmp } = this;
+      const decay = Math.exp(-p.decayRate * dt);
+      const gain = p.memoryEnabled ? p.learningRate * dt : 0;
+      for (let i = 0; i < n; i++) {
+        tmp[i] = Math.min(1, (level[i] + intensity[i] * gain) * decay);
+        if (contactW && contactW[i] > 0.05) {
+          residual[i] += (radialDisp[i] - residual[i]) * Math.min(1, contactW[i] * 3 * dt);
+        }
+      }
+      const D = DIFFUSION * dt;
+      for (let i = 0; i < n; i++) {
+        const im = i === 0 ? n - 1 : i - 1, ip = i === n - 1 ? 0 : i + 1;
+        level[i] = tmp[i] + D * (tmp[im] + tmp[ip] - 2 * tmp[i]);
+      }
+    }
+
+    plasticOffset(i, p) {
+      if (!p.memoryEnabled) return 0;
+      const v = this.residual[i] * this.level[i] * p.plasticity;
+      return v > MAX_PLASTIC ? MAX_PLASTIC : v < -MAX_PLASTIC ? -MAX_PLASTIC : v;
+    }
+
+    regionLevel(r) {
+      let s = 0, c = 0;
+      for (let i = 0; i < this.n; i++) if (this.regionOf[i] === r) { s += this.level[i]; c++; }
+      return c ? s / c : 0;
+    }
+
+    max() { let m = 0; for (const v of this.level) if (v > m) m = v; return m; }
+    mean() { let s = 0; for (const v of this.level) s += v; return s / this.n; }
+  }
+  return { MemorySystem };
+})();
+
+/* ======================= src/behavior/AdaptationSystem.js ======================= */
+const M_behavior_AdaptationSystem = (() => {
+  // Turns accumulated memory into changed behaviour.
+  //
+  // Per node:
+  //   target_i  = smoothstep(T − H, T + 0.1, memory_i)        (0 when adaptive off)
+  //   level_i   eases toward target_i with time constant tau  (no sudden switch)
+  //   sensitivity_i = 1 − strength × (0.3·memory_i + 0.7·level_i)
+  //   stiffness multiplier = 1 + adaptStiffen × level_i
+  //
+  // Per region (for logging) a hysteresis flag: enters at mean memory ≥ T,
+  // exits when it falls below T − H.
+
+  const { smoothstep } = M_util_math;
+
+  const MIN_SENSITIVITY = 0.08;
+
+  class AdaptationSystem {
+    constructor(n, regionCount) {
+      this.n = n;
+      this.regionCount = regionCount;
+      this.level = new Float32Array(n);
+      this.sensitivity = new Float32Array(n).fill(1);
+      this.stiffMul = new Float32Array(n).fill(1);
+      this.regionFlag = new Uint8Array(regionCount);
+    }
+
+    reset() {
+      this.level.fill(0);
+      this.sensitivity.fill(1);
+      this.stiffMul.fill(1);
+      this.regionFlag.fill(0);
+    }
+
+    update(memory, p, dt, onEnter, onExit) {
+      const T = p.adaptationThreshold, H = p.adaptationHysteresis;
+      const ease = 1 - Math.exp(-dt / p.adaptationTau);
+      for (let i = 0; i < this.n; i++) {
+        const m = memory.level[i];
+        const target = p.adaptiveEnabled ? smoothstep(T - H, T + 0.1, m) : 0;
+        this.level[i] += (target - this.level[i]) * ease;
+        const s = p.adaptiveEnabled
+          ? 1 - p.adaptationStrength * (0.3 * m + 0.7 * this.level[i])
+          : 1;
+        this.sensitivity[i] = s < MIN_SENSITIVITY ? MIN_SENSITIVITY : s;
+        this.stiffMul[i] = 1 + p.adaptStiffen * this.level[i];
+      }
+      for (let r = 0; r < this.regionCount; r++) {
+        const rm = memory.regionLevel(r);
+        if (!this.regionFlag[r] && p.adaptiveEnabled && rm >= T) {
+          this.regionFlag[r] = 1;
+          onEnter?.(r, rm);
+        } else if (this.regionFlag[r] && (rm < T - H || !p.adaptiveEnabled)) {
+          this.regionFlag[r] = 0;
+          onExit?.(r, rm);
+        }
+      }
+    }
+
+    max() { let m = 0; for (const v of this.level) if (v > m) m = v; return m; }
+    adaptedRegions() { let c = 0; for (const f of this.regionFlag) c += f; return c; }
+  }
+  return { AdaptationSystem };
+})();
+
+/* ======================= src/behavior/ImmediateResponse.js ======================= */
+const M_behavior_ImmediateResponse = (() => {
+  // SYSTEM 1 — IMMEDIATE RESPONSE: temporary reactions to current input.
+  // Pure state (no DOM). The renderer turns it into local line offsets and
+  // brightness; nothing here writes to behavioural memory.
+  //
+  //   x, y     smoothed pointer position (object units) — avoids abrupt jumps
+  //   level    0..1  hovering near / over the sphere (eased by responseRate)
+  //   dwell    0..1  pointer has stayed within dwellRadius for ≥ dwellDelay s
+  //                  (eases in over dwellRamp, fades over dwellRelease)
+  const { approach, smoothstep } = M_util_math;
+
+  class ImmediateResponse {
+    constructor() { this.reset(); }
+
+    reset() {
+      this.x = 0; this.y = 0; this.hasPos = false;
+      this.level = 0; this.dwell = 0;
+      this.anchorX = 0; this.anchorY = 0; this.dwellMs = 0;
+      this.dwellActive = false; this.dwellStartMs = 0; this.dwellX = 0; this.dwellY = 0;
+    }
+
+    /** near: pointer within interactionRadius of the surface (or inside). */
+    update(inp, near, grabbing, p, dt, nowMs, onDwellEnd) {
+      const active = inp.present && !inp.down && !grabbing && near;
+      if (inp.present) {
+        if (!this.hasPos) { this.x = inp.x; this.y = inp.y; this.hasPos = true; }
+        const a = approach(14, dt);
+        this.x += (inp.x - this.x) * a; this.y += (inp.y - this.y) * a;
+      }
+      this.level += ((active ? 1 : 0) - this.level) * approach(p.responseRate, dt);
+
+      // dwell: time spent within dwellRadius of where the pointer settled
+      if (active && Math.hypot(inp.x - this.anchorX, inp.y - this.anchorY) <= p.dwellRadius) this.dwellMs += dt * 1000;
+      else { this.anchorX = inp.x; this.anchorY = inp.y; this.dwellMs = 0; }
+      const t0 = p.dwellDelay * 1000, target = active ? smoothstep(t0, t0 + p.dwellRamp * 1000, this.dwellMs) : 0;
+      const rate = target > this.dwell ? 3 : 1 / Math.max(0.05, p.dwellRelease);
+      this.dwell += (target - this.dwell) * approach(rate, dt);
+
+      // dwell episodes (hysteresis) for logging
+      if (!this.dwellActive && this.dwell > 0.5) {
+        this.dwellActive = true; this.dwellStartMs = nowMs; this.dwellX = this.anchorX; this.dwellY = this.anchorY;
+      } else if (this.dwellActive && this.dwell < 0.2) {
+        this.dwellActive = false;
+        onDwellEnd?.(nowMs - this.dwellStartMs, this.dwellX, this.dwellY);
+      }
+    }
+  }
+  return { ImmediateResponse };
+})();
+
+/* ======================= src/simulation/Simulation.js ======================= */
+const M_simulation_Simulation = (() => {
+  // The behavioural core. Pure JavaScript, no DOM: it can run headlessly in
+  // tests with scripted input. Call setInput() whenever the pointer changes and
+  // step() once per fixed timestep.
+
+  const { STEP, NODE_COUNT, REGION_COUNT, DEFAULT_SEED, DEFAULT_PARAMS, } = M_config;
+  const { mulberry32, clamp, approach } = M_util_math;
+  const { SoftBody } = M_physics_SoftBody;
+  const { MemorySystem } = M_behavior_MemorySystem;
+  const { AdaptationSystem } = M_behavior_AdaptationSystem;
+  const { ImmediateResponse } = M_behavior_ImmediateResponse;
+
+  const TAU = Math.PI * 2;
+  const DRAG_LOG_INTERVAL_MS = 400;
+  const APPROACH_ON = 0.35, APPROACH_OFF = 0.1, APPROACH_MIN_GAP_MS = 1500;
+  const STILL_SPEED = 0.15, STILL_MIN_MS = 3000;
+  const MAX_FORCE_SPEED = 3;     // object units / s; pointer speed beyond this adds no extra force
+  const SWEEP_OVER = 0.08;        // pointer must be within this of the edge (or inside)
+  const SWEEP_WIDTH = 0.35;       // angular width (rad) of a sweep's footprint
+  const SWEEP_END_MS = 150;       // gap that ends a sweep episode
+  const EXCITE_DECAY = 2.2;       // 1/s
+  const EXCITE_DIFFUSION = 6;     // nodes² / s (lets the excitation travel)
+
+  class Simulation {
+    constructor({ params = {}, seed = DEFAULT_SEED, logger = null, reducedMotion = false } = {}) {
+      this.params = { ...DEFAULT_PARAMS, ...params };
+      this.logger = logger;
+      this.reducedMotion = reducedMotion;
+      const n = (this.n = NODE_COUNT);
+      this.regionCount = REGION_COUNT;
+      this.regionOf = new Uint8Array(n);
+      // regions are centred on their angle: region r covers r·30° ± 15°
+      for (let i = 0; i < n; i++) this.regionOf[i] = Math.floor(((i + n / (2 * REGION_COUNT)) % n) * REGION_COUNT / n);
+      this.body = new SoftBody(n);
+      this.memory = new MemorySystem(n, REGION_COUNT, this.regionOf);
+      this.adapt = new AdaptationSystem(n, REGION_COUNT);
+      this.immediate = new ImmediateResponse();   // system 1: temporary input response
+      this.contactW = new Float32Array(n);
+      this.intensity = new Float32Array(n);
+      this.radial = new Float32Array(n);
+      this.k = new Float32Array(n);
+      this.excite = new Float32Array(n);   // sweep excitation (drives fine vibration)
+      this.exciteTmp = new Float32Array(n);
+      this.hooks = {};                     // optional: { contact(strength), release(tension) }
+      this.signals = { tension: 0, motion: 0, sweep: 0, kinetic: 0 };
+      this.input = { present: false, x: 0, y: 0, vx: 0, vy: 0, down: false };
+      this.reset(seed);
+    }
+
+    reset(seed = this.seed) {
+      this.seed = seed >>> 0;
+      this.body.init(mulberry32(this.seed));
+      this.memory.reset();
+      this.adapt.reset();
+      this.immediate.reset();
+      this.contactW.fill(0);
+      this.intensity.fill(0);
+      this.excite.fill(0);
+      this.sweep = null;
+      this.sweepActive = false;
+      this.signals.tension = this.signals.motion = this.signals.sweep = this.signals.kinetic = 0;
+      this.timeMs = 0;
+      this.proximity = 0;
+      this.boundaryDistance = Infinity;
+      this.speed = 0;
+      this.grab = null;
+      this.wasDown = false;
+      this.lastX = this.input.x; this.lastY = this.input.y;
+      this.approachArmed = true;
+      this.lastApproachMs = -Infinity;
+      this.stillMs = 0;
+      this.lastContactEndMs = -Infinity;
+      this.regionContacts = new Uint16Array(REGION_COUNT);
+      this.totals = {
+        contactMs: 0, interactionMs: 0, contactEpisodes: 0, dragDistance: 0,
+        revisits: 0, adaptationEvents: 0, regionReleases: 0, stillnessPeriods: 0,
+        sweeps: 0, sweepMs: 0, dwells: 0, dwellMs: 0,
+      };
+    }
+
+    setInput(inp) { Object.assign(this.input, inp); }
+
+    log(type, fields) { this.logger?.log(type, this.timeMs, fields); }
+
+    step() {
+      const p = this.params, dt = STEP, b = this.body, n = this.n, inp = this.input;
+      const sens = this.adapt.sensitivity;
+      this.timeMs += dt * 1000;
+
+      // rest shape: seeded base + memory residual + ambient fluctuation
+      b.updateAmbient(this.reducedMotion ? 0 : p.ambientAmplitude, this.timeMs / 1000);
+      for (let i = 0; i < n; i++) b.plastic[i] = this.memory.plasticOffset(i, p);
+
+      // pointer kinematics + proximity (continuous falloff, smoothed)
+      this.speed = Math.hypot(inp.vx, inp.vy);
+      const pr = Math.hypot(inp.x, inp.y);
+      const theta = pr > 1e-6 ? Math.atan2(inp.y, inp.x) : 0;
+      const rb = b.boundaryAtAngle(theta);
+      this.boundaryDistance = inp.present ? pr - rb : Infinity;
+      const pRaw = inp.present ? clamp(1 - Math.max(0, this.boundaryDistance) / p.proximityRadius, 0, 1) : 0;
+      this.proximity += (pRaw - this.proximity) * approach(8, dt);
+
+      // system 1 — immediate response (proximity + dwell); logged when a dwell ends
+      this.immediate.update(inp, this.boundaryDistance < p.interactionRadius, !!this.grab, p, dt, this.timeMs, (dur, x, y) => {
+        this.totals.dwells++; this.totals.dwellMs += dur;
+        const r = this.regionOf[Math.round(((Math.atan2(y, x) / TAU) * n + n) % n) % n];
+        this.log('dwell', { region: r, durationMs: dur, memoryLevel: this.memory.regionLevel(r), metadata: { x: +x.toFixed(3), y: +y.toFixed(3) } });
+      });
+
+      // contact edges
+      if (inp.down && !this.wasDown) this.tryGrab(theta, rb);
+      if (!inp.down && this.grab) this.release();
+      this.wasDown = inp.down;
+
+      b.clearForces();
+      this.sweepActive = false;
+      if (this.grab) this.applyGrip();
+      else if (inp.present) { this.applyProximityField(); this.applySweep(theta, pr, rb); }
+
+      for (let i = 0; i < n; i++) this.k[i] = p.stiffness * this.adapt.stiffMul[i];
+      b.integrate(this.k, p);
+
+      // memory intensity: contact + strong deformation
+      for (let i = 0; i < n; i++) {
+        const dmag = Math.hypot(b.dx[i], b.dy[i]);
+        this.radial[i] = b.radialDisp(i);
+        const deform = clamp(dmag / p.maxDisplacement, 0, 1);
+        const contact = this.grab ? this.contactW[i] * (0.35 + 0.65 * Math.min(1, dmag / 0.25)) : 0;
+        this.intensity[i] = Math.max(contact, 0.25 * Math.max(0, deform - 0.3), p.sweepMemory * this.excite[i] * (this.sweepActive ? 1 : 0));
+      }
+      this.updateExcitation(dt);
+      this.updateSignals();
+      this.memory.update(this.intensity, this.radial, this.grab ? this.contactW : null, p, dt);
+      this.adapt.update(this.memory, p, dt,
+        (region, m) => { this.totals.adaptationEvents++; this.log('adaptation_threshold', { region, memoryLevel: m }); },
+        (region, m) => { this.totals.regionReleases++; this.log('recovery', { region, memoryLevel: m, metadata: { kind: 'region_released' } }); });
+
+      this.track(dt, sens);
+    }
+
+    tryGrab(theta, rb) {
+      const p = this.params, b = this.body, inp = this.input;
+      if (this.boundaryDistance > p.contactMargin) return; // pressed in empty space
+      const px = Math.cos(theta) * rb, py = Math.sin(theta) * rb;
+      let nearest = Math.round(((theta / TAU) * this.n + this.n) % this.n) % this.n;
+      const cr = p.contactRadius * (1 + p.adaptWiden * this.adapt.level[nearest]);
+      let wMax = 0;
+      for (let i = 0; i < this.n; i++) {
+        const d = Math.hypot(b.x(i) - px, b.y(i) - py) / cr;
+        const w = Math.exp(-d * d);
+        this.contactW[i] = w < 0.01 ? 0 : w;
+        if (w > wMax) { wMax = w; nearest = i; }
+      }
+      const region = this.regionOf[nearest];
+      this.grab = { sx: inp.x, sy: inp.y, startMs: this.timeMs, region, dragDist: 0, lastDragLogMs: this.timeMs, lastLoggedDist: 0 };
+      this.totals.contactEpisodes++;
+      const memoryLevel = this.memory.regionLevel(region);
+      this.log('contact_start', {
+        region, distance: this.boundaryDistance, speed: this.speed, memoryLevel,
+        metadata: { x: +inp.x.toFixed(3), y: +inp.y.toFixed(3) },
+      });
+      if (this.regionContacts[region] > 0) {
+        this.totals.revisits++;
+        this.log('region_revisit', { region, memoryLevel, metadata: { previousContacts: this.regionContacts[region] } });
+      }
+      this.regionContacts[region]++;
+      this.hooks.contact?.(Math.min(1, 0.4 + this.speed * 0.15));
+    }
+
+    release() {
+      const g = this.grab;
+      let tension = 0;
+      for (let i = 0; i < this.n; i++) if (this.contactW[i] > 0.2) tension = Math.max(tension, Math.hypot(this.body.dx[i], this.body.dy[i]));
+      this.hooks.release?.(Math.min(1, tension / this.params.maxDisplacement));
+      this.log('contact_end', {
+        region: g.region, durationMs: this.timeMs - g.startMs, distance: g.dragDist,
+        memoryLevel: this.memory.regionLevel(g.region),
+      });
+      this.lastContactEndMs = this.timeMs;
+      this.contactW.fill(0);
+      this.grab = null;
+    }
+
+    applyGrip() {
+      const p = this.params, b = this.body, inp = this.input, g = this.grab;
+      const sens = this.adapt.sensitivity, maxD = p.maxDisplacement;
+      const tx = inp.x - g.sx + inp.vx * p.flingGain;
+      const ty = inp.y - g.sy + inp.vy * p.flingGain;
+      for (let i = 0; i < this.n; i++) {
+        const w = this.contactW[i];
+        if (!w) continue;
+        const gain = w * sens[i] * p.responsiveness;
+        let rx = tx * gain - b.cos[i] * p.pressDepth * gain;
+        let ry = ty * gain - b.sin[i] * p.pressDepth * gain;
+        const m = Math.hypot(rx, ry);
+        if (m > 1e-6) { const s = (maxD * Math.tanh(m / maxD)) / m; rx *= s; ry *= s; } // resists as it stretches
+        b.fx[i] += p.grip * w * (rx - b.dx[i]);
+        b.fy[i] += p.grip * w * (ry - b.dy[i]);
+      }
+    }
+
+    applyProximityField() {
+      const p = this.params, b = this.body, inp = this.input, sens = this.adapt.sensitivity;
+      const R = 0.6;
+      const push = p.proximityPush + p.proximitySpeedGain * Math.min(this.speed, MAX_FORCE_SPEED);
+      const vcap = this.speed > MAX_FORCE_SPEED ? MAX_FORCE_SPEED / this.speed : 1; // saturate very fast flicks
+      const wx = inp.vx * vcap * STEP * p.proximityWake, wy = inp.vy * vcap * STEP * p.proximityWake;
+      for (let i = 0; i < this.n; i++) {
+        const ex = b.x(i) - inp.x, ey = b.y(i) - inp.y;
+        const d = Math.hypot(ex, ey);
+        let s = 1 - d / R;
+        if (s <= 0) continue;
+        s = s * s * (3 - 2 * s);
+        const g = s * sens[i] * p.responsiveness;
+        if (d > 1e-4) { b.fx[i] += (ex / d) * push * g; b.fy[i] += (ey / d) * push * g; }
+        b.fx[i] += wx * g; b.fy[i] += wy * g;
+      }
+    }
+
+    /** Brush / sweep: fast movement over the surface without pressing. */
+    applySweep(theta, pr, rb) {
+      const p = this.params, b = this.body, inp = this.input, sens = this.adapt.sensitivity;
+      if (this.boundaryDistance > SWEEP_OVER || this.speed < p.sweepSpeed) return;
+      this.sweepActive = true;
+      const strength = clamp((this.speed - p.sweepSpeed) / 3, 0, 1) * 0.7 + 0.3;
+      const radial = 0.4 + 0.6 * clamp(pr / Math.max(rb, 1e-3), 0, 1); // stronger near the rim
+      const vcap = this.speed > MAX_FORCE_SPEED ? MAX_FORCE_SPEED / this.speed : 1;
+      const vtx = inp.vx * vcap * STEP, vty = inp.vy * vcap * STEP;
+      for (let i = 0; i < this.n; i++) {
+        let da = Math.abs(((i / this.n) * TAU - theta) % TAU);
+        if (da > Math.PI) da = TAU - da;
+        const q = da / SWEEP_WIDTH;
+        const wa = Math.exp(-q * q) * radial;
+        if (wa < 0.01) continue;
+        const g = wa * sens[i] * p.responsiveness;
+        // tangential drag (friction) + brief inward deflection
+        const tx = -b.sin[i], ty = b.cos[i];
+        const vt = vtx * tx + vty * ty;
+        b.fx[i] += tx * vt * p.sweepGain * g - b.cos[i] * p.sweepDent * strength * g;
+        b.fy[i] += ty * vt * p.sweepGain * g - b.sin[i] * p.sweepDent * strength * g;
+        const e = strength * wa * sens[i];
+        if (e > this.excite[i]) this.excite[i] = e;
+      }
+    }
+
+    updateExcitation(dt) {
+      const n = this.n, e = this.excite, tmp = this.exciteTmp;
+      const decay = Math.exp(-EXCITE_DECAY * dt), D = EXCITE_DIFFUSION * dt;
+      for (let i = 0; i < n; i++) {
+        const im = i === 0 ? n - 1 : i - 1, ip = i === n - 1 ? 0 : i + 1;
+        tmp[i] = (e[i] + D * (e[im] + e[ip] - 2 * e[i])) * decay;
+      }
+      e.set(tmp);
+    }
+
+    /** Smoothed scalar signals for sound and inspection (0..1). */
+    updateSignals() {
+      const b = this.body, s = this.signals;
+      let maxD = 0, sumE = 0;
+      for (let i = 0; i < this.n; i++) { maxD = Math.max(maxD, Math.hypot(b.dx[i], b.dy[i])); sumE += this.excite[i]; }
+      const tension = maxD / this.params.maxDisplacement;
+      const motion = clamp(Math.sqrt(b.energy) * 120, 0, 1);
+      const a = 0.2;
+      s.tension += (tension - s.tension) * a;
+      s.motion += (motion - s.motion) * a;
+      s.sweep += (clamp(sumE / this.n * 6, 0, 1) - s.sweep) * a;
+      s.kinetic = motion;
+    }
+
+    track(dt, _sens) {
+      const inp = this.input, ms = dt * 1000, t = this.totals;
+
+      // sweep episodes (logged once when each ends)
+      if (this.sweepActive) {
+        t.sweepMs += ms;
+        if (!this.sweep) {
+          const r = this.regionOf[Math.round(((Math.atan2(inp.y, inp.x) / TAU) * this.n + this.n) % this.n) % this.n];
+          this.sweep = { startMs: this.timeMs, lastMs: this.timeMs, region: r, peak: this.speed, dist: 0 };
+        }
+        this.sweep.lastMs = this.timeMs;
+        this.sweep.peak = Math.max(this.sweep.peak, this.speed);
+      } else if (this.sweep && this.timeMs - this.sweep.lastMs > SWEEP_END_MS) {
+        t.sweeps++;
+        this.log('sweep', { region: this.sweep.region, durationMs: this.sweep.lastMs - this.sweep.startMs, speed: this.sweep.peak, memoryLevel: this.memory.regionLevel(this.sweep.region) });
+        this.sweep = null;
+      }
+      const moved = Math.hypot(inp.x - this.lastX, inp.y - this.lastY);
+      this.lastX = inp.x; this.lastY = inp.y;
+
+      if (this.grab) {
+        const g = this.grab;
+        t.contactMs += ms;
+        g.dragDist += moved;
+        t.dragDistance += moved;
+        if (this.timeMs - g.lastDragLogMs >= DRAG_LOG_INTERVAL_MS && g.dragDist - g.lastLoggedDist > 0.01) {
+          this.log('drag', { region: g.region, distance: g.dragDist, speed: this.speed });
+          g.lastDragLogMs = this.timeMs; g.lastLoggedDist = g.dragDist;
+        }
+      }
+      if (this.grab || (inp.present && this.proximity > 0.05)) t.interactionMs += ms;
+
+      // approach (hysteresis + minimum gap, so it is not logged every frame)
+      if (this.approachArmed && !inp.down && this.proximity > APPROACH_ON && this.timeMs - this.lastApproachMs > APPROACH_MIN_GAP_MS) {
+        this.approachArmed = false;
+        this.lastApproachMs = this.timeMs;
+        this.log('approach', { distance: Math.max(0, this.boundaryDistance), speed: this.speed });
+      } else if (this.proximity < APPROACH_OFF) this.approachArmed = true;
+
+      // stillness periods (only meaningful after some contact)
+      const active = this.grab || (inp.present && this.speed > STILL_SPEED);
+      if (active) {
+        if (this.stillMs >= STILL_MIN_MS && t.contactEpisodes > 0) {
+          t.stillnessPeriods++;
+          this.log('recovery', { durationMs: this.stillMs, memoryLevel: this.memory.max(), metadata: { kind: 'stillness' } });
+        }
+        this.stillMs = 0;
+      } else this.stillMs += ms;
+    }
+
+    /** Continuous behavioural conditions; several may be true at once. */
+    getState() {
+      const t = this.totals, sinceContact = this.timeMs - this.lastContactEndMs;
+      const flags = {
+        contact: !!this.grab,
+        adaptation: this.adapt.max() > 0.5,
+        recovery: !this.grab && t.contactEpisodes > 0 && sinceContact > 2000 && (this.memory.max() > 0.05 || this.body.energy > 1e-6),
+        exploration: t.contactEpisodes >= 2 && (this.grab || sinceContact < 8000),
+        sweep: this.sweepActive,
+        dwell: this.immediate.dwellActive,
+        approach: !this.grab && this.input.present && this.proximity > 0.05,
+      };
+      const order = ['contact', 'sweep', 'dwell', 'adaptation', 'recovery', 'exploration', 'approach'];
+      const primary = order.find((k) => flags[k]) || 'idle';
+      return { primary: primary.toUpperCase(), flags };
+    }
+
+    /** Mean displacement magnitude across nodes in a region (for tests/inspection). */
+    regionDisplacement(r) {
+      let s = 0, c = 0;
+      for (let i = 0; i < this.n; i++) if (this.regionOf[i] === r) { s += Math.hypot(this.body.dx[i], this.body.dy[i]); c++; }
+      return s / c;
+    }
+
+    maxDisplacement() {
+      let m = 0;
+      for (let i = 0; i < this.n; i++) m = Math.max(m, Math.hypot(this.body.dx[i], this.body.dy[i]));
+      return m;
+    }
+  }
+  return { Simulation };
+})();
+
+/* ======================= src/rendering/FilamentNetwork.js ======================= */
+const M_rendering_FilamentNetwork = (() => {
+  // Filament network: a seeded, stable set of anchors and edges defined in
+  // MATERIAL coordinates (u = angle fraction around the body, s = radius
+  // fraction, z = depth). Anchors never regenerate during a session; each frame
+  // they are mapped through the soft body's current deformation, so the
+  // structure deforms with the material rather than floating over it.
+  //
+  // Pure module (no DOM): positions and per-edge state are testable headlessly.
+
+  const { mulberry32, clamp } = M_util_math;
+
+  const TAU = Math.PI * 2;
+  const LAG_RATE_OUTER = 10, LAG_RATE_INNER = 2.5; // 1/s — inner structure trails the rim
+
+  class FilamentNetwork {
+    constructor(n) {
+      this.n = n;
+      this.lagX = new Float32Array(n); this.lagY = new Float32Array(n);   // slow field (deep/inner)
+      this.midX = new Float32Array(n); this.midY = new Float32Array(n);   // medium field
+      this.parX = 0; this.parY = 0;                                       // eased parallax
+    }
+
+    /** Build the network for a seed. Deterministic. */
+    build(seed, baseRest) {
+      const rng = mulberry32((seed ^ 0x9e3779b9) >>> 0);
+      const A = { u: [], s: [], z: [], kind: [] };
+      const add = (u, s, z, kind) => { A.u.push(((u % 1) + 1) % 1); A.s.push(s); A.z.push(z); A.kind.push(kind); return A.u.length - 1; };
+      const chains = [];
+
+      // 1. rim shell: dense, fibrous, slightly irregular band near the surface
+      const RIM = 120;
+      for (let i = 0; i < RIM; i++) add((i + rng() * 0.6) / RIM, 0.9 + rng() * 0.09, rng() * 2 - 1, 0);
+
+      // 2. strands: long flowing fibres — chords that bow through the interior
+      //    and arcs that wrap partway around. They give the woven, silk-like grain.
+      const STRANDS = 30;
+      for (let f = 0; f < STRANDS; f++) {
+        const z = rng() * 2 - 1, chain = [];
+        const len = 7 + Math.floor(rng() * 6), ph = rng() * TAU;
+        if (rng() < 0.6) {
+          const a0 = rng() * TAU, a1 = a0 + Math.PI * (0.45 + rng() * 0.9) * (rng() < 0.5 ? -1 : 1);
+          const r0 = 0.82 + rng() * 0.14, r1 = 0.82 + rng() * 0.14;
+          const x0 = Math.cos(a0) * r0, y0 = Math.sin(a0) * r0, x1 = Math.cos(a1) * r1, y1 = Math.sin(a1) * r1;
+          const L = Math.hypot(x1 - x0, y1 - y0), nx = -(y1 - y0) / L, ny = (x1 - x0) / L;
+          const bend = (rng() - 0.5) * 0.7;
+          for (let k = 0; k < len; k++) {
+            const t = k / (len - 1), off = bend * Math.sin(Math.PI * t) + 0.012 * Math.sin(t * 7 + ph);
+            const x = x0 + (x1 - x0) * t + nx * off, y = y0 + (y1 - y0) * t + ny * off;
+            chain.push(add(Math.atan2(y, x) / TAU, clamp(Math.hypot(x, y), 0.05, 0.98), clamp(z + (rng() - 0.5) * 0.15, -1, 1), 1));
+          }
+        } else {
+          const s0 = 0.3 + rng() * 0.62, u0 = rng(), du = (0.12 + rng() * 0.3) * (rng() < 0.5 ? -1 : 1);
+          for (let k = 0; k < len; k++) {
+            const t = k / (len - 1);
+            chain.push(add(u0 + du * t, clamp(s0 + 0.07 * Math.sin(t * Math.PI * 2 + ph), 0.08, 0.98), clamp(z + (rng() - 0.5) * 0.15, -1, 1), 1));
+          }
+        }
+        chains.push(chain);
+      }
+
+      // 3. clusters: localised dense knots of structure
+      const CL = 7 + Math.floor(rng() * 3);
+      for (let c = 0; c < CL; c++) {
+        const cu = rng(), cs = 0.25 + rng() * 0.6, z = rng() * 2 - 1;
+        const cnt = 8 + Math.floor(rng() * 8), spread = 0.08 + rng() * 0.1;
+        for (let k = 0; k < cnt; k++) {
+          const a = cu * TAU, x = Math.cos(a) * cs + (rng() - 0.5) * 2 * spread, y = Math.sin(a) * cs + (rng() - 0.5) * 2 * spread;
+          add(Math.atan2(y, x) / TAU, clamp(Math.hypot(x, y), 0.08, 0.98), clamp(z + (rng() - 0.5) * 0.5, -1, 1), 2);
+        }
+      }
+
+      // 4. sparse interior
+      for (let i = 0; i < 34; i++) add(rng(), Math.sqrt(rng()) * 0.85, rng() * 2 - 1, 3);
+
+      const N = A.u.length;
+      this.count = N;
+      this.u = Float32Array.from(A.u); this.s = Float32Array.from(A.s); this.z = Float32Array.from(A.z);
+      this.kind = Uint8Array.from(A.kind);
+      this.cosA = new Float32Array(N); this.sinA = new Float32Array(N);
+      this.i0 = new Uint16Array(N); this.fr = new Float32Array(N);
+      this.restX = new Float32Array(N); this.restY = new Float32Array(N);
+      this.x = new Float32Array(N); this.y = new Float32Array(N);
+      this.mem = new Float32Array(N); this.exc = new Float32Array(N);
+      this.respX = new Float32Array(N); this.respY = new Float32Array(N); this.resp = new Float32Array(N); // system 1 offsets / glow
+      this.vibPhase = new Float32Array(N); this.vibDirX = new Float32Array(N); this.vibDirY = new Float32Array(N);
+      for (let i = 0; i < N; i++) {
+        const a = this.u[i] * TAU;
+        this.cosA[i] = Math.cos(a); this.sinA[i] = Math.sin(a);
+        const f = this.u[i] * this.n;
+        this.i0[i] = Math.floor(f) % this.n; this.fr[i] = f - Math.floor(f);
+        const j = (this.i0[i] + 1) % this.n, r = baseRest[this.i0[i]] * (1 - this.fr[i]) + baseRest[j] * this.fr[i];
+        this.restX[i] = this.cosA[i] * r * this.s[i]; this.restY[i] = this.sinA[i] * r * this.s[i];
+        this.vibPhase[i] = rng() * TAU;
+        const va = rng() * TAU; this.vibDirX[i] = Math.cos(va); this.vibDirY[i] = Math.sin(va);
+      }
+
+      // ---- edges ----
+      const E = { a: [], b: [], dormant: [], strand: [], prev: [], next: [] };
+      const seen = new Set();
+      const link = (a, b, dormant = -1, strand = 0, prev = -1, next = -1) => {
+        if (a === b) return;
+        const key = a < b ? a * 4096 + b : b * 4096 + a;
+        if (seen.has(key)) return;
+        seen.add(key); E.a.push(a); E.b.push(b); E.dormant.push(dormant); E.strand.push(strand); E.prev.push(prev); E.next.push(next);
+      };
+      const d2 = (a, b) => (this.restX[a] - this.restX[b]) ** 2 + (this.restY[a] - this.restY[b]) ** 2;
+
+      // rim: circumferential fibres to the next 1–3 rim anchors
+      for (let i = 0; i < RIM; i++) {
+        link(i, (i + 1) % RIM);
+        if (rng() < 0.55) link(i, (i + 2) % RIM);
+        if (rng() < 0.2) link(i, (i + 3 + Math.floor(rng() * 3)) % RIM);
+      }
+      // strand segments know their neighbours so they can be drawn as one smooth curve
+      for (const ch of chains) for (let k = 1; k < ch.length; k++) link(ch[k - 1], ch[k], -1, 1, k > 1 ? ch[k - 2] : -1, k < ch.length - 1 ? ch[k + 1] : -1);
+
+      // nearest-neighbour bridges (denser inside clusters)
+      const order = Array.from({ length: N }, (_, i) => i);
+      for (let i = 0; i < N; i++) {
+        order.sort((p, q) => d2(i, p) - d2(i, q));
+        const k = this.kind[i] === 2 ? 3 : this.kind[i] === 0 ? 1 : this.kind[i] === 1 ? (rng() < 0.25 ? 1 : 0) : 2;
+        let made = 0;
+        for (let m = 1; m < order.length && made < k; m++) {
+          const j = order[m];
+          if (d2(i, j) > 0.34 * 0.34) break;
+          if (rng() < 0.7) { link(i, j); made++; }
+        }
+        // dormant short fibres: only appear in regions with accumulated memory
+        if (this.s[i] > 0.6 && (this.kind[i] === 0 || this.kind[i] === 2)) {
+          for (let r = 0; r < 2; r++) {
+            const j = order[2 + Math.floor(rng() * 6)];
+            if (j !== undefined && d2(i, j) < 0.3 * 0.3) link(i, j, 0.12 + rng() * 0.5);
+          }
+        }
+      }
+      // a few long cross strands
+      for (let c = 0; c < 14; c++) {
+        const a = Math.floor(rng() * N), b = Math.floor(rng() * N);
+        const dd = Math.sqrt(d2(a, b));
+        if (dd > 0.5 && dd < 1.5) link(a, b);
+      }
+
+      const M = E.a.length;
+      this.edgeCount = M;
+      this.ea = Uint16Array.from(E.a); this.eb = Uint16Array.from(E.b);
+      this.dormant = Float32Array.from(E.dormant);
+      this.eprev = Int16Array.from(E.prev); this.enext = Int16Array.from(E.next);
+      this.restLen = new Float32Array(M); this.slack = new Float32Array(M);
+      this.rank = new Float32Array(M); this.depth = new Float32Array(M);
+      this.strain = new Float32Array(M); this.edgeMem = new Float32Array(M);
+      for (let e = 0; e < M; e++) {
+        this.restLen[e] = Math.max(1e-3, Math.sqrt(d2(this.ea[e], this.eb[e])));
+        // curvature follows a smooth flow field (coherent bowing), strands stay nearly straight
+        const a = this.ea[e], c = this.eb[e];
+        const mx = (this.restX[a] + this.restX[c]) / 2, my = (this.restY[a] + this.restY[c]) / 2;
+        const field = Math.sin(Math.atan2(my, mx) * 3 + Math.hypot(mx, my) * 4 + seed % 7);
+        this.slack[e] = E.strand[e] ? 0.012 * Math.sign(field || 1) : (0.03 + rng() * 0.07) * Math.sign(field || 1);
+        this.rank[e] = rng(); // stable order for density control
+        this.depth[e] = (this.z[this.ea[e]] + this.z[this.eb[e]]) / 2;
+      }
+      this.degree = new Uint8Array(N);
+      for (let e = 0; e < M; e++) if (this.dormant[e] < 0) { this.degree[this.ea[e]]++; this.degree[this.eb[e]]++; }
+      this.lagX.fill(0); this.lagY.fill(0); this.midX.fill(0); this.midY.fill(0);
+      this.parX = this.parY = 0;
+      return this;
+    }
+
+    /**
+     * Map anchors through the body's current state.
+     * opts: { dt, t, parallaxX, parallaxY, vibration (0..1 scale), reducedMotion }
+     */
+    update(sim, opts) {
+      const b = sim.body, n = this.n, mem = sim.memory.level, exc = sim.excite;
+      const aOuter = 1 - Math.exp(-LAG_RATE_OUTER * opts.dt), aInner = 1 - Math.exp(-LAG_RATE_INNER * opts.dt);
+      for (let i = 0; i < n; i++) {
+        this.midX[i] += (b.dx[i] - this.midX[i]) * aOuter; this.midY[i] += (b.dy[i] - this.midY[i]) * aOuter;
+        this.lagX[i] += (b.dx[i] - this.lagX[i]) * aInner; this.lagY[i] += (b.dy[i] - this.lagY[i]) * aInner;
+      }
+      const pa = 1 - Math.exp(-3 * opts.dt);
+      this.parX += ((opts.parallaxX || 0) - this.parX) * pa;
+      this.parY += ((opts.parallaxY || 0) - this.parY) * pa;
+      const vib = opts.reducedMotion ? 0 : (opts.vibration ?? 1);
+      const t = opts.t;
+      const im = sim.immediate, P = sim.params, R = P.interactionRadius;
+      const aResp = 1 - Math.exp(-P.responseRate * opts.dt);
+      for (let k = 0; k < this.count; k++) {
+        const i = this.i0[k], j = i === n - 1 ? 0 : i + 1, f = this.fr[k], g = 1 - f, s = this.s[k], z = this.z[k];
+        const r = b.restRadius(i) * g + b.restRadius(j) * f;
+        // depth-weighted blend: rim follows the live surface, deep/inner points trail
+        const live = clamp(s * s * (1.15 - 0.3 * (z + 1) / 2), 0, 1);
+        const curX = b.dx[i] * g + b.dx[j] * f, curY = b.dy[i] * g + b.dy[j] * f;
+        const midX = this.midX[i] * g + this.midX[j] * f, midY = this.midY[i] * g + this.midY[j] * f;
+        const lagX = this.lagX[i] * g + this.lagX[j] * f, lagY = this.lagY[i] * g + this.lagY[j] * f;
+        const w1 = live, w2 = (1 - live) * 0.6, w3 = 1 - w1 - w2;
+        const ds = Math.pow(s, 0.7);
+        let x = this.cosA[k] * r * s + (curX * w1 + midX * w2 + lagX * w3) * ds;
+        let y = this.sinA[k] * r * s + (curY * w1 + midY * w2 + lagY * w3) * ds;
+        // sweep excitation → brief fine vibration (decays with the simulation field)
+        const e = exc[i] * g + exc[j] * f;
+        this.exc[k] = e;
+        if (e > 0.01 && vib > 0) {
+          const amp = e * 0.022 * vib * (0.4 + 0.6 * s) * Math.sin(t * 38 + this.vibPhase[k]);
+          x += this.vibDirX[k] * amp; y += this.vibDirY[k] * amp;
+        }
+        // system 1 — immediate response: local, smoothed offset + glow near the pointer
+        {
+          const dx = x - im.x, dy = y - im.y, d = Math.hypot(dx, dy);
+          let u = 1 - d / R, tx = 0, ty = 0, glow = 0;
+          if (u > 0 && (im.level > 0.002 || im.dwell > 0.002)) {
+            u = u * u * (3 - 2 * u);
+            if (d > 1e-4) {
+              const push = P.proximityResponse * im.level * (1 - im.dwell) * u;   // hover: ease away
+              const pull = Math.min(d * 0.5, P.dwellAttraction * im.dwell * u);   // dwell: draw in
+              tx = (dx / d) * (push - pull); ty = (dy / d) * (push - pull);
+            }
+            if (vib > 0 && im.dwell > 0.01) {                                    // dwell: fine activity
+              const sh = P.dwellActivity * im.dwell * u * Math.sin(t * 9 + this.vibPhase[k]);
+              tx += this.vibDirX[k] * sh; ty += this.vibDirY[k] * sh;
+            }
+            glow = u * (P.proximityGlow * im.level + P.dwellGlow * im.dwell);
+          }
+          this.respX[k] += (tx - this.respX[k]) * aResp;
+          this.respY[k] += (ty - this.respY[k]) * aResp;
+          this.resp[k] += (glow - this.resp[k]) * aResp;
+          x += this.respX[k]; y += this.respY[k];
+        }
+        // subtle depth parallax
+        x += this.parX * z; y += this.parY * z;
+        this.x[k] = x; this.y[k] = y;
+        this.mem[k] = (mem[i] * g + mem[j] * f) * clamp((s - 0.25) / 0.6, 0, 1);
+      }
+      for (let e = 0; e < this.edgeCount; e++) {
+        const a = this.ea[e], c = this.eb[e];
+        const L = Math.hypot(this.x[a] - this.x[c], this.y[a] - this.y[c]);
+        this.strain[e] = L / this.restLen[e] - 1;
+        this.edgeMem[e] = (this.mem[a] + this.mem[c]) / 2;
+      }
+    }
+  }
+  return { FilamentNetwork };
+})();
+
+/* ======================= src/rendering/FilamentRenderer.js ======================= */
+const M_rendering_FilamentRenderer = (() => {
+  // V4 renderer (Canvas 2D). Layers, back to front:
+  //   A  structural skeleton — the soft body itself (not drawn)
+  //   C  translucent membrane — outer surface + one inner surface, low alpha
+  //   B  filament network     — stable anchors mapped through the deformation
+  //   D  tension              — per-edge strain: stretched fibres straighten and
+  //                              brighten, compressed fibres bow and thicken in density
+  //   E  memory               — fibres in high-memory regions align (lose slack),
+  //                              brighten slightly, and dormant short fibres appear
+  // Filaments are batched into (depth × brightness) buckets so a frame issues
+  // ~40 strokes instead of one per filament. Nothing is allocated per frame.
+
+  const { FilamentNetwork } = M_rendering_FilamentNetwork;
+  const { DEFAULT_VISUAL } = M_config;
+  const { mulberry32 } = M_util_math;
+
+  const NB = 12;           // brightness buckets
+  const DEPTHS = 3;        // far / mid / near
+  const PALETTE = {
+    deep: [24, 44, 64],          // #182C40 deep structural blue
+    secondary: [117, 189, 232],  // #75BDE8 main material blue
+    primary: [199, 233, 255],    // #C7E9FF pale translucent blue
+    highlight: [244, 249, 255],  // #F4F9FF white fibre highlight
+  };
+  const DEPTH_WIDTH = [0.5, 0.7, 0.95];
+  const DEPTH_ALPHA = [0.55, 0.8, 1];
+  const FOLDS = 4;         // overlapping translucent membrane sheets
+
+  const mix = (a, b, t) => [0, 1, 2].map((k) => Math.round(a[k] + (b[k] - a[k]) * t));
+
+  class FilamentRenderer {
+    constructor(canvas, sim) {
+      this.canvas = canvas;
+      this.ctx = canvas.getContext('2d');
+      this.sim = sim;
+      this.net = new FilamentNetwork(sim.n);
+      this.visual = { ...DEFAULT_VISUAL };
+      this.detail = 1;             // auto-detail multiplier (1 or reduced)
+      this.reducedMotion = false;
+      this.time = 0;
+      this.n = sim.n;
+      this.ox = new Float32Array(sim.n); this.oy = new Float32Array(sim.n);   // outer membrane
+      this.ix = new Float32Array(sim.n); this.iy = new Float32Array(sim.n);   // inner membrane
+      this.foldX = Array.from({ length: FOLDS }, () => new Float32Array(sim.n));
+      this.foldY = Array.from({ length: FOLDS }, () => new Float32Array(sim.n));
+      this.buildStyles();
+      this.rebuild();
+      this.resize();
+    }
+
+    /** Regenerate the network for the simulation's current seed. */
+    rebuild() {
+      this.net.build(this.sim.seed, this.sim.body.baseRest);
+      const B = DEPTHS * NB;
+      this.bucketLen = new Uint16Array(B);
+      this.bucketItems = Array.from({ length: B }, () => new Uint16Array(this.net.edgeCount));
+      this.gradient = null;
+      // seeded fold sheets: each is the body outline reshaped by a low harmonic and
+      // offset slightly, so sheets overlap like folded translucent layers
+      const rng = mulberry32((this.sim.seed ^ 0x51ed27) >>> 0);
+      this.folds = Array.from({ length: FOLDS }, (_, k) => ({
+        scale: [0.97, 0.84, 0.7, 0.55][k],
+        m: 2 + Math.floor(rng() * 4),
+        amp: 0.05 + rng() * 0.09,
+        phase: rng() * Math.PI * 2,
+        ox: (rng() - 0.5) * 0.14, oy: (rng() - 0.5) * 0.14,
+        live: [0.85, 0.6, 0.4, 0.25][k],     // how much it follows the live surface vs the lagged field
+      }));
+    }
+
+    buildStyles() {
+      this.styles = [];
+      for (let d = 0; d < DEPTHS; d++) {
+        const [c0, c1] = d === 0 ? [PALETTE.deep, PALETTE.secondary] : d === 1 ? [PALETTE.secondary, PALETTE.primary] : [PALETTE.primary, PALETTE.highlight];
+        for (let q = 0; q < NB; q++) {
+          const b = (q + 0.5) / NB, c = mix(c0, c1, b);
+          this.styles.push(`rgba(${c[0]},${c[1]},${c[2]},${((0.06 + b * 0.62) * DEPTH_ALPHA[d]).toFixed(3)})`);
+        }
+      }
+      const p = PALETTE.primary;
+      this.dotStyle = `rgba(${p[0]},${p[1]},${p[2]},0.22)`;
+    }
+
+    resize() {
+      const r = this.canvas.getBoundingClientRect();
+      const cap = this.visual.lowDetail ? 1.5 : 2;
+      this.dpr = Math.min(globalThis.devicePixelRatio || 1, cap);
+      this.w = Math.max(1, r.width); this.h = Math.max(1, r.height);
+      this.canvas.width = Math.round(this.w * this.dpr);
+      this.canvas.height = Math.round(this.h * this.dpr);
+      this.cx = this.w / 2; this.cy = this.h * 0.5;
+      // desktop: object diameter ≈ 45–55 % of viewport width; narrow: ≈ 72 %
+      this.scale = this.w < 640 ? Math.min(this.w * 0.36, this.h * 0.3) : Math.min(this.w * 0.27, this.h * 0.36);
+    }
+
+    toObject(clientX, clientY) {
+      const r = this.canvas.getBoundingClientRect();
+      return { x: (clientX - r.left - this.cx) / this.scale, y: (clientY - r.top - this.cy) / this.scale };
+    }
+
+    setVisual(key, value) {
+      this.visual[key] = value;
+      if (key === 'lowDetail') this.resize();
+      if (key === 'membraneOpacity') this.gradient = null;
+    }
+
+    pathRing(xs, ys) {
+      const ctx = this.ctx, n = xs.length;
+      ctx.beginPath();
+      ctx.moveTo((xs[n - 1] + xs[0]) / 2, (ys[n - 1] + ys[0]) / 2);
+      for (let i = 0; i < n; i++) {
+        const j = i === n - 1 ? 0 : i + 1;
+        ctx.quadraticCurveTo(xs[i], ys[i], (xs[i] + xs[j]) / 2, (ys[i] + ys[j]) / 2);
+      }
+      ctx.closePath();
+    }
+
+    draw(dt, pointer) {
+      const { ctx, sim, net, visual: V } = this, b = sim.body, n = this.n;
+      this.time += dt;
+      const parallax = !this.reducedMotion && pointer?.present && !sim.grab;
+      net.update(sim, {
+        dt, t: this.time, reducedMotion: this.reducedMotion,
+        parallaxX: parallax ? Math.max(-1.5, Math.min(1.5, pointer.x)) * 0.012 : 0,
+        parallaxY: parallax ? Math.max(-1.5, Math.min(1.5, pointer.y)) * 0.012 : 0,
+      });
+
+      ctx.setTransform(this.dpr, 0, 0, this.dpr, 0, 0);
+      ctx.clearRect(0, 0, this.w, this.h);
+      ctx.save();
+      ctx.translate(this.cx, this.cy);
+      ctx.scale(this.scale, this.scale);
+      const px = 1 / this.scale;
+
+      // ---- C: membrane ----
+      for (let i = 0; i < n; i++) {
+        this.ox[i] = b.x(i); this.oy[i] = b.y(i);
+        const r = b.restRadius(i) * 0.7;
+        this.ix[i] = b.cos[i] * r + net.midX[i] * 0.78; this.iy[i] = b.sin[i] * r + net.midY[i] * 0.78;
+      }
+      const mo = V.membraneOpacity;
+      if (mo > 0) {
+        if (!this.gradient) {
+          const g = ctx.createRadialGradient(0, 0, 0.05, 0, 0, 1.1);
+          g.addColorStop(0, `rgba(24,44,64,${Math.min(1, 0.38 * mo)})`);
+          g.addColorStop(0.8, `rgba(24,44,64,${Math.min(1, 0.26 * mo)})`);
+          g.addColorStop(1, `rgba(117,189,232,${0.12 * mo})`);
+          this.gradient = g;
+          const f = ctx.createRadialGradient(0, 0, 0.1, 0, 0, 1.05);
+          f.addColorStop(0, `rgba(117,189,232,${0.012 * mo})`);
+          f.addColorStop(0.7, `rgba(117,189,232,${0.03 * mo})`);
+          f.addColorStop(1, `rgba(199,233,255,${0.06 * mo})`);
+          this.foldGradient = f;
+        }
+        // body: deep-blue translucent volume
+        this.pathRing(this.ox, this.oy);
+        ctx.fillStyle = this.gradient; ctx.fill();
+        // folded sheets (additive): low-alpha fills, soft edges — they deform with the body
+        ctx.save();
+        ctx.clip(); // folds stay inside the membrane (no smudges outside the edge)
+        ctx.globalCompositeOperation = 'lighter';
+        for (let k = 0; k < FOLDS; k++) {
+          const F = this.folds[k], fx = this.foldX[k], fy = this.foldY[k], live = F.live;
+          const ds = Math.pow(F.scale, 0.7);
+          for (let i = 0; i < n; i++) {
+            const a = (i / n) * Math.PI * 2;
+            const r = b.restRadius(i) * (F.scale + F.amp * Math.sin(F.m * a + F.phase));
+            const dx = b.dx[i] * live + net.lagX[i] * (1 - live), dy = b.dy[i] * live + net.lagY[i] * (1 - live);
+            fx[i] = b.cos[i] * r + F.ox + dx * ds;
+            fy[i] = b.sin[i] * r + F.oy + dy * ds;
+          }
+          this.pathRing(fx, fy);
+          ctx.fillStyle = this.foldGradient; ctx.fill();
+          ctx.lineWidth = 3.2 * px;
+          ctx.strokeStyle = `rgba(117,189,232,${(0.035 * mo).toFixed(3)})`; ctx.stroke();
+          ctx.lineWidth = 0.8 * px;
+          ctx.strokeStyle = `rgba(199,233,255,${(0.2 * mo).toFixed(3)})`; ctx.stroke();
+        }
+        ctx.restore();
+        ctx.globalCompositeOperation = 'lighter';
+        // outer surface edge
+        this.pathRing(this.ox, this.oy);
+        ctx.lineWidth = 1 * px;
+        ctx.strokeStyle = `rgba(199,233,255,${(0.32 * Math.min(1.5, mo)).toFixed(3)})`; ctx.stroke();
+        ctx.globalCompositeOperation = 'source-over';
+      }
+
+      // ---- B/D/E: filaments, bucketed ----
+      const density = V.filamentDensity * this.detail * (V.lowDetail ? 0.55 : 1);
+      const contrast = V.structuralContrast, th = V.tensionHighlight, vm = V.visualMemory;
+      const lens = this.bucketLen; lens.fill(0);
+      const M = net.edgeCount;
+      for (let e = 0; e < M; e++) {
+        if (net.rank[e] > density) continue;
+        const m = net.edgeMem[e] * vm;
+        let vis = 1;
+        if (net.dormant[e] >= 0) {
+          const t0 = net.dormant[e];
+          vis = m <= t0 ? 0 : Math.min(1, (m - t0) / 0.2);
+          if (vis <= 0) continue;
+        }
+        const st = net.strain[e], tens = st > 0 ? st : 0, comp = st < 0 ? -st : 0;
+        const z = net.depth[e], ex = (net.exc[net.ea[e]] + net.exc[net.eb[e]]) * 0.5;
+        let br = 0.26 + 0.24 * (z + 1) / 2
+          + th * Math.min(0.55, tens * 2.4)
+          + Math.min(0.14, comp * 1.2)
+          + m * 0.16
+          + ex * 0.22;
+        br += (net.resp[net.ea[e]] + net.resp[net.eb[e]]) * 0.5;   // system 1 glow
+        br *= vis;
+        br = 0.5 + (br - 0.5) * contrast;
+        if (br < 0.03) continue;
+        const q = br >= 1 ? NB - 1 : Math.floor(br * NB);
+        const d = z < -0.33 ? 0 : z < 0.33 ? 1 : 2;
+        const k = d * NB + q;
+        this.bucketItems[k][lens[k]++] = e;
+      }
+      ctx.globalCompositeOperation = 'lighter';
+      const X = net.x, Y = net.y;
+      for (let d = 0; d < DEPTHS; d++) {
+        ctx.lineWidth = DEPTH_WIDTH[d] * px;
+        for (let q = 0; q < NB; q++) {
+          const k = d * NB + q, len = lens[k];
+          if (!len) continue;
+          const items = this.bucketItems[k];
+          ctx.beginPath();
+          for (let t = 0; t < len; t++) {
+            const e = items[t], a = net.ea[e], c = net.eb[e];
+            const ax = X[a], ay = Y[a], cx = X[c], cy = Y[c];
+            const dx = cx - ax, dy = cy - ay;
+            const st = net.strain[e], tens = st > 0 ? st : 0, comp = st < 0 ? -st : 0;
+            // slack: stretched → straight; compressed → bows; memory → aligned (straighter)
+            const sf = net.slack[e]
+              * (1 - Math.min(0.92, tens * 4))
+              * (1 + Math.min(1.2, comp * 6))
+              * (1 - Math.min(0.8, net.edgeMem[e] * vm * 0.9));
+            const pv = net.eprev[e], nx = net.enext[e];
+            if (pv >= 0 || nx >= 0) {
+              // strand segment: midpoint-smoothed so consecutive segments join without corners
+              const sx = pv >= 0 ? (X[pv] + ax) * 0.5 : ax, sy = pv >= 0 ? (Y[pv] + ay) * 0.5 : ay;
+              const exx = nx >= 0 ? (ax + cx) * 0.5 : cx, eyy = nx >= 0 ? (ay + cy) * 0.5 : cy;
+              ctx.moveTo(sx, sy);
+              if (pv >= 0) ctx.quadraticCurveTo(ax, ay, exx, eyy); else ctx.lineTo(exx, eyy);
+              if (nx < 0 && pv >= 0) ctx.lineTo(cx, cy);
+              continue;
+            }
+            ctx.moveTo(ax, ay);
+            ctx.quadraticCurveTo(ax + dx * 0.5 - dy * sf, ay + dy * 0.5 + dx * sf, cx, cy);
+          }
+          ctx.strokeStyle = this.styles[k];
+          ctx.stroke();
+        }
+      }
+
+      // junctions
+      if (!V.lowDetail) {
+        ctx.beginPath();
+        const s = 1.1 * px;
+        for (let k = 0; k < net.count; k++) {
+          if (net.degree[k] < 3) continue;
+          ctx.rect(X[k] - s / 2, Y[k] - s / 2, s, s);
+        }
+        ctx.fillStyle = this.dotStyle; ctx.fill();
+      }
+      ctx.globalCompositeOperation = 'source-over';
+      ctx.restore();
+
+      // pointer mark (screen space, faint; not for touch)
+      if (pointer?.present && pointer.type !== 'touch') {
+        const sx = this.cx + pointer.x * this.scale, sy = this.cy + pointer.y * this.scale, p = sim.proximity;
+        if (sim.grab) {
+          ctx.beginPath(); ctx.arc(sx, sy, 2.5, 0, Math.PI * 2);
+          ctx.fillStyle = 'rgba(244,249,255,0.6)'; ctx.fill();
+        } else if (p > 0.1) {
+          ctx.beginPath(); ctx.arc(sx, sy, 6 + p * 5, 0, Math.PI * 2);
+          ctx.lineWidth = 1; ctx.strokeStyle = `rgba(199,233,255,${(0.08 + p * 0.22).toFixed(3)})`; ctx.stroke();
+        }
+      }
+    }
+
+    resetLag() { this.rebuild(); }
+  }
+  return { FilamentRenderer };
+})();
+
+/* ======================= src/interaction/PointerController.js ======================= */
+const M_interaction_PointerController = (() => {
+  // Unified Pointer Events input (mouse, touch, pen). Converts to object units
+  // and keeps a smoothed velocity (object units / second). No modes.
+
+  class PointerController {
+    constructor(canvas, toObject) {
+      this.canvas = canvas;
+      this.toObject = toObject;
+      this.state = { present: false, x: 0, y: 0, vx: 0, vy: 0, down: false, type: 'mouse' };
+      this.lastT = 0;
+      this.pointerId = null;
+      this.handlers = {
+        pointerdown: (e) => this.onDown(e),
+        pointermove: (e) => this.onMove(e),
+        pointerup: (e) => this.onUp(e),
+        pointercancel: (e) => this.onUp(e),
+        pointerleave: (e) => this.onLeave(e),
+        contextmenu: (e) => e.preventDefault(),
+      };
+      for (const [k, fn] of Object.entries(this.handlers)) canvas.addEventListener(k, fn);
+    }
+
+    sample(e) {
+      const p = this.toObject(e.clientX, e.clientY);
+      const t = e.timeStamp || performance.now();
+      const dt = Math.max(1, t - this.lastT) / 1000;
+      if (this.state.present && dt < 0.2) {
+        const a = 0.35;
+        this.state.vx += ((p.x - this.state.x) / dt - this.state.vx) * a;
+        this.state.vy += ((p.y - this.state.y) / dt - this.state.vy) * a;
+      } else { this.state.vx = 0; this.state.vy = 0; }
+      this.state.x = p.x; this.state.y = p.y;
+      this.state.type = e.pointerType || 'mouse';
+      this.state.present = true;
+      this.lastT = t;
+    }
+
+    onDown(e) {
+      if (!e.isPrimary) return;
+      this.sample(e);
+      this.state.down = true;
+      this.pointerId = e.pointerId;
+      try { this.canvas.setPointerCapture(e.pointerId); } catch { /* ignore */ }
+      e.preventDefault();
+    }
+
+    onMove(e) {
+      if (!e.isPrimary) return;
+      if (e.pointerType === 'touch' && !this.state.down) return;
+      this.sample(e);
+    }
+
+    onUp(e) {
+      if (!e.isPrimary) return;
+      this.state.down = false;
+      if (e.pointerType === 'touch') { this.state.present = false; this.state.vx = this.state.vy = 0; }
+    }
+
+    onLeave(e) {
+      if (!e.isPrimary || this.state.down) return;
+      this.state.present = false;
+      this.state.vx = this.state.vy = 0;
+    }
+
+    /** Call once per frame: velocity decays when the pointer stops sending moves. */
+    update(now) {
+      if (now - this.lastT > 50) { this.state.vx *= 0.7; this.state.vy *= 0.7; }
+    }
+
+    destroy() { for (const [k, fn] of Object.entries(this.handlers)) this.canvas.removeEventListener(k, fn); }
+  }
+  return { PointerController };
+})();
+
+/* ======================= src/audio/AudioEngine.js ======================= */
+const M_audio_AudioEngine = (() => {
+  // Procedural, interaction-driven sound (Web Audio API). No music, no samples.
+  //
+  //   continuous voices (always connected while enabled, gains driven by simulation):
+  //     stretch  — band-passed noise; level ∝ tension × deformation motion, pitch ∝ tension
+  //     friction — high band-passed noise; level ∝ sweep excitation
+  //     settle   — low-passed noise; level ∝ residual motion after release
+  //   one-shots (created per event, disconnected when finished):
+  //     contact  — soft muted tap (low-passed noise burst + low sine)
+  //     release  — short downward-gliding band-passed noise, scaled by stored tension
+  //
+  // Signal chain: voices → master gain → compressor (soft safety limiter) → analyser → out.
+  // The context is created only on an explicit user gesture and suspended when hidden.
+
+  const SMOOTH = 0.06;        // s, time constant for all parameter changes
+  const MASTER = 0.55;
+
+  class AudioEngine {
+    constructor() {
+      this.ctx = null;
+      this.enabled = false;
+      this.voices = null;
+      this.activeOneShots = 0;
+      this.peak = 0;
+    }
+
+    get supported() { return typeof (globalThis.AudioContext || globalThis.webkitAudioContext) === 'function'; }
+
+    /** Must be called from a user gesture handler. */
+    async enable() {
+      if (!this.supported) return false;
+      if (!this.ctx) this.init();
+      await this.ctx.resume();
+      this.enabled = true;
+      this.master.gain.setTargetAtTime(MASTER, this.ctx.currentTime, 0.15); // gentle fade-in
+      return true;
+    }
+
+    disable() {
+      this.enabled = false;
+      if (!this.ctx) return;
+      const t = this.ctx.currentTime;
+      this.master.gain.setTargetAtTime(0, t, 0.05);
+      for (const v of Object.values(this.voices)) v.gain.gain.setTargetAtTime(0, t, 0.05);
+      setTimeout(() => { if (!this.enabled && this.ctx?.state === 'running') this.ctx.suspend(); }, 400);
+    }
+
+    /** Page hidden → suspend; visible → resume only if the participant had sound on. */
+    setHidden(hidden) {
+      if (!this.ctx) return;
+      if (hidden) this.ctx.suspend();
+      else if (this.enabled) this.ctx.resume();
+    }
+
+    init() {
+      const AC = globalThis.AudioContext || globalThis.webkitAudioContext;
+      const ctx = (this.ctx = new AC({ latencyHint: 'interactive' }));
+      this.noise = this.makeNoise(2);
+      this.master = ctx.createGain();
+      this.master.gain.value = 0;
+      const comp = ctx.createDynamicsCompressor();
+      comp.threshold.value = -18; comp.knee.value = 12; comp.ratio.value = 6;
+      comp.attack.value = 0.005; comp.release.value = 0.2;
+      this.analyser = ctx.createAnalyser();
+      this.analyser.fftSize = 512;
+      this.scope = new Float32Array(this.analyser.fftSize);
+      this.master.connect(comp).connect(this.analyser).connect(ctx.destination);
+
+      const voice = (type, freq, q) => {
+        const src = ctx.createBufferSource();
+        src.buffer = this.noise; src.loop = true;
+        src.loopStart = 0; src.loopEnd = this.noise.duration;
+        const filter = ctx.createBiquadFilter();
+        filter.type = type; filter.frequency.value = freq; filter.Q.value = q;
+        const gain = ctx.createGain(); gain.gain.value = 0;
+        src.connect(filter).connect(gain).connect(this.master);
+        src.start(0, Math.random() * this.noise.duration);
+        return { src, filter, gain };
+      };
+      this.voices = {
+        stretch: voice('bandpass', 500, 6),
+        friction: voice('bandpass', 3200, 1.4),
+        settle: voice('lowpass', 260, 0.7),
+      };
+      // a faint resonant partial under the stretch texture
+      const osc = ctx.createOscillator(); osc.type = 'sine'; osc.frequency.value = 68;
+      const og = ctx.createGain(); og.gain.value = 0;
+      osc.connect(og).connect(this.master); osc.start();
+      this.voices.tone = { src: osc, filter: null, gain: og };
+    }
+
+    makeNoise(seconds) {
+      const len = Math.floor(this.ctx.sampleRate * seconds);
+      const buf = this.ctx.createBuffer(1, len, this.ctx.sampleRate);
+      const d = buf.getChannelData(0);
+      let b = 0;
+      for (let i = 0; i < len; i++) { const w = Math.random() * 2 - 1; b = 0.97 * b + 0.03 * w; d[i] = w * 0.6 + b * 3; } // slightly darkened white noise
+      return buf;
+    }
+
+    /** Per frame. signals: { tension, motion, sweep, kinetic }, grabbing: bool */
+    update(signals, grabbing) {
+      if (!this.enabled || !this.ctx || this.ctx.state !== 'running') return;
+      const t = this.ctx.currentTime, v = this.voices;
+      const tension = signals.tension, motion = signals.motion;
+      const stretch = grabbing ? Math.min(1, tension * (0.25 + motion * 1.6)) : 0;
+      v.stretch.gain.gain.setTargetAtTime(stretch * 0.32, t, SMOOTH);
+      v.stretch.filter.frequency.setTargetAtTime(380 + tension * 1300 + motion * 400, t, SMOOTH);
+      v.tone.gain.gain.setTargetAtTime(grabbing ? tension * 0.05 : 0, t, 0.12);
+      v.tone.src.frequency.setTargetAtTime(62 + tension * 30, t, 0.12);
+      v.friction.gain.gain.setTargetAtTime(Math.min(1, signals.sweep) * 0.22, t, 0.04);
+      v.friction.filter.frequency.setTargetAtTime(2400 + signals.sweep * 2200, t, SMOOTH);
+      const settle = !grabbing && motion > 0.04 ? Math.min(1, (motion - 0.04) * 1.5) : 0;
+      v.settle.gain.gain.setTargetAtTime(settle * 0.2, t, 0.15);
+      // peak meter (for researcher readout / clipping checks)
+      this.analyser.getFloatTimeDomainData(this.scope);
+      let pk = 0;
+      for (let i = 0; i < this.scope.length; i++) { const a = Math.abs(this.scope[i]); if (a > pk) pk = a; }
+      this.peak = Math.max(pk, this.peak * 0.95);
+    }
+
+    oneShot(build, duration) {
+      if (!this.enabled || !this.ctx || this.ctx.state !== 'running' || this.activeOneShots > 6) return;
+      this.activeOneShots++;
+      const nodes = build(this.ctx, this.ctx.currentTime);
+      const first = nodes[0];
+      first.onended = () => { for (const n of nodes) n.disconnect(); this.activeOneShots--; };
+      first.stop(this.ctx.currentTime + duration);
+    }
+
+    contact(strength = 0.5) {
+      this.oneShot((ctx, t) => {
+        const src = ctx.createBufferSource(); src.buffer = this.noise;
+        const lp = ctx.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 700 + strength * 500; lp.Q.value = 0.8;
+        const g = ctx.createGain();
+        g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(0.22 * strength, t + 0.006); g.gain.exponentialRampToValueAtTime(0.0008, t + 0.12);
+        const osc = ctx.createOscillator(); osc.frequency.setValueAtTime(150, t); osc.frequency.exponentialRampToValueAtTime(90, t + 0.12);
+        const og = ctx.createGain();
+        og.gain.setValueAtTime(0, t); og.gain.linearRampToValueAtTime(0.08 * strength, t + 0.008); og.gain.exponentialRampToValueAtTime(0.0005, t + 0.16);
+        src.connect(lp).connect(g).connect(this.master);
+        osc.connect(og).connect(this.master);
+        src.start(t, Math.random() * 1.5); osc.start(t); osc.stop(t + 0.2);
+        return [src, lp, g, osc, og];
+      }, 0.2);
+    }
+
+    release(tension = 0.5) {
+      if (tension < 0.08) return;
+      const dur = 0.18 + tension * 0.35;
+      this.oneShot((ctx, t) => {
+        const src = ctx.createBufferSource(); src.buffer = this.noise;
+        const bp = ctx.createBiquadFilter(); bp.type = 'bandpass'; bp.Q.value = 4;
+        bp.frequency.setValueAtTime(600 + tension * 1400, t); bp.frequency.exponentialRampToValueAtTime(180, t + dur);
+        const g = ctx.createGain();
+        g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(0.28 * tension, t + 0.01); g.gain.exponentialRampToValueAtTime(0.0008, t + dur);
+        src.connect(bp).connect(g).connect(this.master);
+        src.start(t, Math.random() * 1.2);
+        return [src, bp, g];
+      }, dur + 0.05);
+    }
+  }
+  return { AudioEngine };
+})();
+
+/* ======================= src/research/SessionLogger.js ======================= */
+const M_research_SessionLogger = (() => {
+  // In-memory structured event log. Nothing is persisted or transmitted.
+  // Timestamps are milliseconds on the simulation clock since session start
+  // (the clock pauses while the tab is hidden).
+  //
+  // InteractionEvent = {
+  //   timestampMs, type, region?, durationMs?, distance?, speed?, memoryLevel?, metadata?
+  // }
+
+  const { randomId } = M_util_math;
+
+  const EVENT_TYPES = Object.freeze([
+    'session_start', 'approach', 'contact_start', 'contact_end', 'drag',
+    'region_revisit', 'adaptation_threshold', 'recovery', 'parameter_change',
+    'reflection', 'session_end',
+    // V4
+    'sweep', 'sound_toggle', 'dwell',
+  ]);
+
+  const round = (v, d = 3) => (typeof v === 'number' ? Math.round(v * 10 ** d) / 10 ** d : v);
+
+  class SessionLogger {
+    constructor({ maxEvents = 5000, idFactory = randomId, now = () => new Date() } = {}) {
+      this.maxEvents = maxEvents;
+      this.idFactory = idFactory;
+      this.now = now;
+      this.events = [];
+      this.dropped = 0;
+      this.reflection = null;
+      this.sessionId = null;
+      this.startedAt = null;
+      this.meta = {};
+    }
+
+    start(meta) {
+      this.events = [];
+      this.dropped = 0;
+      this.reflection = null;
+      this.sessionId = this.idFactory();
+      this.startedAt = this.now().toISOString();
+      this.meta = { ...meta };
+      this.log('session_start', 0, { metadata: { ...meta } });
+    }
+
+    log(type, timestampMs, fields = {}) {
+      if (!EVENT_TYPES.includes(type)) throw new Error('Unknown event type: ' + type);
+      if (this.events.length >= this.maxEvents) { this.dropped++; return null; }
+      const ev = { timestampMs: Math.round(timestampMs), type };
+      for (const k of ['region', 'durationMs', 'distance', 'speed', 'memoryLevel']) {
+        if (fields[k] !== undefined && fields[k] !== null) ev[k] = k === 'durationMs' || k === 'region' ? Math.round(fields[k]) : round(fields[k]);
+      }
+      if (fields.metadata) ev.metadata = fields.metadata;
+      this.events.push(ev);
+      return ev;
+    }
+
+    count(type) { let c = 0; for (const e of this.events) if (e.type === type) c++; return c; }
+
+    setReflection(answers, timestampMs) {
+      this.reflection = answers;
+      const answered = answers ? Object.values(answers).filter((v) => v && String(v).trim()).length : 0;
+      this.log('reflection', timestampMs, { metadata: { skipped: !answers, answered } });
+    }
+  }
+  return { EVENT_TYPES, SessionLogger };
+})();
+
+/* ======================= src/research/Exporter.js ======================= */
+const M_research_Exporter = (() => {
+  // Builds the session JSON (pure) and triggers a download (DOM).
+
+  const { APP_VERSION } = M_config;
+
+  function buildPayload(sim, logger, { condition, visual = null, exportedAt = new Date().toISOString() } = {}) {
+    const t = sim.totals;
+    const events = [...logger.events, {
+      timestampMs: Math.round(sim.timeMs),
+      type: 'session_end',
+      metadata: { exported: true },
+    }];
+    return {
+      schema: 'one-object-many-encounters/session',
+      schemaVersion: 2,
+      appVersion: APP_VERSION,
+      sessionId: logger.sessionId,
+      startedAt: logger.startedAt,
+      exportedAt,
+      durationMs: Math.round(sim.timeMs),
+      clock: 'simulation milliseconds since session start (pauses while the tab is hidden)',
+      condition,
+      seed: sim.seed,
+      parameters: { ...sim.params },
+      visualParameters: visual ? { ...visual } : null,
+      summary: {
+        totalContactMs: Math.round(t.contactMs),
+        totalInteractionMs: Math.round(t.interactionMs),
+        contactEpisodes: t.contactEpisodes,
+        dragDistance: Math.round(t.dragDistance * 1000) / 1000,
+        regionRevisits: t.revisits,
+        adaptationEvents: t.adaptationEvents,
+        regionRecoveries: t.regionReleases,
+        stillnessPeriods: t.stillnessPeriods,
+        sweeps: t.sweeps,
+        totalSweepMs: Math.round(t.sweepMs),
+        dwells: t.dwells,
+        totalDwellMs: Math.round(t.dwellMs),
+        soundToggles: logger.count('sound_toggle'),
+        parameterChanges: logger.count('parameter_change'),
+        finalMeanMemory: Math.round(sim.memory.mean() * 1000) / 1000,
+        droppedEvents: logger.dropped,
+      },
+      units: {
+        distance: 'object units (base radius = 1)',
+        speed: 'object units per second',
+        coordinates: 'object units relative to the object centre',
+        region: '12 perimeter regions; region r is centred at r × 30°, 0° = right, clockwise on screen',
+      },
+      events,
+      reflection: logger.reflection,
+      methodNote: 'Programmed generative simulation. Logged values describe observed pointer behaviour and system state; they do not establish participant expectation, interpretation, or object agency.',
+    };
+  }
+
+  function downloadJSON(payload) {
+    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `encounter-v4-${payload.condition}-${payload.sessionId.slice(0, 8)}.json`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+  }
+  return { buildPayload, downloadJSON };
+})();
+
+/* ======================= src/ui/translations.js ======================= */
+const M_ui_translations = (() => {
+  // All interface text lives here. Rendering code contains no strings.
+
+  const translations = {
+    en: {
+      docTitle: 'One Object / Many Encounters · V4.1',
+      title: 'ONE OBJECT / MANY ENCOUNTERS',
+      info: 'INFO',
+      soundOn: 'SOUND ON',
+      soundOff: 'SOUND OFF',
+      soundUnavailable: 'NO SOUND',
+      reset: 'RESET',
+      finish: 'FINISH',
+      canvasLabel: 'An unfamiliar form that responds to approach, touch and time.',
+      hints: {
+        approach: 'MOVE CLOSER.',
+        touch: 'TRY TOUCHING.',
+        wait: 'WHAT HAPPENS IF YOU WAIT?',
+      },
+      infoTitle: 'About this encounter',
+      infoBody: 'A single form that responds to approach, touch and time. There is no goal and no correct way to interact. Stay as long as you like.',
+      howTitle: 'Interaction',
+      howBody: 'Move a mouse, pen or finger toward the form, press and drag on or near it, move quickly across it, release, or simply wait. The experience is visual and pointer-based; it cannot currently be explored with a keyboard or screen reader alone.',
+      soundTitle: 'Sound',
+      soundBody: 'Sound is off until you turn it on with SOUND. When on, quiet sounds are generated only by your interaction with the form.',
+      privacyTitle: 'Recording',
+      privacyBody: 'Interaction timing, pointer movement near the form and any optional answers are kept only in this browser tab so the researcher can export them. Nothing is sent to a server, and nothing is kept after the page is closed or reset.',
+      simNote: 'The form is a programmed simulation.',
+      openResearcher: 'Researcher mode',
+      shortcutNote: 'Shortcut: Shift + R',
+      close: 'CLOSE',
+      reflectTitle: 'After the encounter',
+      reflectIntro: 'Only if you wish. Every question is optional.',
+      questions: [
+        'What did you notice changing during the encounter?',
+        'Did you begin to expect certain responses?',
+        'Did anything respond differently than you expected?',
+        'Did you change how you interacted with it? Why?',
+        'How would you describe the object now?',
+      ],
+      skip: 'SKIP',
+      save: 'SAVE',
+      thanks: 'Thank you. You can keep exploring.',
+      continue: 'CONTINUE',
+      bootWarning: 'This page uses JavaScript modules and must be opened through a web server (for example: python3 -m http.server), not directly from the file system.',
+      researcher: {
+        title: 'RESEARCHER MODE',
+        condition: 'Condition',
+        presetA: 'A — Stable material',
+        presetB: 'B — Adaptive material',
+        presetNote: 'Applying a preset or seed starts a new session.',
+        seed: 'Seed',
+        applySeed: 'Apply seed',
+        params: {
+          responsiveness: 'Base responsiveness',
+          stiffness: 'Spring stiffness',
+          damping: 'Damping',
+          learningRate: 'Memory learning rate',
+          decayRate: 'Memory decay rate',
+          adaptationStrength: 'Adaptation strength',
+          adaptationThreshold: 'Adaptation threshold',
+          memoryEnabled: 'Memory enabled',
+          adaptiveEnabled: 'Adaptive response enabled',
+          filamentDensity: 'Filament density',
+          membraneOpacity: 'Membrane opacity',
+          structuralContrast: 'Structural contrast',
+          tensionHighlight: 'Tension highlight',
+          visualMemory: 'Visual memory intensity',
+          interactionRadius: 'Interaction radius',
+          proximityResponse: 'Proximity response',
+          dwellDelay: 'Dwell delay (s)',
+          dwellAttraction: 'Dwell attraction',
+        },
+        state: 'Behavioural state',
+        heatmap: 'Memory (outer) / adaptation (inner)',
+        visualTitle: 'Display (does not change the condition)',
+        lowDetail: 'Reduced detail',
+        detailAuto: 'Auto detail',
+        audioPeak: 'Audio peak',
+        reset: 'Reset experiment',
+        export: 'Export session (.json)',
+        close: 'Close',
+        stats: { elapsed: 'Elapsed', contacts: 'Contacts', revisits: 'Revisits', adapted: 'Adapted regions', sweeps: 'Sweeps', dwells: 'Dwells', maxMemory: 'Max memory', events: 'Events', fps: 'FPS' },
+        custom: 'custom',
+      },
+    },
+    zh: {
+      docTitle: '一个物体 / 多次相遇 · V4.1',
+      title: '一个物体 / 多次相遇',
+      info: '说明',
+      soundOn: '声音 开',
+      soundOff: '声音 关',
+      soundUnavailable: '无声音',
+      reset: '重置',
+      finish: '结束',
+      canvasLabel: '一个陌生的形态，会对靠近、触碰与时间作出回应。',
+      hints: {
+        approach: '靠近一点。',
+        touch: '试着触碰。',
+        wait: '如果等一等，会怎样？',
+      },
+      infoTitle: '关于这次相遇',
+      infoBody: '一个会对靠近、触碰与时间作出回应的形态。这里没有目标，也没有正确的互动方式。停留多久都可以。',
+      howTitle: '互动方式',
+      howBody: '用鼠标、触控笔或手指靠近它，在它上面或附近按住并拖动，快速划过它，松开，或者只是等待。这个体验以视觉和指针操作为主，目前无法仅通过键盘或读屏软件完整体验。',
+      soundTitle: '声音',
+      soundBody: '声音默认关闭，点击“声音”即可开启。开启后，只有你与形态的互动才会产生轻微的声音。',
+      privacyTitle: '记录说明',
+      privacyBody: '互动的时间、靠近形态时的指针移动以及你自愿填写的回答，只保存在当前浏览器标签页中，供研究者导出。数据不会发送到任何服务器；关闭页面或重置后不会保留。',
+      simNote: '这个形态是由程序生成的模拟。',
+      openResearcher: '研究者模式',
+      shortcutNote: '快捷键：Shift + R',
+      close: '关闭',
+      reflectTitle: '相遇之后',
+      reflectIntro: '只在你愿意时回答。所有问题都是可选的。',
+      questions: [
+        '在这次相遇中，你注意到了哪些变化？',
+        '你是否开始预期某些回应？',
+        '有没有哪里的回应和你预期的不同？',
+        '你和它互动的方式有改变吗？为什么？',
+        '现在你会如何描述这个物体？',
+      ],
+      skip: '跳过',
+      save: '保存',
+      thanks: '谢谢。你可以继续探索。',
+      continue: '继续',
+      bootWarning: '本页面使用 JavaScript 模块，需要通过本地服务器打开（例如 python3 -m http.server），不能直接从文件系统打开。',
+      researcher: {
+        title: '研究者模式',
+        condition: '实验条件',
+        presetA: 'A — 稳定材料',
+        presetB: 'B — 适应性材料',
+        presetNote: '应用预设或随机种子会开始新的会话。',
+        seed: '随机种子',
+        applySeed: '应用种子',
+        params: {
+          responsiveness: '基础回应程度',
+          stiffness: '弹簧刚度',
+          damping: '阻尼',
+          learningRate: '记忆积累速度',
+          decayRate: '记忆衰减速度',
+          adaptationStrength: '适应强度',
+          adaptationThreshold: '适应阈值',
+          memoryEnabled: '启用记忆',
+          adaptiveEnabled: '启用适应性回应',
+          filamentDensity: '纤维密度',
+          membraneOpacity: '膜的不透明度',
+          structuralContrast: '结构对比度',
+          tensionHighlight: '张力高光强度',
+          visualMemory: '视觉记忆强度',
+          interactionRadius: '互动半径',
+          proximityResponse: '靠近回应强度',
+          dwellDelay: '停留延迟（秒）',
+          dwellAttraction: '停留吸引强度',
+        },
+        state: '行为状态',
+        heatmap: '记忆（外圈）/ 适应（内圈）',
+        visualTitle: '显示（不改变实验条件）',
+        lowDetail: '降低细节',
+        detailAuto: '自动细节',
+        audioPeak: '音频峰值',
+        reset: '重置实验',
+        export: '导出会话 (.json)',
+        close: '关闭',
+        stats: { elapsed: '时长', contacts: '接触次数', revisits: '重访次数', adapted: '已适应区域', sweeps: '划过次数', dwells: '停留次数', maxMemory: '最高记忆', events: '事件数', fps: '帧率' },
+        custom: '自定义',
+      },
+    },
+  };
+
+  /** Resolve a dotted key, e.g. "hints.touch". */
+  function t(lang, key) {
+    return key.split('.').reduce((o, k) => (o == null ? o : o[k]), translations[lang]) ?? key;
+  }
+  return { translations, t };
+})();
+
+/* ======================= src/ui/ExhibitionUI.js ======================= */
+const M_ui_ExhibitionUI = (() => {
+  // Participant-facing interface: language, progressive hints, info panel,
+  // optional reflection. Contains no simulation logic.
+
+  const { t, translations } = M_ui_translations;
+
+  const HINT_FIRST_DELAY = 900;
+  const TOUCH_HINT_DELAY = 2500;
+  const WAIT_HINT_STILL = 2000;
+  const HINT_MAX_AGE = { approach: Infinity, touch: 8000, wait: 6000 };
+
+  class ExhibitionUI {
+    constructor({ lang = 'en', onLangChange, onReset, onFinish, onReflection, onOpenResearcher, onSound }) {
+      this.lang = lang;
+      this.sound = 'off';
+      this.cb = { onLangChange, onReset, onFinish, onReflection, onOpenResearcher, onSound };
+      this.$ = (id) => document.getElementById(id);
+      this.hintEl = this.$('hint');
+      this.info = this.$('info');
+      this.reflection = this.$('reflection');
+      this.lastFocus = null;
+      this.buildQuestions();
+      this.bind();
+      this.resetHints();
+      this.applyLanguage();
+    }
+
+    bind() {
+      this.$('langBtn').addEventListener('click', () => {
+        this.lang = this.lang === 'en' ? 'zh' : 'en';
+        this.applyLanguage();
+        this.cb.onLangChange?.(this.lang);
+      });
+      this.$('soundBtn').addEventListener('click', () => this.cb.onSound?.());
+      this.$('infoBtn').addEventListener('click', () => this.togglePanel(this.info, this.$('infoBtn')));
+      this.$('infoClose').addEventListener('click', () => this.closePanel(this.info));
+      this.$('openResearcher').addEventListener('click', () => { this.closePanel(this.info); this.cb.onOpenResearcher?.(); });
+      this.$('resetBtn').addEventListener('click', () => { this.closePanel(this.reflection); this.cb.onReset?.(); });
+      this.$('finishBtn').addEventListener('click', () => this.openReflection());
+      this.$('reflectSkip').addEventListener('click', () => this.submitReflection(null));
+      this.$('reflectForm').addEventListener('submit', (e) => {
+        e.preventDefault();
+        const answers = {};
+        this.reflection.querySelectorAll('textarea').forEach((ta, i) => { answers['q' + (i + 1)] = ta.value.trim(); });
+        this.submitReflection(answers);
+      });
+      this.$('reflectContinue').addEventListener('click', () => this.closePanel(this.reflection));
+    }
+
+    buildQuestions() {
+      const wrap = this.$('questions');
+      const n = translations.en.questions.length;
+      for (let i = 0; i < n; i++) {
+        const id = 'q' + (i + 1);
+        const label = document.createElement('label');
+        label.htmlFor = id;
+        label.dataset.i18n = `questions.${i}`;
+        const ta = document.createElement('textarea');
+        ta.id = id; ta.rows = 2;
+        wrap.append(label, ta);
+      }
+    }
+
+    applyLanguage() {
+      const L = this.lang;
+      document.documentElement.lang = L === 'zh' ? 'zh-CN' : 'en';
+      document.title = t(L, 'docTitle');
+      document.querySelectorAll('[data-i18n]').forEach((el) => { el.textContent = t(L, el.dataset.i18n); });
+      document.querySelectorAll('[data-i18n-aria]').forEach((el) => { el.setAttribute('aria-label', t(L, el.dataset.i18nAria)); });
+      this.$('langEn').classList.toggle('on', L === 'en');
+      this.$('langZh').classList.toggle('on', L === 'zh');
+      this.$('langBtn').setAttribute('aria-label', L === 'en' ? '切换到中文' : 'Switch to English');
+      if (this.hint) this.hintEl.textContent = t(L, 'hints.' + this.hint);
+      this.renderSound();
+    }
+
+    /** state: 'on' | 'off' | 'unavailable' */
+    setSound(state) { this.sound = state; this.renderSound(); }
+
+    renderSound() {
+      const btn = this.$('soundBtn');
+      const key = this.sound === 'on' ? 'soundOn' : this.sound === 'unavailable' ? 'soundUnavailable' : 'soundOff';
+      btn.textContent = t(this.lang, key);
+      btn.setAttribute('aria-pressed', String(this.sound === 'on'));
+      btn.disabled = this.sound === 'unavailable';
+    }
+
+    // ---------- hints ----------
+    resetHints() {
+      this.hint = null; this.hintAge = 0; this.elapsed = 0;
+      this.seen = { approach: false, touch: false, wait: false };
+      this.approachedAt = null;
+      this.hintEl.classList.remove('visible');
+    }
+
+    showHint(key) {
+      this.hint = key; this.hintAge = 0; this.seen[key] = true;
+      this.hintEl.textContent = t(this.lang, 'hints.' + key);
+      this.hintEl.classList.add('visible');
+    }
+
+    hideHint() { this.hint = null; this.hintEl.classList.remove('visible'); }
+
+    update(sim, dtMs) {
+      this.elapsed += dtMs;
+      const tot = sim.totals, near = sim.proximity > 0.3;
+      if (near && this.approachedAt === null) { this.approachedAt = this.elapsed; this.seen.approach = true; }
+      if (this.hint) {
+        this.hintAge += dtMs;
+        const done = (this.hint === 'approach' && near)
+          || (this.hint === 'touch' && tot.contactEpisodes > 0)
+          || this.hintAge > HINT_MAX_AGE[this.hint];
+        if (done) this.hideHint();
+        return;
+      }
+      if (!this.seen.approach && this.elapsed > HINT_FIRST_DELAY && tot.contactEpisodes === 0) this.showHint('approach');
+      else if (!this.seen.touch && this.approachedAt !== null && tot.contactEpisodes === 0 && this.elapsed - this.approachedAt > TOUCH_HINT_DELAY) this.showHint('touch');
+      else if (!this.seen.wait && tot.contactEpisodes >= 3 && !sim.grab && sim.stillMs > WAIT_HINT_STILL) this.showHint('wait');
+    }
+
+    // ---------- panels ----------
+    anyPanelOpen() { return !this.info.hidden || !this.reflection.hidden; }
+
+    togglePanel(panel, opener) { if (panel.hidden) this.openPanel(panel, opener); else this.closePanel(panel); }
+
+    openPanel(panel, opener = document.activeElement) {
+      this.lastFocus = opener;
+      panel.hidden = false;
+      if (panel === this.info) this.$('infoBtn').setAttribute('aria-expanded', 'true');
+      requestAnimationFrame(() => panel.classList.add('open'));
+      panel.querySelector('button, textarea, [tabindex]')?.focus();
+    }
+
+    closePanel(panel) {
+      if (panel.hidden) return;
+      panel.classList.remove('open');
+      panel.hidden = true;
+      if (panel === this.info) this.$('infoBtn').setAttribute('aria-expanded', 'false');
+      this.lastFocus?.focus?.();
+    }
+
+    closeAll() { this.closePanel(this.info); this.closePanel(this.reflection); }
+
+    openReflection() {
+      this.closePanel(this.info);
+      this.$('reflectForm').hidden = false;
+      this.$('reflectThanks').hidden = true;
+      this.cb.onFinish?.();
+      this.openPanel(this.reflection, this.$('finishBtn'));
+    }
+
+    submitReflection(answers) {
+      this.cb.onReflection?.(answers);
+      this.$('reflectForm').hidden = true;
+      this.$('reflectThanks').hidden = false;
+      this.$('reflectContinue').focus();
+    }
+
+    clearReflection() { this.reflection.querySelectorAll('textarea').forEach((ta) => { ta.value = ''; }); }
+  }
+  return { ExhibitionUI };
+})();
+
+/* ======================= src/ui/ResearcherPanel.js ======================= */
+const M_ui_ResearcherPanel = (() => {
+  // Researcher Mode: hidden during ordinary encounters. Builds its own DOM.
+
+  const { RESEARCH_SLIDERS, RESEARCH_TOGGLES, VISUAL_SLIDERS } = M_config;
+  const { t } = M_ui_translations;
+
+  const UPDATE_INTERVAL = 200; // ms
+
+  class ResearcherPanel {
+    constructor(root, { getLang, onParam, onVisual, onPreset, onSeed, onReset, onExport }) {
+      this.root = root;
+      this.cb = { getLang, onParam, onVisual, onPreset, onSeed, onReset, onExport };
+      this.sinceUpdate = UPDATE_INTERVAL;
+      this.build();
+    }
+
+    get open() { return !this.root.hidden; }
+
+    toggle() { if (this.open) this.close(); else this.show(); }
+    show() { this.root.hidden = false; this.sinceUpdate = UPDATE_INTERVAL; this.root.querySelector('button')?.focus(); }
+    close() { this.root.hidden = true; }
+
+    L(key) { return t(this.cb.getLang(), 'researcher.' + key); }
+
+    build() {
+      const r = this.root;
+      r.innerHTML = '';
+      const el = (tag, attrs = {}, ...kids) => {
+        const e = document.createElement(tag);
+        for (const [k, v] of Object.entries(attrs)) {
+          if (k === 'class') e.className = v; else if (k.startsWith('on')) e.addEventListener(k.slice(2), v); else e.setAttribute(k, v);
+        }
+        e.append(...kids);
+        return e;
+      };
+      this.el = el;
+
+      r.append(el('div', { class: 'r-head' },
+        el('h2', { id: 'r-title' }, this.L('title')),
+        el('button', { type: 'button', onclick: () => this.close(), 'aria-label': this.L('close') }, '×')));
+
+      // condition + presets
+      this.condEl = el('strong');
+      r.append(el('section', {},
+        el('div', { class: 'r-row' }, el('span', {}, this.L('condition')), this.condEl),
+        el('div', { class: 'r-presets' },
+          el('button', { type: 'button', onclick: () => this.cb.onPreset('A') }, this.L('presetA')),
+          el('button', { type: 'button', onclick: () => this.cb.onPreset('B') }, this.L('presetB'))),
+        el('p', { class: 'r-note' }, this.L('presetNote'))));
+
+      // seed
+      this.seedInput = el('input', { type: 'number', min: '0', step: '1', id: 'r-seed' });
+      r.append(el('section', {}, el('label', { for: 'r-seed' }, this.L('seed')),
+        el('div', { class: 'r-seed' }, this.seedInput,
+          el('button', { type: 'button', onclick: () => {
+            const v = Math.floor(Number(this.seedInput.value));
+            if (Number.isFinite(v) && v >= 0) this.cb.onSeed(v >>> 0);
+          } }, this.L('applySeed')))));
+
+      // sliders
+      this.inputs = {};
+      const sliders = el('section', {});
+      for (const s of RESEARCH_SLIDERS) {
+        const id = 'r-' + s.key;
+        const out = el('output', { for: id });
+        const input = el('input', { type: 'range', id, min: s.min, max: s.max, step: s.step });
+        input.addEventListener('input', () => { out.textContent = input.value; });
+        input.addEventListener('change', () => this.cb.onParam(s.key, Number(input.value)));
+        this.inputs[s.key] = { input, out };
+        sliders.append(el('div', { class: 'r-slider' },
+          el('label', { for: id }, el('span', {}, this.L('params.' + s.key)), out), input));
+      }
+      for (const key of RESEARCH_TOGGLES) {
+        const id = 'r-' + key;
+        const input = el('input', { type: 'checkbox', id });
+        input.addEventListener('change', () => this.cb.onParam(key, input.checked));
+        this.inputs[key] = { input };
+        sliders.append(el('label', { class: 'r-check', for: id }, input, el('span', {}, this.L('params.' + key))));
+      }
+      r.append(sliders);
+
+      // display-only settings (scope "visual")
+      this.visualInputs = {};
+      const vis = el('section', {}, el('h3', {}, this.L('visualTitle')));
+      for (const s of VISUAL_SLIDERS) {
+        const id = 'r-v-' + s.key;
+        const out = el('output', { for: id });
+        const input = el('input', { type: 'range', id, min: s.min, max: s.max, step: s.step });
+        input.addEventListener('input', () => { out.textContent = input.value; this.cb.onVisual(s.key, Number(input.value), false); });
+        input.addEventListener('change', () => this.cb.onVisual(s.key, Number(input.value), true));
+        this.visualInputs[s.key] = { input, out };
+        vis.append(el('div', { class: 'r-slider' }, el('label', { for: id }, el('span', {}, this.L('params.' + s.key)), out), input));
+      }
+      const low = el('input', { type: 'checkbox', id: 'r-v-lowDetail' });
+      low.addEventListener('change', () => this.cb.onVisual('lowDetail', low.checked, true));
+      this.visualInputs.lowDetail = { input: low };
+      vis.append(el('label', { class: 'r-check', for: 'r-v-lowDetail' }, low, el('span', {}, this.L('lowDetail'))));
+      r.append(vis);
+
+      // live state
+      this.stateEl = el('div', { class: 'r-state' });
+      this.statsEl = el('dl', { class: 'r-stats' });
+      this.heat = el('canvas', { width: '360', height: '360', class: 'r-heat', 'aria-hidden': 'true' });
+      r.append(el('section', {}, el('h3', {}, this.L('state')), this.stateEl, this.statsEl,
+        el('h3', {}, this.L('heatmap')), this.heat));
+
+      r.append(el('section', { class: 'r-actions' },
+        el('button', { type: 'button', onclick: () => this.cb.onReset() }, this.L('reset')),
+        el('button', { type: 'button', class: 'primary', onclick: () => this.cb.onExport() }, this.L('export'))));
+    }
+
+    /** Re-render labels after a language change, keeping values. */
+    relabel(sim, conditionId, visual) {
+      const wasOpen = this.open;
+      this.build();
+      this.sync(sim, conditionId, visual);
+      this.root.hidden = !wasOpen;
+    }
+
+    sync(sim, conditionId, visual) {
+      for (const [key, { input, out }] of Object.entries(this.inputs)) {
+        if (input.type === 'checkbox') input.checked = !!sim.params[key];
+        else { input.value = sim.params[key]; out.textContent = sim.params[key]; }
+      }
+      this.seedInput.value = sim.seed;
+      this.condEl.textContent = conditionId;
+      for (const [key, { input, out }] of Object.entries(this.visualInputs)) {
+        if (input.type === 'checkbox') input.checked = !!visual[key];
+        else { input.value = visual[key]; out.textContent = visual[key]; }
+      }
+    }
+
+    update(sim, fps, dtMs, eventCount, extra = {}) {
+      if (!this.open) return;
+      this.sinceUpdate += dtMs;
+      if (this.sinceUpdate < UPDATE_INTERVAL) return;
+      this.sinceUpdate = 0;
+      const st = sim.getState();
+      this.stateEl.textContent = st.primary + '  ·  ' + Object.entries(st.flags).filter(([, v]) => v).map(([k]) => k).join(' + ');
+      const tot = sim.totals;
+      const rows = [
+        ['elapsed', (sim.timeMs / 1000).toFixed(1) + 's'],
+        ['contacts', tot.contactEpisodes],
+        ['revisits', tot.revisits],
+        ['adapted', sim.adapt.adaptedRegions() + ' / ' + sim.regionCount],
+        ['sweeps', tot.sweeps],
+        ['dwells', tot.dwells],
+        ['maxMemory', sim.memory.max().toFixed(2)],
+        ['events', eventCount],
+        ['fps', Math.round(fps) + (extra.detail < 1 ? ' · ' + this.L('detailAuto') + ' ' + extra.detail : '')],
+      ];
+      if (extra.audioPeak !== undefined) rows.push(['audioPeak', extra.audioPeak]);
+      this.statsEl.replaceChildren(...rows.flatMap(([k, v]) => [this.el('dt', {}, k === 'audioPeak' ? this.L('audioPeak') : this.L('stats.' + k)), this.el('dd', {}, String(v))]));
+      this.drawHeat(sim);
+    }
+
+    drawHeat(sim) {
+      const c = this.heat, ctx = c.getContext('2d'), W = c.width, cx = W / 2;
+      const ink = getComputedStyle(this.root).color;
+      ctx.clearRect(0, 0, W, W);
+      const n = sim.n, step = (Math.PI * 2) / n;
+      for (let i = 0; i < n; i++) {
+        const a0 = i * step - step / 2, a1 = a0 + step;
+        ctx.beginPath(); ctx.arc(cx, cx, W * 0.44, a0, a1); ctx.arc(cx, cx, W * 0.32, a1, a0, true); ctx.closePath();
+        ctx.fillStyle = `rgba(199,233,255,${0.06 + sim.memory.level[i] * 0.9})`; ctx.fill();
+        ctx.beginPath(); ctx.arc(cx, cx, W * 0.3, a0, a1); ctx.arc(cx, cx, W * 0.2, a1, a0, true); ctx.closePath();
+        ctx.fillStyle = `rgba(117,189,232,${0.06 + sim.adapt.level[i] * 0.9})`; ctx.fill();
+      }
+      ctx.strokeStyle = ink; ctx.globalAlpha = 0.35; ctx.lineWidth = 1;
+      for (let r = 0; r < sim.regionCount; r++) {
+        const a = (r - 0.5) * (Math.PI * 2 / sim.regionCount);
+        ctx.beginPath(); ctx.moveTo(cx + Math.cos(a) * W * 0.2, cx + Math.sin(a) * W * 0.2);
+        ctx.lineTo(cx + Math.cos(a) * W * 0.46, cx + Math.sin(a) * W * 0.46); ctx.stroke();
+      }
+      ctx.globalAlpha = 1;
+    }
+  }
+  return { ResearcherPanel };
+})();
+
+// Module namespace (read-only use: console inspection and headless tests)
+globalThis.OOME = Object.freeze({ M_config, M_util_math, M_physics_SoftBody, M_behavior_MemorySystem, M_behavior_AdaptationSystem, M_behavior_ImmediateResponse, M_simulation_Simulation, M_rendering_FilamentNetwork, M_rendering_FilamentRenderer, M_interaction_PointerController, M_audio_AudioEngine, M_research_SessionLogger, M_research_Exporter, M_ui_translations, M_ui_ExhibitionUI, M_ui_ResearcherPanel });
+
+/* ======================= src/main.js ======================= */
+// Only runs in a browser page that has the stage canvas (lets tests load the modules headlessly).
+if (typeof document !== 'undefined' && document.getElementById('stage')) {
+  // Entry point: wires simulation, renderer, input, sound, UI and research tools.
+
+  const { APP_VERSION, STEP, MAX_SUBSTEPS, DEFAULT_PARAMS, PRESETS, DEFAULT_VISUAL } = M_config;
+  const { Simulation } = M_simulation_Simulation;
+  const { FilamentRenderer } = M_rendering_FilamentRenderer;
+  const { PointerController } = M_interaction_PointerController;
+  const { AudioEngine } = M_audio_AudioEngine;
+  const { SessionLogger } = M_research_SessionLogger;
+  const { buildPayload, downloadJSON } = M_research_Exporter;
+  const { ExhibitionUI } = M_ui_ExhibitionUI;
+  const { ResearcherPanel } = M_ui_ResearcherPanel;
+
+  const canvas = document.getElementById('stage');
+  const motionQuery = matchMedia('(prefers-reduced-motion: reduce)');
+
+  const logger = new SessionLogger();
+  const sim = new Simulation({ logger, reducedMotion: motionQuery.matches });
+  const renderer = new FilamentRenderer(canvas, sim);
+  renderer.reducedMotion = motionQuery.matches;
+  const pointer = new PointerController(canvas, (x, y) => renderer.toObject(x, y));
+  const audio = new AudioEngine();
+  sim.hooks.contact = (s) => audio.contact(s);
+  sim.hooks.release = (t) => audio.release(t);
+
+  let lang = 'en';
+  const visual = renderer.visual;
+  const condition = { preset: 'B', custom: false };
+  const conditionId = () => PRESETS[condition.preset].id + (condition.custom ? '+custom' : '');
+
+  function startSession() {
+    sim.reset(sim.seed);
+    renderer.resetLag();
+    logger.start({
+      appVersion: APP_VERSION,
+      condition: conditionId(),
+      seed: sim.seed,
+      parameters: { ...sim.params },
+      visualParameters: { ...visual },
+      reducedMotion: sim.reducedMotion,
+      sound: audio.enabled,
+    });
+    ui.resetHints();
+    ui.clearReflection();
+  }
+
+  function logParam(param, from, to, scope = 'behaviour') {
+    logger.log('parameter_change', sim.timeMs, { metadata: { param, from, to, scope } });
+  }
+
+  const ui = new ExhibitionUI({
+    lang,
+    onLangChange: (l) => { lang = l; researcher.relabel(sim, conditionId(), visual); },
+    onReset: () => startSession(),
+    onReflection: (answers) => logger.setReflection(answers, sim.timeMs),
+    onOpenResearcher: () => researcher.show(),
+    onSound: async () => {
+      if (audio.enabled) audio.disable();
+      else if (!(await audio.enable())) { ui.setSound('unavailable'); return; }
+      ui.setSound(audio.enabled ? 'on' : 'off');
+      logger.log('sound_toggle', sim.timeMs, { metadata: { enabled: audio.enabled } });
+    },
+  });
+  ui.setSound(audio.supported ? 'off' : 'unavailable');
+
+  const researcher = new ResearcherPanel(document.getElementById('researcher'), {
+    getLang: () => lang,
+    onParam: (key, value) => {
+      const from = sim.params[key];
+      if (from === value) return;
+      sim.params[key] = value;
+      condition.custom = true;
+      logParam(key, from, value);
+      researcher.sync(sim, conditionId(), visual);
+    },
+    // display-only: applied live while dragging a slider, logged on commit; never marks the condition custom
+    onVisual: (key, value, commit) => {
+      const from = visual[key];
+      if (!commit) { renderer.setVisual(key, value); return; }
+      if (visualCommitted[key] !== value) logParam(key, visualCommitted[key], value, 'visual');
+      visualCommitted[key] = value;
+      if (from !== value) renderer.setVisual(key, value);
+    },
+    onPreset: (id) => {
+      const { id: _ignored, ...flags } = PRESETS[id];
+      logParam('preset', conditionId(), PRESETS[id].id);
+      Object.assign(sim.params, DEFAULT_PARAMS, flags);
+      condition.preset = id; condition.custom = false;
+      startSession();
+      researcher.sync(sim, conditionId(), visual);
+    },
+    onSeed: (seed) => {
+      logParam('seed', sim.seed, seed);
+      sim.seed = seed;
+      startSession();
+      researcher.sync(sim, conditionId(), visual);
+    },
+    onReset: () => { startSession(); researcher.sync(sim, conditionId(), visual); },
+    onExport: () => downloadJSON(buildPayload(sim, logger, { condition: conditionId(), visual })),
+  });
+  const visualCommitted = { ...DEFAULT_VISUAL };
+
+  startSession();
+  researcher.sync(sim, conditionId(), visual);
+
+  // ---------- global input ----------
+  addEventListener('keydown', (e) => {
+    const typing = /^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName);
+    if (e.key === 'Escape') { if (researcher.open) researcher.close(); else ui.closeAll(); }
+    else if (!typing && e.shiftKey && (e.key === 'R' || e.key === 'r')) { e.preventDefault(); researcher.toggle(); }
+  });
+
+  new ResizeObserver(() => renderer.resize()).observe(canvas);
+  motionQuery.addEventListener?.('change', (e) => { sim.reducedMotion = e.matches; renderer.reducedMotion = e.matches; });
+
+  // ---------- loop ----------
+  let last = performance.now(), acc = 0, fps = 60, slowMs = 0;
+  document.addEventListener('visibilitychange', () => {
+    audio.setHidden(document.hidden);
+    if (!document.hidden) last = performance.now();
+  });
+
+  function frame(now) {
+    requestAnimationFrame(frame);
+    const dt = Math.min(0.1, Math.max(0, (now - last) / 1000));
+    last = now;
+    if (dt > 0) fps += (1 / dt - fps) * 0.05;
+    acc += dt;
+    pointer.update(now);
+    sim.setInput(pointer.state);
+    let steps = 0;
+    while (acc >= STEP && steps < MAX_SUBSTEPS) { sim.step(); acc -= STEP; steps++; }
+    if (steps === MAX_SUBSTEPS) acc = 0; // drop backlog instead of spiralling
+
+    // automatic reduced-detail fallback after sustained low frame rate
+    slowMs = fps < 40 ? slowMs + dt * 1000 : 0;
+    if (slowMs > 2500 && renderer.detail === 1) {
+      renderer.detail = 0.6;
+      logParam('autoDetail', 1, 0.6, 'visual');
+    }
+
+    renderer.draw(dt, pointer.state);
+    audio.update(sim.signals, !!sim.grab);
+    ui.update(sim, dt * 1000);
+    researcher.update(sim, fps, dt * 1000, logger.events.length, {
+      detail: renderer.detail,
+      audioPeak: audio.enabled ? audio.peak.toFixed(3) : undefined,
+    });
+  }
+  requestAnimationFrame(frame);
+
+  // exposed for manual inspection in the console (read-only use)
+  window.__oome = { sim, logger, renderer, audio, version: APP_VERSION };
+  window.__oomeReady = true;
+  document.getElementById('boot-warning')?.remove();
+}
+  </script>
+</body>
+</html>
