@@ -84,6 +84,14 @@ export const SILICONE_DEFAULTS = Object.freeze({
   maxDeformation: 0.45, // 0.15..0.8  how far a grabbed region can be pulled (object units)
 });
 
+// Condition 03 (Plastic / Crease) researcher parameters — defaults
+export const PLASTIC_DEFAULTS = Object.freeze({
+  stiffness: 0.5,     // 0..1  force needed before the sheet yields and folds (yield threshold)
+  plasticity: 0.5,    // 0..1  how much of each fold remains after release (permanent bend)
+  springBack: 0.5,    // 0..1  speed of the partial elastic spring-back after release
+  foldLimit: 0.45,    // 0.2..0.6  largest fraction of the sheet one fold can lift
+});
+
 export const PRESETS = Object.freeze({
   A: Object.freeze({ id: 'A_stable', memoryEnabled: false, adaptiveEnabled: false }),
   B: Object.freeze({ id: 'B_adaptive', memoryEnabled: true, adaptiveEnabled: true }),

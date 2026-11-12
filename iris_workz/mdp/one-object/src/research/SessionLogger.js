@@ -15,7 +15,7 @@ export const EVENT_TYPES = Object.freeze([
   // V4
   'sweep', 'sound_toggle', 'dwell',
   // V5
-  'reset',
+  'reset', 'fold',
 ]);
 
 const round = (v, d = 3) => (typeof v === 'number' ? Math.round(v * 10 ** d) / 10 ** d : v);
