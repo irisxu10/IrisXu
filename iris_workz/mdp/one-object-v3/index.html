@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>One Object / Many Encounters</title>
+  <link rel="stylesheet" href="src/styles/main.css">
+</head>
+<body>
+  <canvas id="stage" role="img" data-i18n-aria="canvasLabel" aria-label="An unfamiliar form that responds to approach, touch and time." aria-describedby="a11y-desc"></canvas>
+  <p id="a11y-desc" class="sr-only" data-i18n="howBody"></p>
+
+  <header class="chrome top">
+    <div class="title" data-i18n="title">ONE OBJECT / MANY ENCOUNTERS</div>
+    <nav>
+      <button type="button" id="infoBtn" aria-expanded="false" aria-controls="info" data-i18n="info">INFO</button>
+      <button type="button" id="langBtn"><span id="langEn" class="on">EN</span> / <span id="langZh">中文</span></button>
+    </nav>
+  </header>
+
+  <footer class="chrome bottom">
+    <p id="hint" class="hint" aria-live="polite"></p>
+    <div class="actions">
+      <button type="button" id="finishBtn" data-i18n="finish">FINISH</button>
+      <button type="button" id="resetBtn" data-i18n="reset">RESET ↺</button>
+    </div>
+  </footer>
+
+  <section id="info" class="panel info" role="dialog" aria-labelledby="infoTitle" hidden>
+    <h2 id="infoTitle" data-i18n="infoTitle"></h2>
+    <p data-i18n="infoBody"></p>
+    <h3 data-i18n="howTitle"></h3>
+    <p data-i18n="howBody"></p>
+    <h3 data-i18n="privacyTitle"></h3>
+    <p data-i18n="privacyBody"></p>
+    <p class="muted" data-i18n="simNote"></p>
+    <div class="panel-actions">
+      <button type="button" id="openResearcher" class="quiet" data-i18n="openResearcher"></button>
+      <span class="muted small" data-i18n="shortcutNote"></span>
+    </div>
+    <button type="button" id="infoClose" class="close" data-i18n="close"></button>
+  </section>
+
+  <section id="reflection" class="panel reflection" role="dialog" aria-modal="true" aria-labelledby="reflectTitle" hidden>
+    <h2 id="reflectTitle" data-i18n="reflectTitle"></h2>
+    <form id="reflectForm">
+      <p class="muted" data-i18n="reflectIntro"></p>
+      <div id="questions" class="questions"></div>
+      <div class="panel-actions">
+        <button type="button" id="reflectSkip" data-i18n="skip"></button>
+        <button type="submit" class="primary" data-i18n="save"></button>
+      </div>
+    </form>
+    <div id="reflectThanks" hidden>
+      <p data-i18n="thanks"></p>
+      <button type="button" id="reflectContinue" class="primary" data-i18n="continue"></button>
+    </div>
+  </section>
+
+  <aside id="researcher" class="researcher" aria-labelledby="r-title" hidden></aside>
+
+  <div id="boot-warning" class="boot-warning" hidden>
+    This page uses JavaScript modules and must be opened through a web server
+    (for example: <code>python3 -m http.server</code>), not directly from the file system.<br>
+    本页面需要通过本地服务器打开，不能直接从文件系统打开。
+  </div>
+  <script>
+    setTimeout(function () { if (!window.__oomeReady) { var w = document.getElementById('boot-warning'); if (w) w.hidden = false; } }, 1500);
+  </script>
+  <script type="module" src="src/main.js"></script>
+</body>
+</html>

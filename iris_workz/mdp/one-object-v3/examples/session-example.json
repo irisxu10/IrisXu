@@ -1,0 +1,491 @@
+{
+  "schema": "one-object-many-encounters/session",
+  "schemaVersion": 1,
+  "appVersion": "3.0.0",
+  "sessionId": "test-1",
+  "startedAt": "2026-11-05T10:00:00.000Z",
+  "exportedAt": "2026-11-05T10:03:00.000Z",
+  "durationMs": 34633,
+  "clock": "simulation milliseconds since session start (pauses while the tab is hidden)",
+  "condition": "B_adaptive",
+  "seed": 20261105,
+  "parameters": {
+    "responsiveness": 1,
+    "stiffness": 0.014,
+    "damping": 0.95,
+    "tension": 0.22,
+    "volume": 0.015,
+    "maxDisplacement": 0.36,
+    "contactRadius": 0.36,
+    "contactMargin": 0.3,
+    "grip": 0.18,
+    "pressDepth": 0.05,
+    "flingGain": 0.05,
+    "proximityRadius": 0.8,
+    "proximityPush": 0.0012,
+    "proximitySpeedGain": 0.0012,
+    "proximityWake": 0.06,
+    "memoryEnabled": true,
+    "learningRate": 0.35,
+    "decayRate": 0.05,
+    "plasticity": 0.3,
+    "adaptiveEnabled": true,
+    "adaptationStrength": 0.72,
+    "adaptationThreshold": 0.65,
+    "adaptationHysteresis": 0.2,
+    "adaptationTau": 1.2,
+    "adaptStiffen": 1.5,
+    "adaptWiden": 0.8,
+    "ambientAmplitude": 0.008
+  },
+  "summary": {
+    "totalContactMs": 8133,
+    "totalInteractionMs": 23800,
+    "contactEpisodes": 8,
+    "dragDistance": 6.992,
+    "regionRevisits": 6,
+    "adaptationEvents": 1,
+    "regionRecoveries": 1,
+    "stillnessPeriods": 1,
+    "parameterChanges": 0,
+    "finalMeanMemory": 0.07,
+    "droppedEvents": 0
+  },
+  "units": {
+    "distance": "object units (base radius = 1)",
+    "speed": "object units per second",
+    "coordinates": "object units relative to the object centre",
+    "region": "12 perimeter regions; region r is centred at r × 30°, 0° = right, clockwise on screen"
+  },
+  "events": [
+    {
+      "timestampMs": 0,
+      "type": "session_start",
+      "metadata": {
+        "condition": "B_adaptive",
+        "seed": 20261105
+      }
+    },
+    {
+      "timestampMs": 1217,
+      "type": "approach",
+      "distance": 0.445,
+      "speed": 0.66
+    },
+    {
+      "timestampMs": 1517,
+      "type": "contact_start",
+      "region": 0,
+      "distance": 0.065,
+      "speed": 0,
+      "memoryLevel": 0,
+      "metadata": {
+        "x": 1,
+        "y": 0
+      }
+    },
+    {
+      "timestampMs": 1917,
+      "type": "drag",
+      "region": 0,
+      "distance": 0.483,
+      "speed": 0.6
+    },
+    {
+      "timestampMs": 2333,
+      "type": "drag",
+      "region": 0,
+      "distance": 0.543,
+      "speed": 0
+    },
+    {
+      "timestampMs": 2533,
+      "type": "contact_end",
+      "region": 0,
+      "durationMs": 1017,
+      "distance": 0.543,
+      "memoryLevel": 0.195
+    },
+    {
+      "timestampMs": 3533,
+      "type": "contact_start",
+      "region": 0,
+      "distance": 0.014,
+      "speed": 0,
+      "memoryLevel": 0.179,
+      "metadata": {
+        "x": 1,
+        "y": 0
+      }
+    },
+    {
+      "timestampMs": 3533,
+      "type": "region_revisit",
+      "region": 0,
+      "memoryLevel": 0.179,
+      "metadata": {
+        "previousContacts": 1
+      }
+    },
+    {
+      "timestampMs": 3950,
+      "type": "drag",
+      "region": 0,
+      "distance": 0.55,
+      "speed": 0.6
+    },
+    {
+      "timestampMs": 4350,
+      "type": "drag",
+      "region": 0,
+      "distance": 0.6,
+      "speed": 0
+    },
+    {
+      "timestampMs": 4550,
+      "type": "contact_end",
+      "region": 0,
+      "durationMs": 1017,
+      "distance": 0.6,
+      "memoryLevel": 0.357
+    },
+    {
+      "timestampMs": 4550,
+      "type": "approach",
+      "distance": null,
+      "speed": 0
+    },
+    {
+      "timestampMs": 5550,
+      "type": "contact_start",
+      "region": 0,
+      "distance": 0.006,
+      "speed": 0,
+      "memoryLevel": 0.327,
+      "metadata": {
+        "x": 1,
+        "y": 0
+      }
+    },
+    {
+      "timestampMs": 5550,
+      "type": "region_revisit",
+      "region": 0,
+      "memoryLevel": 0.327,
+      "metadata": {
+        "previousContacts": 2
+      }
+    },
+    {
+      "timestampMs": 5950,
+      "type": "drag",
+      "region": 0,
+      "distance": 0.54,
+      "speed": 0.6
+    },
+    {
+      "timestampMs": 6350,
+      "type": "drag",
+      "region": 0,
+      "distance": 0.6,
+      "speed": 0
+    },
+    {
+      "timestampMs": 6567,
+      "type": "contact_end",
+      "region": 0,
+      "durationMs": 1017,
+      "distance": 0.6,
+      "memoryLevel": 0.489
+    },
+    {
+      "timestampMs": 6567,
+      "type": "approach",
+      "distance": null,
+      "speed": 0
+    },
+    {
+      "timestampMs": 7567,
+      "type": "contact_start",
+      "region": 0,
+      "distance": 0.002,
+      "speed": 0,
+      "memoryLevel": 0.45,
+      "metadata": {
+        "x": 1,
+        "y": 0
+      }
+    },
+    {
+      "timestampMs": 7567,
+      "type": "region_revisit",
+      "region": 0,
+      "memoryLevel": 0.45,
+      "metadata": {
+        "previousContacts": 3
+      }
+    },
+    {
+      "timestampMs": 7967,
+      "type": "drag",
+      "region": 0,
+      "distance": 0.54,
+      "speed": 0.6
+    },
+    {
+      "timestampMs": 8383,
+      "type": "drag",
+      "region": 0,
+      "distance": 0.6,
+      "speed": 0
+    },
+    {
+      "timestampMs": 8583,
+      "type": "contact_end",
+      "region": 0,
+      "durationMs": 1017,
+      "distance": 0.6,
+      "memoryLevel": 0.605
+    },
+    {
+      "timestampMs": 8583,
+      "type": "approach",
+      "distance": null,
+      "speed": 0
+    },
+    {
+      "timestampMs": 9583,
+      "type": "contact_start",
+      "region": 0,
+      "distance": 0.004,
+      "speed": 0,
+      "memoryLevel": 0.557,
+      "metadata": {
+        "x": 1,
+        "y": 0
+      }
+    },
+    {
+      "timestampMs": 9583,
+      "type": "region_revisit",
+      "region": 0,
+      "memoryLevel": 0.557,
+      "metadata": {
+        "previousContacts": 4
+      }
+    },
+    {
+      "timestampMs": 10000,
+      "type": "drag",
+      "region": 0,
+      "distance": 0.55,
+      "speed": 0.6
+    },
+    {
+      "timestampMs": 10250,
+      "type": "adaptation_threshold",
+      "region": 0,
+      "memoryLevel": 0.65
+    },
+    {
+      "timestampMs": 10417,
+      "type": "drag",
+      "region": 0,
+      "distance": 0.6,
+      "speed": 0
+    },
+    {
+      "timestampMs": 10600,
+      "type": "contact_end",
+      "region": 0,
+      "durationMs": 1017,
+      "distance": 0.6,
+      "memoryLevel": 0.703
+    },
+    {
+      "timestampMs": 10600,
+      "type": "approach",
+      "distance": null,
+      "speed": 0
+    },
+    {
+      "timestampMs": 11600,
+      "type": "contact_start",
+      "region": 0,
+      "distance": 0.008,
+      "speed": 0,
+      "memoryLevel": 0.651,
+      "metadata": {
+        "x": 1,
+        "y": 0
+      }
+    },
+    {
+      "timestampMs": 11600,
+      "type": "region_revisit",
+      "region": 0,
+      "memoryLevel": 0.651,
+      "metadata": {
+        "previousContacts": 5
+      }
+    },
+    {
+      "timestampMs": 12017,
+      "type": "drag",
+      "region": 0,
+      "distance": 0.55,
+      "speed": 0.6
+    },
+    {
+      "timestampMs": 12433,
+      "type": "drag",
+      "region": 0,
+      "distance": 0.6,
+      "speed": 0
+    },
+    {
+      "timestampMs": 12617,
+      "type": "contact_end",
+      "region": 0,
+      "durationMs": 1017,
+      "distance": 0.6,
+      "memoryLevel": 0.778
+    },
+    {
+      "timestampMs": 12617,
+      "type": "approach",
+      "distance": null,
+      "speed": 0
+    },
+    {
+      "timestampMs": 13617,
+      "type": "contact_start",
+      "region": 5,
+      "distance": 0.015,
+      "speed": 0,
+      "memoryLevel": 0,
+      "metadata": {
+        "x": -0.707,
+        "y": 0.707
+      }
+    },
+    {
+      "timestampMs": 14033,
+      "type": "drag",
+      "region": 5,
+      "distance": 2.378,
+      "speed": 0.6
+    },
+    {
+      "timestampMs": 14450,
+      "type": "drag",
+      "region": 5,
+      "distance": 2.428,
+      "speed": 0
+    },
+    {
+      "timestampMs": 14633,
+      "type": "contact_end",
+      "region": 5,
+      "durationMs": 1017,
+      "distance": 2.428,
+      "memoryLevel": 0.142
+    },
+    {
+      "timestampMs": 14633,
+      "type": "approach",
+      "distance": null,
+      "speed": 0
+    },
+    {
+      "timestampMs": 20550,
+      "type": "recovery",
+      "region": 0,
+      "memoryLevel": 0.45,
+      "metadata": {
+        "kind": "region_released"
+      }
+    },
+    {
+      "timestampMs": 31633,
+      "type": "contact_start",
+      "region": 0,
+      "distance": 0.028,
+      "speed": 0,
+      "memoryLevel": 0.221,
+      "metadata": {
+        "x": 1,
+        "y": 0
+      }
+    },
+    {
+      "timestampMs": 31633,
+      "type": "region_revisit",
+      "region": 0,
+      "memoryLevel": 0.221,
+      "metadata": {
+        "previousContacts": 6
+      }
+    },
+    {
+      "timestampMs": 31633,
+      "type": "recovery",
+      "durationMs": 17000,
+      "memoryLevel": 0.233,
+      "metadata": {
+        "kind": "stillness"
+      }
+    },
+    {
+      "timestampMs": 32033,
+      "type": "drag",
+      "region": 0,
+      "distance": 0.961,
+      "speed": 0.6
+    },
+    {
+      "timestampMs": 32433,
+      "type": "drag",
+      "region": 0,
+      "distance": 1.021,
+      "speed": 0
+    },
+    {
+      "timestampMs": 32650,
+      "type": "contact_end",
+      "region": 0,
+      "durationMs": 1017,
+      "distance": 1.021,
+      "memoryLevel": 0.4
+    },
+    {
+      "timestampMs": 32650,
+      "type": "approach",
+      "distance": null,
+      "speed": 0
+    },
+    {
+      "timestampMs": 34633,
+      "type": "reflection",
+      "metadata": {
+        "skipped": false,
+        "answered": 3
+      }
+    },
+    {
+      "timestampMs": 34633,
+      "type": "session_end",
+      "metadata": {
+        "exported": true
+      }
+    }
+  ],
+  "reflection": {
+    "q1": "One side became stiffer.",
+    "q2": "Yes, that it would stretch.",
+    "q3": "",
+    "q4": "I moved to the other side.",
+    "q5": ""
+  },
+  "methodNote": "Programmed generative simulation. Logged values describe observed pointer behaviour and system state; they do not establish participant expectation, interpretation, or object agency."
+}
