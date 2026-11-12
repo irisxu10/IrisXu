@@ -3,7 +3,7 @@
 // Switching condition (or resetting, applying a preset or seed) closes the
 // current encounter — its record is frozen and kept — and begins a new one.
 
-import { APP_VERSION, DEFAULT_PARAMS, PRESETS, DEFAULT_VISUAL, DEFAULT_SEED } from './config.js';
+import { APP_VERSION, DEFAULT_PARAMS, PRESETS, DEFAULT_VISUAL, DEFAULT_SEED, GEL_DEFAULTS } from './config.js';
 import { PointerController } from './interaction/PointerController.js';
 import { AudioEngine } from './audio/AudioEngine.js';
 import { SessionLogger } from './research/SessionLogger.js';
@@ -26,6 +26,7 @@ const SILENT = Object.freeze({ tension: 0, motion: 0, sweep: 0, kinetic: 0 });
 const params = { ...DEFAULT_PARAMS };          // behaviour (condition 01)
 const visual = { ...DEFAULT_VISUAL };          // display (condition 01)
 const visualCommitted = { ...DEFAULT_VISUAL };
+const materialParams = { gel: { ...GEL_DEFAULTS } };   // per-material researcher parameters (02–04)
 const preset = { id: 'B', custom: false };
 let seed = DEFAULT_SEED;
 const presetLabel = () => PRESETS[preset.id].id + (preset.custom ? '+custom' : '');
@@ -37,11 +38,12 @@ let logger = null;         // its encounter log
 let token = 0;             // guards against overlapping switches
 
 const clock = () => (material ? material.clockMs() : 0);
+const conditionLabel = (d) => (d.key === 'structural' ? presetLabel() : d.status === 'placeholder' ? 'placeholder' : d.key);
 function logParam(param, from, to, scope = 'behaviour') {
   logger?.log('parameter_change', clock(), { metadata: { param, from, to, scope } });
 }
 function snapshot(endReason) {
-  return material.buildEncounterPayload({ condition: def.key === 'structural' ? presetLabel() : 'placeholder', visual, endReason });
+  return material.buildEncounterPayload({ condition: conditionLabel(def), visual, endReason });
 }
 
 /**
@@ -63,7 +65,7 @@ async function activate(conditionId, reason, { archive = true, event = null } = 
   def = d;
   logger = new SessionLogger();
   const enc = research.beginEncounter({ conditionId: d.id, materialKey: d.key, materialName: d.name, startReason: reason, preset: presetLabel() });
-  const m = new mod.default(d, { canvas, logger, audio, seed, params: { ...params }, visual: { ...visual }, reducedMotion: motionQuery.matches });
+  const m = new mod.default(d, { canvas, logger, audio, seed, params: { ...params }, visual: { ...visual }, materialParams: structuredClone(materialParams), reducedMotion: motionQuery.matches });
   m.initialize();
   if ('onAutoDetail' in m) m.onAutoDetail = (from, to) => logParam('autoDetail', from, to, 'visual');
   material = m;
@@ -79,9 +81,9 @@ async function activate(conditionId, reason, { archive = true, event = null } = 
     startReason: reason,
     previousConditionId: enc.previousConditionId,
     preset: presetLabel(),
-    condition: d.key === 'structural' ? presetLabel() : 'placeholder',
+    condition: conditionLabel(d),
     seed,
-    parameters: d.key === 'structural' ? { ...params } : null,
+    parameters: d.key === 'structural' ? { ...params } : materialParams[d.key] ? { ...materialParams[d.key] } : null,
     visualParameters: d.key === 'structural' ? { ...visual } : null,
     reducedMotion: motionQuery.matches,
     sound: audio.enabled,
@@ -96,7 +98,7 @@ async function activate(conditionId, reason, { archive = true, event = null } = 
 function refresh() {
   if (!def) return;
   ui.setConditions(def.id, research.allowedConditions());
-  researcher.sync({ def, sim: material?.sim || null, presetLabel: presetLabel(), params, seed, visual, research });
+  researcher.sync({ def, material, sim: material?.sim || null, presetLabel: presetLabel(), params, seed, visual, research });
 }
 
 const ui = new ExhibitionUI({
@@ -125,6 +127,15 @@ ui.setSound(audio.supported ? 'off' : 'unavailable');
 const researcher = new ResearcherPanel(document.getElementById('researcher'), {
   getLang: () => lang,
   onSwitch: (id) => { if (def && id !== def.id) activate(id, 'researcher_switch'); },
+  // per-material parameters (e.g. Gel viscosity); persist across encounters, logged with scope "material"
+  onMaterialParam: (key, value) => {
+    const store = materialParams[def.key];
+    if (!store || store[key] === value) return;
+    const from = store[key];
+    store[key] = value;
+    material?.setParam?.(key, value);
+    logParam(`${def.key}.${key}`, from, value, 'material');
+  },
   onParam: (key, value) => {
     const from = params[key];
     if (from === value) return;

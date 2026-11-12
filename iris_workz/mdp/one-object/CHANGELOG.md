@@ -2,6 +2,34 @@
 
 All notable changes to ONE OBJECT / MANY ENCOUNTERS. Dates are 2026.
 
+## 5.0.0-alpha.2 — 12 Nov · Phase 03: Gel / Flow (condition 02)
+
+**Condition 02 is now a real material** rather than a placeholder. Condition 01 is untouched: its files are unchanged and all 52 regression checks still pass.
+
+**Physics** (`physics/GelBody.js`, pure, fixed step, deterministic): a pressure-based, approximately volume-conserving soft boundary of 80 nodes.
+
+- The enclosed area's shortfall becomes an outward pressure along every normal. Pressing one side sinks it in and pushes the other regions out. Volume change stays under 0.2% for a normal press.
+- Heavy, overdamped integration with viscous coupling between neighbouring nodes. Drag is slow and delayed: 63% of the response in about 0.27 s, versus 0.02 s for Structural, with no overshoot. Motion continues briefly after release, then dissipates.
+- Weak shape memory and boundary smoothing return the form toward the circle. A final ease brings it to exact rest, with no autonomous motion afterwards.
+
+**Interior** (simulated, so it can be tested):
+
+- Three liquid layers lag the boundary at different rates, so they slide relative to one another.
+- Flow lines are carried by a flow field interpolated from the boundary velocities, and relax back to rest.
+
+**Rendering** (`rendering/GelRenderer.js`): a translucent icy body whose density centre follows the deformation; soft overlapping layers; flow lines; a thin rim highlight that brightens where the gel is compressed; one soft specular highlight that drifts against the deformation. No glow effects.
+
+**Researcher-only parameters:** viscosity, pressure redistribution, recovery speed and internal flow intensity. They persist across encounters and are logged as `parameter_change` with scope `material`. Researcher Mode now shows a parameters section for whichever material provides one.
+
+**Logging:**
+
+- Contact location, duration and drag distance.
+- At `contact_end`: `peakDeformation`, `redistribution` (peak mean outward expansion outside the contact footprint) and `peakVolumeChange`.
+- `recovery` with kind `settle`: time from release until displacement falls below 0.01, or `completed: false` if a new press interrupted it.
+- The export summary adds peak deformation, peak redistribution and completed recoveries.
+
+**Also:** `PointerTracker` gains `{ contacts: false }`, and the exporter's basic payload accepts material parameters and extra summary fields. Version 5.0.0-alpha.2. Tests: 45 (9 new gel tests).
+
 ## 5.0.0-alpha.1 — 12 Nov · V5 "Same Form, Different Materialities": material framework (Phase 02)
 
 **Four material conditions** behind one material interface (`src/materials/Material.js`):

@@ -4,14 +4,14 @@ An interactive MFA thesis research prototype. It shows one unfamiliar, transluce
 
 **This folder is the canonical project.** Edit files here. Everything else in `iris_workz/mdp/` that relates to this work is an archived earlier version (see [CHANGELOG.md](CHANGELOG.md)).
 
-Current version: **5.0.0-alpha.1** ("V5 — Same Form, Different Materialities", Phase 02 framework). The tab title shows "· V5".
+Current version: **5.0.0-alpha.2** ("V5 — Same Form, Different Materialities"; Phase 03: Gel). The tab title shows "· V5".
 
 **Four conditions** share the same initial form. Participants see only **01 / 02 / 03 / 04**, in a narrow selector on the left:
 
 | ID | Name (researchers only) | Status |
 |---|---|---|
 | 01 | Structural / Memory | Full system (V4.2 physics, memory, adaptation, filaments, sound) |
-| 02 | Gel / Flow | Placeholder: static texture, pointer logging, no physics yet |
+| 02 | Gel / Flow | Full: viscous, volume-conserving contained fluid (pressure redistribution, slow drag, flow layers) |
 | 03 | Plastic / Crease | Placeholder |
 | 04 | Silicone / Elasticity | Placeholder |
 
@@ -47,7 +47,7 @@ Tests need Node 18 or later:
 
 ```bash
 cd iris_workz/mdp/one-object
-npm test            # 36 tests: physics, memory, adaptation, sweep, filaments, proximity/dwell, shared form, research session, logging, export
+npm test            # 45 tests (incl. 9 Gel acceptance tests): physics, memory, adaptation, sweep, filaments, proximity/dwell, shared form, research session, logging, export
 npm run example     # regenerates examples/session-example.json (deterministic)
 ```
 
@@ -62,7 +62,8 @@ one-object/
 │   ├── main.js                   wiring + fixed-timestep frame loop
 │   ├── config.js                 ALL parameters, presets, slider definitions, version
 │   ├── util/math.js              seeded PRNG, smoothstep, ids
-│   ├── physics/SoftBody.js       material behaviour: 80-node perimeter soft body
+│   ├── physics/SoftBody.js       material behaviour (01): 80-node perimeter soft body
+│   ├── physics/GelBody.js        material behaviour (02): pressure-redistribution viscous boundary + interior flow
 │   ├── behavior/
 │   │   ├── MemorySystem.js       per-node behavioural memory (accumulates, decays, residual shape)
 │   │   ├── AdaptationSystem.js   memory → reduced sensitivity, stiffer, wider contact
@@ -74,11 +75,13 @@ one-object/
 │   │   ├── sharedForm.js         shared outline, centre, diameter, body fill (identical for all four)
 │   │   ├── StructuralMaterial.js 01 — adapter around Simulation + FilamentRenderer (unchanged)
 │   │   ├── PlaceholderMaterial.js  base for 02–04: shared form + static texture + pointer logging
-│   │   ├── GelMaterial.js · PlasticMaterial.js · SiliconeMaterial.js   02 / 03 / 04 textures
+│   │   ├── GelMaterial.js        02 — wires GelBody + GelRenderer, research logging, parameters
+│   │   ├── PlasticMaterial.js · SiliconeMaterial.js   03 / 04 placeholder textures
 │   │   └── PointerTracker.js     pointer event logging for materials without their own physics
 │   ├── rendering/
 │   │   ├── FilamentNetwork.js    seeded filament anchors/edges mapped through the deformation
-│   │   └── FilamentRenderer.js   Canvas 2D: membrane, folds, filaments, tension, memory traces
+│   │   ├── FilamentRenderer.js   Canvas 2D (01): membrane, folds, filaments, tension, memory traces
+│   │   └── GelRenderer.js        Canvas 2D (02): translucent body, liquid layers, flow lines, rim highlights
 │   ├── interaction/PointerController.js   Pointer Events (mouse/touch/pen) → object units
 │   ├── audio/AudioEngine.js      procedural Web Audio (off by default)
 │   ├── research/
@@ -131,4 +134,5 @@ All live in `src/config.js`. ★ means the parameter is also a Researcher Mode s
 | Proximity / sweep | `proximityRadius`, `proximityPush`, `proximitySpeedGain`, `proximityWake`, `sweepSpeed`, `sweepGain`, `sweepDent`, `sweepMemory` |
 | Immediate response | `interactionRadius`★, `proximityResponse`★, `proximityGlow`, `responseRate`, `dwellRadius`, `dwellDelay`★, `dwellRamp`, `dwellRelease`, `dwellAttraction`★, `dwellGlow`, `dwellActivity` |
 | Memory / adaptation | `memoryEnabled`★, `learningRate`★, `decayRate`★, `plasticity`, `adaptiveEnabled`★, `adaptationStrength`★, `adaptationThreshold`★, `adaptationHysteresis`, `adaptationTau`, `adaptStiffen`, `adaptWiden` |
+| Gel (02, researcher-only) | `viscosity` (0.6), `pressure` redistribution (1.0), `recovery` speed (0.5), `flow` intensity (0.7) — defaults in `config.js` `GEL_DEFAULTS` |
 | Display only (never changes the condition) | `filamentDensity`★, `membraneOpacity`★, `structuralContrast`★, `tensionHighlight`★, `visualMemory`★, `lowDetail`★ |

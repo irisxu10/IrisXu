@@ -56,7 +56,8 @@ export function buildPayload(sim, logger, { condition, visual = null, endReason 
  * Encounter payload for materials without the full simulation (placeholders).
  * Same schema and field meanings as buildPayload; behaviour-specific totals are absent.
  */
-export function buildBasicPayload(tracker, logger, { condition, seed, materialKey, endReason = 'export', exportedAt = new Date().toISOString() } = {}) {
+export function buildBasicPayload(tracker, logger, { condition, seed, materialKey, endReason = 'export', exportedAt = new Date().toISOString(),
+  materialStatus = 'placeholder (static texture, no material physics yet)', parameters = null, summaryExtra = {}, methodNote = null } = {}) {
   const t = tracker.totals;
   return {
     schema: 'one-object-many-encounters/session',
@@ -70,8 +71,8 @@ export function buildBasicPayload(tracker, logger, { condition, seed, materialKe
     condition,
     seed,
     materialKey,
-    materialStatus: 'placeholder (static texture, no material physics yet)',
-    parameters: null,
+    materialStatus,
+    parameters,
     visualParameters: null,
     summary: {
       totalContactMs: Math.round(t.contactMs),
@@ -83,6 +84,7 @@ export function buildBasicPayload(tracker, logger, { condition, seed, materialKe
       soundToggles: logger.count('sound_toggle'),
       parameterChanges: logger.count('parameter_change'),
       droppedEvents: logger.dropped,
+      ...summaryExtra,
     },
     units: {
       distance: 'object units (base radius = 1)',
@@ -92,7 +94,7 @@ export function buildBasicPayload(tracker, logger, { condition, seed, materialKe
     },
     events: [...logger.events, { timestampMs: Math.round(tracker.timeMs), type: 'session_end', metadata: { exported: true, reason: endReason } }],
     reflection: logger.reflection,
-    methodNote: 'Placeholder condition: the form does not deform. Logged values describe observed pointer behaviour only.',
+    methodNote: methodNote || 'Placeholder condition: the form does not deform. Logged values describe observed pointer behaviour only.',
   };
 }
 

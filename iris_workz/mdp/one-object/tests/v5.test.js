@@ -26,7 +26,8 @@ test('Registry: four conditions 01–04, each with its own module and researcher
   assert.deepEqual(CONDITION_IDS, ['01', '02', '03', '04']);
   assert.deepEqual(MATERIALS.map((m) => m.key), ['structural', 'gel', 'plastic', 'silicone']);
   assert.equal(materialById('01').status, 'full');
-  for (const id of ['02', '03', '04']) assert.equal(materialById(id).status, 'placeholder');
+  assert.equal(materialById('02').status, 'full', 'Gel implemented in Phase 03');
+  for (const id of ['03', '04']) assert.equal(materialById(id).status, 'placeholder');
   const loaders = MATERIALS.map((m) => m.load.toString());
   assert.equal(new Set(loaders).size, 4, 'distinct module per material');
   const html = fs.readFileSync(new URL('../index.html', import.meta.url), 'utf8');

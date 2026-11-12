@@ -2,7 +2,7 @@
 // the object's base radius is 1.0 and its centre is the origin.
 // All per-step forces assume the fixed physics step below.
 
-export const APP_VERSION = '5.0.0-alpha.1';
+export const APP_VERSION = '5.0.0-alpha.2';
 export const STEP = 1 / 60;          // fixed physics timestep (s)
 export const MAX_SUBSTEPS = 5;       // cap on catch-up steps per frame
 export const NODE_COUNT = 80;        // perimeter nodes
@@ -65,6 +65,14 @@ export const DEFAULT_PARAMS = Object.freeze({
   dwellAttraction: 0.05,    // how far nearby lines are drawn toward a dwelling pointer
   dwellGlow: 0.3,           // brightness lift of nearby lines while dwelling
   dwellActivity: 0.006,     // fine local shimmer of nearby lines while dwelling
+});
+
+// Condition 02 (Gel / Flow) researcher parameters — defaults
+export const GEL_DEFAULTS = Object.freeze({
+  viscosity: 0.6,     // 0..1   heavier, slower, more neighbour drag
+  pressure: 1.0,      // 0..2   redistribution strength (0 = no volume conservation)
+  recovery: 0.5,      // 0..1   speed of the return toward the circle
+  flow: 0.7,          // 0..1.5 internal flow intensity (visual layers + flow lines)
 });
 
 export const PRESETS = Object.freeze({

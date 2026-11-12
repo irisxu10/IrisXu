@@ -1,36 +1,105 @@
-// Condition 02 — Gel / Flow (PLACEHOLDER: static texture only, no gel physics yet).
-// Texture: soft rounded pools of light and a few slow, smooth flowing curves —
-// no straight lines, no sharp edges.
+// Condition 02 — Gel / Flow.
+// A viscous, volume-conserving contained fluid (physics/GelBody.js) drawn by
+// rendering/GelRenderer.js. Pressing one side pushes the rest outward; dragging
+// is heavy and delayed; after release the material flows back and settles.
+//
+// Research logging (all values derived directly from the simulation):
+//   contact_start   region, distance to the surface, pointer speed, location (x, y)
+//   drag            cumulative drag distance (≈ every 400 ms while dragging)
+//   contact_end     durationMs, drag distance, and metadata:
+//                     peakDeformation    deepest inward radial displacement in the footprint (object units)
+//                     redistribution     peak mean outward displacement of material outside the footprint
+//                     peakVolumeChange   peak |area / restArea − 1| during the contact
+//   recovery        kind 'settle': durationMs from release until max displacement < 0.01
+//                   (completed: false if a new press interrupted it)
+//   region_revisit, approach, recovery (kind 'stillness') as in the other conditions
 
-import { PlaceholderMaterial, rgba, FORM_PALETTE as P } from './PlaceholderMaterial.js';
+import { STEP, MAX_SUBSTEPS, DEFAULT_SEED } from '../config.js';
+import { Material } from './Material.js';
+import { PointerTracker } from './PointerTracker.js';
+import { restOutline } from './sharedForm.js';
+import { GelBody, GEL_DEFAULTS } from '../physics/GelBody.js';
+import { GelRenderer } from '../rendering/GelRenderer.js';
+import { buildBasicPayload } from '../research/Exporter.js';
 
-export default class GelMaterial extends PlaceholderMaterial {
-  get textureSalt() { return 0x6e1; }
+/** Researcher-only parameters (labels in translations: researcher.params.<key>). */
+export const GEL_PARAM_SPEC = Object.freeze([
+  { key: 'viscosity', label: 'gelViscosity', min: 0, max: 1, step: 0.01 },
+  { key: 'pressure', label: 'gelPressure', min: 0, max: 2, step: 0.01 },
+  { key: 'recovery', label: 'gelRecovery', min: 0, max: 1, step: 0.01 },
+  { key: 'flow', label: 'gelFlow', min: 0, max: 1.5, step: 0.01 },
+]);
 
-  drawTexture(c, rng, px) {
-    // soft pools
-    for (let i = 0; i < 7; i++) {
-      const a = rng() * Math.PI * 2, r = Math.sqrt(rng()) * 0.62;
-      const x = Math.cos(a) * r, y = Math.sin(a) * r, R = 0.22 + rng() * 0.3;
-      const g = c.createRadialGradient(x, y, 0, x, y, R);
-      g.addColorStop(0, rgba(P.pale, 0.12 + rng() * 0.06));
-      g.addColorStop(0.6, rgba(P.main, 0.05));
-      g.addColorStop(1, rgba(P.main, 0));
-      c.fillStyle = g;
-      c.beginPath(); c.arc(x, y, R, 0, Math.PI * 2); c.fill();
-    }
-    // slow flowing curves (smooth, soft-edged)
-    for (let i = 0; i < 13; i++) {
-      const y0 = -0.9 + (i + rng() * 0.6) * (1.8 / 13), amp = 0.06 + rng() * 0.1, ph = rng() * Math.PI * 2, tilt = (rng() - 0.5) * 0.5;
-      c.beginPath();
-      for (let k = 0; k <= 40; k++) {
-        const x = -1.1 + (2.2 * k) / 40;
-        const y = y0 + tilt * x + amp * Math.sin(x * 2.2 + ph) + 0.03 * Math.sin(x * 5.1 + ph * 1.7);
-        if (k === 0) c.moveTo(x, y); else c.lineTo(x, y);
-      }
-      c.lineCap = 'round';
-      c.lineWidth = 5 * px; c.strokeStyle = rgba(P.main, 0.05); c.stroke();
-      c.lineWidth = 1.3 * px; c.strokeStyle = rgba(P.pale, 0.16 + rng() * 0.08); c.stroke();
-    }
+export default class GelMaterial extends Material {
+  initialize() {
+    super.initialize();
+    const { canvas, logger, audio, seed, materialParams } = this.ctx;
+    this.seed = (seed ?? DEFAULT_SEED) >>> 0;
+    this.outline = restOutline(this.seed);
+    this.body = new GelBody(this.outline, this.seed, { ...GEL_DEFAULTS, ...(materialParams?.gel || {}) });
+    this.body.onEvent = (type, fields) => {
+      logger?.log(type, this.body.timeMs, fields);
+      if (type === 'contact_start') audio?.contact(0.45);
+      if (type === 'contact_end') audio?.release(Math.min(1, (fields.metadata?.peakDeformation || 0) / 0.3));
+    };
+    this.tracker = new PointerTracker(this.outline, logger, { contacts: false });
+    this.renderer = new GelRenderer(canvas, this.body);
+    this.renderer.opacity = this.ctx.visual?.membraneOpacity ?? 1;
+    this.acc = 0;
+  }
+
+  update(dt) {
+    this.acc += dt;
+    let steps = 0;
+    while (this.acc >= STEP && steps < MAX_SUBSTEPS) { this.tracker.step(STEP); this.body.step(); this.acc -= STEP; steps++; }
+    if (steps === MAX_SUBSTEPS) this.acc = 0;
+  }
+
+  handlePointerInput(input) { this.body.setInput(input); this.tracker.setInput(input); }
+  render(pointer) { this.renderer.proximity = this.tracker.proximity; this.renderer.draw(pointer); }
+  reset() { this.body.reset(); this.tracker.reset(); this.acc = 0; }
+  resize() { this.renderer.resize(); }
+
+  getParamSpec() { return GEL_PARAM_SPEC.map((s) => ({ ...s, value: this.body.params[s.key] })); }
+  setParam(key, value) { if (key in this.body.params) this.body.params[key] = value; }
+
+  hintSource() {
+    const b = this.body, t = this.tracker;
+    return { proximity: t.proximity, totals: b.totals, grab: b.contact, stillMs: t.stillMs };
+  }
+  audioSignals() { return this.body.signals(); }
+  isGrabbing() { return !!this.body.contact; }
+  clockMs() { return this.body.timeMs; }
+
+  getResearchState() {
+    const b = this.body;
+    return {
+      timeMs: b.timeMs, totals: b.totals, proximity: this.tracker.proximity, grabbing: !!b.contact,
+      gel: { maxDisp: b.maxDisp, volumeChange: b.area / b.A0 - 1, settled: b.settled, recovering: !!b.recovery },
+    };
+  }
+
+  buildEncounterPayload({ condition, endReason, exportedAt }) {
+    const b = this.body, t = b.totals, tr = this.tracker.totals;
+    // PointerTracker supplies interaction time and stillness; contact totals come from the gel itself
+    const tracker = { timeMs: b.timeMs, totals: { ...tr, contactMs: t.contactMs, contactEpisodes: t.contactEpisodes, dragDistance: t.dragDistance, revisits: t.revisits } };
+    return buildBasicPayload(tracker, this.ctx.logger, {
+      condition, seed: this.seed, materialKey: this.key, endReason, exportedAt,
+      materialStatus: 'gel v1 (pressure-redistribution soft boundary + viscous flow)',
+      parameters: { ...b.params },
+      summaryExtra: {
+        peakDeformation: Math.round(t.peakDeformation * 1e4) / 1e4,
+        peakRedistribution: Math.round(t.peakRedistribution * 1e4) / 1e4,
+        completedRecoveries: t.recoveries,
+      },
+      methodNote: 'Gel condition: a programmed viscous, approximately volume-conserving soft boundary. Logged values describe observed pointer behaviour and simulated deformation only.',
+    });
+  }
+
+  dispose() {
+    if (this.disposed) return;
+    if (this.body) this.body.onEvent = null;
+    this.body = null; this.renderer = null; this.tracker = null;
+    super.dispose();
   }
 }

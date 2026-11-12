@@ -78,6 +78,11 @@ export class ResearcherPanel {
         el('button', { type: 'button', class: 'primary', id: 'r-export', onclick: () => this.cb.onExport() }, this.L('export')),
         el('button', { type: 'button', id: 'r-new-research', onclick: () => { if (confirm(this.L('newResearchConfirm'))) this.cb.onNewResearch(); } }, this.L('newResearch')))));
 
+    // ---- per-material parameters (conditions that expose getParamSpec) ----
+    this.matParamsEl = el('section', { id: 'r-material-params', hidden: '' });
+    this.matParamsFor = null;
+    r.append(this.matParamsEl);
+
     // ---- condition 01 only: presets, seed, physics, display ----
     this.structuralEl = el('div', { id: 'r-structural' });
     this.condEl = el('strong', { id: 'r-condition' });
@@ -152,6 +157,7 @@ export class ResearcherPanel {
   /** Re-render labels after a language change, keeping values. */
   relabel() {
     const wasOpen = this.open;
+    this.matParamsFor = null;
     this.build();
     if (this.state) this.sync(this.state);
     this.root.hidden = !wasOpen;
@@ -175,7 +181,8 @@ export class ResearcherPanel {
 
     this.structuralEl.hidden = !structural;
     this.heat.hidden = this.heatTitle.hidden = !structural;
-    this.placeholderNote.hidden = structural;
+    this.placeholderNote.hidden = def.status !== 'placeholder';
+    this.buildMaterialParams(state.material);
     for (const [key, { input, out }] of Object.entries(this.inputs)) {
       if (input.type === 'checkbox') input.checked = !!params[key];
       else { input.value = params[key]; out.textContent = params[key]; }
@@ -185,6 +192,27 @@ export class ResearcherPanel {
     for (const [key, { input, out }] of Object.entries(this.visualInputs)) {
       if (input.type === 'checkbox') input.checked = !!visual[key];
       else { input.value = visual[key]; out.textContent = visual[key]; }
+    }
+  }
+
+  /** Sliders for the active material's own parameters (rebuilt only when the material instance changes). */
+  buildMaterialParams(material) {
+    if (material === this.matParamsFor) return;
+    this.matParamsFor = material;
+    const spec = material?.getParamSpec?.();
+    this.matParamsEl.replaceChildren();
+    this.matParamsEl.hidden = !spec;
+    if (!spec) return;
+    const el = this.el;
+    this.matParamsEl.append(el('h3', {}, this.L('materialParams')));
+    for (const s of spec) {
+      const id = 'r-m-' + s.key;
+      const out = el('output', { for: id }, String(s.value));
+      const input = el('input', { type: 'range', id, min: s.min, max: s.max, step: s.step });
+      input.value = s.value;
+      input.addEventListener('input', () => { out.textContent = input.value; });
+      input.addEventListener('change', () => this.cb.onMaterialParam(s.key, Number(input.value)));
+      this.matParamsEl.append(el('div', { class: 'r-slider' }, el('label', { for: id }, el('span', {}, this.L('params.' + s.label)), out), input));
     }
   }
 
@@ -209,12 +237,18 @@ export class ResearcherPanel {
         ['maxMemory', rs.maxMemory.toFixed(2)],
       ];
     } else {
-      this.stateEl.textContent = rs.grabbing ? 'CONTACT' : rs.proximity > 0.05 ? 'APPROACH' : 'IDLE';
+      const gel = rs.gel;
+      this.stateEl.textContent = rs.grabbing ? 'CONTACT' : gel?.recovering ? 'RECOVERY' : rs.proximity > 0.05 ? 'APPROACH' : gel && !gel.settled ? 'SETTLING' : 'IDLE';
       rows = [
         ['elapsed', (rs.timeMs / 1000).toFixed(1) + 's'],
         ['contacts', tot.contactEpisodes],
         ['revisits', tot.revisits],
       ];
+      if (gel) {
+        rows.push(['peakDeformation', (tot.peakDeformation ?? 0).toFixed(3)]);
+        rows.push(['redistribution', (tot.peakRedistribution ?? 0).toFixed(3)]);
+        rows.push(['volumeChange', (gel.volumeChange * 100).toFixed(2) + '%']);
+      }
     }
     rows.push(['events', eventCount]);
     rows.push(['fps', Math.round(fps) + (rs.detail < 1 ? ' · ' + this.L('detailAuto') + ' ' + rs.detail : '')]);

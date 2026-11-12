@@ -1,6 +1,6 @@
 # Project Handoff — ONE OBJECT / MANY ENCOUNTERS
 
-*Current as of 2026-11-12, version 5.0.0-alpha.1 (V5 Phase 02: material framework).* This document supersedes `../PROJECT_HANDOFF.md` (5 Nov), which describes the earlier single-file build.
+*Current as of 2026-11-12, version 5.0.0-alpha.2 (V5 Phase 03: Gel / Flow implemented).* This document supersedes `../PROJECT_HANDOFF.md` (5 Nov), which describes the earlier single-file build.
 
 Every claim below is labelled:
 
@@ -16,7 +16,7 @@ Every claim below is labelled:
 |---|---|
 | **Canonical project** | `iris_workz/mdp/one-object/` (ES modules, no build step, no dependencies) |
 | **Launch** | VS Code Live Server → `http://127.0.0.1:5501/iris_workz/mdp/one-object/index.html`. Or `cd one-object && python3 -m http.server 8000` → `http://localhost:8000/`. **`file://` does not work** (modules need a server); the page shows a warning. |
-| **Version** | `APP_VERSION = '5.0.0-alpha.1'` in `src/config.js`. The tab title shows "· V5". |
+| **Version** | `APP_VERSION = '5.0.0-alpha.2'` in `src/config.js`. The tab title shows "· V5". |
 | **Repository** | `github.com/irisxu10/IrisXu` (the artist's portfolio site); branch `prototype/homepage-soft-glass-atmosphere` |
 | **Archived, not edited** | `../one_object_three_encounters_v2.html` (4.1 + Stage 1, single file), `../one-object-v4/` (4.1), `../one-object-v4.0/` (4.0), `../one-object-v3/` (3.0). Original V2 is in git `9a361d3`. A tarball of all of these is at `~/Desktop/IrisXu/one-object-backups/one-object-pre-consolidation-2026-11-12.tar.gz` (outside the repository). |
 
@@ -86,7 +86,8 @@ The research question: *How do repeated sensory encounters shape expectations, i
 | **Logging / export** | Events: `session_start`, `approach`, `contact_start/end`, `drag`, `region_revisit`, `adaptation_threshold`, `recovery`, `parameter_change`, `reflection`, `sweep`, `sound_toggle`, `dwell`, `session_end`. Throttled, timed on the simulation clock. JSON schema v2 with a summary. | Implemented, verified |
 | **Bilingual interface and reflection** | English and Simplified Chinese; switching keeps the session. Three hints. FINISH opens five optional neutral questions. | Implemented, verified |
 | **Material framework (V5 Phase 02)** | Four conditions behind one interface. Selector shows only 01–04. Research session keeps every encounter. Order can be configured and locked. | Implemented, verified (52 browser checks, 36 tests) |
-| **Gel / Plastic / Silicone behaviour** | Placeholders only: static textures plus pointer logging. | **Physics not implemented** (Phase 03) |
+| **Gel / Flow (02)** | `GelBody`: 80-node boundary with area-deficit pressure along normals (redistribution, volume ≈ conserved), displacement smoothing, weak shape return, heavy overdamped integration plus viscous neighbour coupling, and a final ease to exact rest. Interior: 3 lagged liquid layers and flow lines carried by a kernel-interpolated boundary velocity field. `GelRenderer`: translucent body, layers, flow lines, compression rim highlight, drifting specular highlight. | Implemented, verified (9 node tests, 19 browser checks). **Not yet tested by a human.** |
+| **Plastic (03) / Silicone (04) behaviour** | Placeholders only: static textures plus pointer logging. | **Physics not implemented** |
 | **Click ripple, directional drag traces, autonomy (Stages 2–4)** | — | **Not implemented** |
 
 ## 4. Visual design
@@ -163,6 +164,29 @@ The research question: *How do repeated sensory encounters shape expectations, i
 
 ## 7. Verification
 
+### V5 Phase 03 — Gel (12 Nov 2026)
+
+- **`npm test`:** 45 of 45 pass.
+- **Gel tests (node):**
+  - At rest it is exactly the shared outline, with no motion.
+  - A 1 s press sinks the contact region by more than 0.15 while the far side and the flanks expand, and the area stays within 1%.
+  - With `pressure = 0`, nothing else expands and volume is lost. This is the control showing redistribution is a separate effect from denting.
+  - Drag reaches 63% of its response more than 5× slower than Structural, with peak/final under 1.02 (no overshoot), and neighbours lag.
+  - After release, motion continues, there is no overshoot past rest, it reaches exact rest, and there is then zero motion for 3 s. Recovery duration is logged.
+  - Layers and flow lines move with the deformation, and the inner layer lags.
+  - 3 minutes of extreme parameters and pressing stays bounded.
+  - All logged metrics are correct, including revisits and interrupted recovery.
+  - The parameters act as labelled; deterministic; reset works.
+- **Browser (headless Chrome):** 19 of 19 gel checks pass, with no console errors.
+  - At rest: brightness 28.4 (01: 30.0), exact circle, static.
+  - Held press: contact −0.235, far side +0.042, volume −0.06%.
+  - During drag the layers slide (outer 0.43 vs inner 0.30); motion continues after release; it settles fully (recovery about 5 s after a large drag).
+  - Logged: duration, drag, peak deformation 0.36, redistribution 0.061, volume change 0.13%.
+  - 25 rapid presses stay stable.
+  - Researcher sliders work and are logged; parameters persist across encounters; switching away and back resets the gel.
+- **Regression:** all 52 Phase 02 checks still pass. Condition 01 adapts from 0.237 to 0.097, its untouched region responds at 0.234, and dwell works.
+- **Not verified:** whether the gel *feels* viscous and liquid to a person (it needs human testing); touch devices; low-end hardware. The flow-line kernel runs about 19k evaluations per step, which is fine at 60 fps on this machine but has not been profiled on slow hardware.
+
 ### V5 Phase 02 (12 Nov 2026)
 
 - **`npm test`:** 36 of 36 pass.
@@ -201,7 +225,7 @@ The one failure was frame rate under heavy system load (see §6).
 2. **Stages 2–3:** a click ripple with a persistent trace, and directional drag traces stored in memory. Files: `Simulation.js`, `MemorySystem.js`, `FilamentNetwork.js`, `FilamentRenderer.js`, `config.js`.
 3. **Material depth:** a less circular silhouette, true folds, pseudo-lighting, denser fine strands, and optionally an interior mesh. Files: `SoftBody.js`, `FilamentNetwork.js`, `FilamentRenderer.js`.
 4. **Stage 4 autonomy** as an explicit, logged, switchable factor. Files: a new `behavior/Autonomy.js`, plus `Simulation.js`, `config.js` and `ResearcherPanel.js`.
-5. **Phase 03: real behaviour for 02–04.** Each condition subclasses `Material` (replacing `PlaceholderMaterial`) and implements genuinely different behaviour, not just different stiffness or colour. They reuse `sharedForm`, `PointerTracker` (or their own logging) and `buildEncounterPayload`.
+5. **Real behaviour for 03 (Plastic / Crease) and 04 (Silicone / Elasticity)**, following the Gel pattern: a pure physics module (`physics/*Body.js`), a renderer, a `Material` subclass exposing `getParamSpec`/`setParam`, and research events that are derivable from the simulation.
 
 ## 9. Open questions for the creative director
 

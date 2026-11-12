@@ -13,9 +13,11 @@ const DRAG_LOG_INTERVAL_MS = 400;
 const STILL_SPEED = 0.15, STILL_MIN_MS = 3000;
 
 export class PointerTracker {
-  constructor(outline, logger) {
+  /** opts.contacts = false: track approach / proximity / stillness only (the material logs its own contacts). */
+  constructor(outline, logger, { contacts = true } = {}) {
     this.outline = outline;          // rest radius per node (Float32Array)
     this.logger = logger;
+    this.contacts = contacts;
     this.reset();
   }
 
@@ -59,7 +61,7 @@ export class PointerTracker {
     const pRaw = inp.present ? clamp(1 - Math.max(0, this.boundaryDistance) / DEFAULT_PARAMS.proximityRadius, 0, 1) : 0;
     this.proximity += (pRaw - this.proximity) * approach(8, dt);
 
-    if (inp.down && !this.wasDown && this.boundaryDistance <= DEFAULT_PARAMS.contactMargin) {
+    if (this.contacts && inp.down && !this.wasDown && this.boundaryDistance <= DEFAULT_PARAMS.contactMargin) {
       const region = this.regionAt(theta);
       this.grab = { region, startMs: this.timeMs, dist: 0, lastLogMs: this.timeMs, lastLogged: 0 };
       t.contactEpisodes++;
@@ -91,7 +93,7 @@ export class PointerTracker {
       this.log('approach', { distance: Math.max(0, this.boundaryDistance), speed: this.speed });
     } else if (this.proximity < APPROACH_OFF) this.approachArmed = true;
 
-    const active = this.grab || (inp.present && this.speed > STILL_SPEED);
+    const active = this.grab || (!this.contacts && inp.down) || (inp.present && this.speed > STILL_SPEED);
     if (active) {
       if (this.stillMs >= STILL_MIN_MS && t.contactEpisodes > 0) {
         t.stillnessPeriods++;
