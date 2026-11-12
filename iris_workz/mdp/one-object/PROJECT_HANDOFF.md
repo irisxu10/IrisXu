@@ -1,6 +1,6 @@
 # Project Handoff — ONE OBJECT / MANY ENCOUNTERS
 
-*Current as of 2026-11-12, version 4.2.0.* This document supersedes `../PROJECT_HANDOFF.md` (5 Nov), which describes the earlier single-file build.
+*Current as of 2026-11-12, version 5.0.0-alpha.1 (V5 Phase 02: material framework).* This document supersedes `../PROJECT_HANDOFF.md` (5 Nov), which describes the earlier single-file build.
 
 Every claim below is labelled:
 
@@ -16,7 +16,7 @@ Every claim below is labelled:
 |---|---|
 | **Canonical project** | `iris_workz/mdp/one-object/` (ES modules, no build step, no dependencies) |
 | **Launch** | VS Code Live Server → `http://127.0.0.1:5501/iris_workz/mdp/one-object/index.html`. Or `cd one-object && python3 -m http.server 8000` → `http://localhost:8000/`. **`file://` does not work** (modules need a server); the page shows a warning. |
-| **Version** | `APP_VERSION = '4.2.0'` in `src/config.js`. The tab title shows "· V4.2" and exports record it. |
+| **Version** | `APP_VERSION = '5.0.0-alpha.1'` in `src/config.js`. The tab title shows "· V5". |
 | **Repository** | `github.com/irisxu10/IrisXu` (the artist's portfolio site); branch `prototype/homepage-soft-glass-atmosphere` |
 | **Archived, not edited** | `../one_object_three_encounters_v2.html` (4.1 + Stage 1, single file), `../one-object-v4/` (4.1), `../one-object-v4.0/` (4.0), `../one-object-v3/` (3.0). Original V2 is in git `9a361d3`. A tarball of all of these is at `~/Desktop/IrisXu/one-object-backups/one-object-pre-consolidation-2026-11-12.tar.gz` (outside the repository). |
 
@@ -27,6 +27,32 @@ The design principle: *"The object should not pretend to be alive. It should beh
 The research question: *How do repeated sensory encounters shape expectations, interpretations, and ways of interacting with an unfamiliar object?*
 
 ## 2. Architecture
+
+### V5 material framework (Phase 02)
+
+`main.js` owns the canvas, pointer, audio, UI and a `ResearchSession`, and keeps **exactly one** active material.
+
+- **Material interface** (`materials/Material.js`): `initialize`, `update(dt)`, `render(pointer)`, `handlePointerInput`, `reset`, `resize`, `getResearchState`, `hintSource`, `audioSignals`, `isGrabbing`, `clockMs`, `buildEncounterPayload`, `dispose`.
+- **No DOM listeners in materials.** Materials never add their own event listeners. `Material.live` counts live instances and should always be 1.
+- **Lazy loading.** `materials/registry.js` lists the four conditions; each module loads on demand through `import()`. A switch token discards superseded switches.
+- **Condition 01** = `StructuralMaterial`, an adapter around the unchanged `Simulation` and `FilamentRenderer`.
+- **Conditions 02–04** = `PlaceholderMaterial` subclasses:
+  - the shared form (outline, centre, diameter, fill, edge from `sharedForm.js`),
+  - a static, seeded texture cached offscreen,
+  - pointer logging through `PointerTracker`,
+  - no motion.
+- **Switching** (participant selector, researcher override, RESET, preset, seed): the current encounter's payload is frozen into the research session, then the material is disposed, then a new material and logger are created. Hints and reflection are reset.
+
+**Export schema v3** contains: `researchSessionId`, `conditionOrder`, `orderLocked`, `orderLog`, `conditionSequence`, and `encounters[]`. Each encounter has:
+
+- `encounterIndex`, `conditionId`, `materialKey`, `materialName`
+- `orderPosition`, `conditionOrder`
+- `startReason`, `endReason`, `previousConditionId`
+- `preset`, `startedAt`, `endedAt`
+- `payload`, a schema-v2 session with its own events
+
+### Module layers
+
 
 | Layer | Files | Notes |
 |---|---|---|
@@ -59,8 +85,9 @@ The research question: *How do repeated sensory encounters shape expectations, i
 | **Researcher Mode** | Opens with Shift + R or INFO → Researcher mode. Presets, seed, 11 behaviour sliders, 2 toggles, 5 visual sliders plus low-detail, state flags, statistics, heatmap, reset, export. | Implemented, verified |
 | **Logging / export** | Events: `session_start`, `approach`, `contact_start/end`, `drag`, `region_revisit`, `adaptation_threshold`, `recovery`, `parameter_change`, `reflection`, `sweep`, `sound_toggle`, `dwell`, `session_end`. Throttled, timed on the simulation clock. JSON schema v2 with a summary. | Implemented, verified |
 | **Bilingual interface and reflection** | English and Simplified Chinese; switching keeps the session. Three hints. FINISH opens five optional neutral questions. | Implemented, verified |
+| **Material framework (V5 Phase 02)** | Four conditions behind one interface. Selector shows only 01–04. Research session keeps every encounter. Order can be configured and locked. | Implemented, verified (52 browser checks, 36 tests) |
+| **Gel / Plastic / Silicone behaviour** | Placeholders only: static textures plus pointer logging. | **Physics not implemented** (Phase 03) |
 | **Click ripple, directional drag traces, autonomy (Stages 2–4)** | — | **Not implemented** |
-| **Gel / Plastic / Silicone materials** | — | **Not implemented** (deferred by request) |
 
 ## 4. Visual design
 
@@ -95,7 +122,7 @@ The research question: *How do repeated sensory encounters shape expectations, i
 
 **Bugs and risks:**
 
-1. **Participant RESET erases the research log and reflection** (`main.js`: `onReset` calls `startSession()`). This is the highest priority.
+1. ~~Participant RESET erases the research log~~ — **fixed in 5.0.0-alpha.1**: RESET now closes the encounter (kept) and starts a new one with a `reset` event.
 2. Session data is lost on reload or close (no persistence, by design). Export before closing.
 3. Researcher Mode is reachable by participants through the INFO panel.
 4. `TRY TOUCHING.` can appear while a visitor is dwelling.
@@ -119,9 +146,38 @@ The research question: *How do repeated sensory encounters shape expectations, i
 - Headless measurements are relative only. On 12 Nov, under a system load average of about 14, a long scripted run measured about 35 fps during a drag. A fresh side-by-side measurement gave identical results for this build and the previous single-file build (about 60 fps idle).
 - The project has not been tested on real low-end hardware, tablets, phones or projectors.
 
+**V5-specific:**
+
+- Conditions 02–04 do not deform. Participants touching them get no material response yet, only the pointer mark.
+- Three further issues are tracked as deferred items **D1–D3** below.
+
+### Deferred issues (logged 2026-11-12, to address in a later phase)
+
+| ID | Issue | Impact | Possible fix (not yet decided) | Files |
+|---|---|---|---|---|
+| **D1** | **Rapid switching creates very short encounters.** Each click on the selector closes the current encounter and opens a new one, so clicking through quickly leaves several encounters lasting under a second. | Inflates encounter counts and adds noise to per-condition analysis. The data itself is accurate (each record is real). | Analysis-side minimum-duration filter; or a short cool-down or settle time before a switch is committed; or flag encounters under N seconds in the export. | `src/main.js` (`activate`), `src/research/ResearchSession.js` |
+| **D2** | **Locked conditions are visually greyed out.** When the researcher locks the order, unavailable condition numbers are dimmed (`disabled`). | The greying itself tells participants that an order exists and which condition comes next, which may influence behaviour. | Hide unavailable buttons instead (keeping a fixed layout); or show all at equal weight and silently ignore disallowed clicks; or let the researcher advance conditions. | `src/ui/ExhibitionUI.js` (`setConditions`), `src/styles/main.css` (`.conditions button:disabled`) |
+| **D3** | **Session data is lost if the tab closes without exporting.** Encounters live only in memory, by design (privacy), so a reload, close or crash discards everything not yet exported. | Data loss during studies if the researcher forgets to export. | A `beforeunload` warning when unexported encounters exist; an "unsaved encounters" counter in Researcher Mode; or opt-in, researcher-enabled `sessionStorage` autosave (a privacy decision for the researcher). | `src/main.js`, `src/ui/ResearcherPanel.js`, `src/ui/translations.js` |
+
 **Needs manual testing:** look and feel, the noticeability of memory and dwell, sound quality and loudness, iOS Safari audio unlock, Android, pen input, the OS reduced-motion setting, and screen readers.
 
-## 7. Verification (12 Nov 2026)
+## 7. Verification
+
+### V5 Phase 02 (12 Nov 2026)
+
+- **`npm test`:** 36 of 36 pass.
+- **Headless Chrome:** 52 of 52 checks pass, with no console errors. The checks cover:
+  - **Switching:** switching to each condition; exactly one live material after every switch; the old 01 simulation frozen and detached after switching away.
+  - **Leaks:** window, document and canvas listeners stay at 8 → 8 after 15+ switches. Rapid switching settles correctly.
+  - **Initial state:** each condition starts from its initial state.
+  - **Shared form:** same diameter (1135–1140 px), same centre (±1 px), similar brightness (27.3–30.7), icy-blue palette in all four. Placeholders are static.
+  - **Layout:** the UI does not move or resize between conditions, and the selector does not overlap the object on a 390 px phone.
+  - **Condition 01 unchanged:** adaptation 0.232 → 0.098, untouched region 0.231, dwell works.
+  - **Research data:** RESET keeps the previous encounter and logs `reset`; language switching keeps the encounter.
+  - **Researcher Mode:** names shown in Researcher Mode only, and nowhere in the participant view; order lock enables only current + next; order changes logged; presets recorded.
+  - **Export:** the v3 export contains every encounter, with reasons, positions and events.
+
+### V4.2 (12 Nov 2026)
 
 **Automated:** `npm test` passes **29 of 29**, against the real `src/` modules.
 
@@ -141,11 +197,11 @@ The one failure was frame rate under heavy system load (see §6).
 
 ## 8. Next priorities (ranked by research value, then experience, then feasibility)
 
-1. **Data integrity:** separate a participant object-reset from a researcher-only new session; hide the researcher entry; prompt to export before leaving. Files: `main.js`, `ExhibitionUI.js`, `translations.js`, `index.html`.
+1. **Remaining data integrity:** RESET no longer loses data (fixed in 5.0.0-alpha.1). Still to do: hide the researcher entry from participants, and add an "export before leaving" prompt. Files: `main.js`, `ExhibitionUI.js`, `translations.js`, `index.html`.
 2. **Stages 2–3:** a click ripple with a persistent trace, and directional drag traces stored in memory. Files: `Simulation.js`, `MemorySystem.js`, `FilamentNetwork.js`, `FilamentRenderer.js`, `config.js`.
 3. **Material depth:** a less circular silhouette, true folds, pseudo-lighting, denser fine strands, and optionally an interior mesh. Files: `SoftBody.js`, `FilamentNetwork.js`, `FilamentRenderer.js`.
 4. **Stage 4 autonomy** as an explicit, logged, switchable factor. Files: a new `behavior/Autonomy.js`, plus `Simulation.js`, `config.js` and `ResearcherPanel.js`.
-5. **Material presets (Gel / Plastic / Silicone)**, which are deferred. They would map naturally onto `config.js` parameter sets plus renderer palettes; these should be decided after items 1–3.
+5. **Phase 03: real behaviour for 02–04.** Each condition subclasses `Material` (replacing `PlaceholderMaterial`) and implements genuinely different behaviour, not just different stiffness or colour. They reuse `sharedForm`, `PointerTracker` (or their own logging) and `buildEncounterPayload`.
 
 ## 9. Open questions for the creative director
 
@@ -160,7 +216,8 @@ The one failure was frame rate under heavy system load (see §6).
 9. Protocol: who runs Researcher Mode, is there a consent step, and how are conditions assigned?
 10. Should participants have RESET at all?
 11. Reflection: immediately after FINISH, or as an interview?
-12. Gel / Plastic / Silicone: are these alternative conditions, or a progression within one encounter?
+12. Locked order: should unavailable conditions be hidden instead of greyed out, to avoid signalling an order? Should the participant be able to return to an earlier condition?
+13. Should very short encounters (for example under 2 s, from rapid clicking) be excluded at analysis time, or prevented in the interface?
 
 ## 10. Files to share
 

@@ -2,6 +2,43 @@
 
 All notable changes to ONE OBJECT / MANY ENCOUNTERS. Dates are 2026.
 
+## 5.0.0-alpha.1 — 12 Nov · V5 "Same Form, Different Materialities": material framework (Phase 02)
+
+**Four material conditions** behind one material interface (`src/materials/Material.js`):
+
+| Condition | Name (researcher-only) | Status |
+|---|---|---|
+| 01 | Structural / Memory | Full V4.2 system |
+| 02 | Gel / Flow | Placeholder |
+| 03 | Plastic / Crease | Placeholder |
+| 04 | Silicone / Elasticity | Placeholder |
+
+- **Participants see only 01 / 02 / 03 / 04**, in a narrow selector on the far left. The selected condition has an ice-blue border, and the buttons are fixed-size, so switching never shifts the layout.
+- **Condition 01 is unchanged.** It is the existing Simulation and FilamentRenderer wrapped in an adapter (`StructuralMaterial`). Its physics, adaptation, rendering and logging are identical (verified).
+- **Conditions 02–04 are placeholders.** Each is its own lazily loaded module with a distinct, static internal texture:
+  - 02: soft pools of light and flowing curves.
+  - 03: straight creases with faceted tonal planes.
+  - 04: curved, taut elastic bands with a satin sheen.
+
+  They have no physics yet. Pointer events are still logged through `PointerTracker`.
+- **Shared initial form** (`materials/sharedForm.js`): all four use Condition 01's exact outline, centre and diameter, and the same body fill and edge. The 01 renderer now takes its geometry from this module, using the same formula as before. Brightness inside the form measured 27.3–30.7 across the four.
+- **Research sessions** (`research/ResearchSession.js`):
+  - Switching, RESET, presets and seed changes now *close* the current encounter (its record is frozen and kept) and start a new one.
+  - Each encounter records condition id, material, order position, start and end time, start and end reason, preset, previous condition, and its own events.
+  - New `reset` event type.
+  - Export schema v3 contains *all* encounters, each a schema-v2 session.
+- **Fixed:** the participant RESET no longer erases the research log (the known issue since 5 Nov).
+- **Researcher Mode:**
+  - Shows real material names and a researcher override switch.
+  - The condition order can be set, shuffled and locked. When locked, participants can choose only the current and the next condition. Order changes are logged.
+  - Lists the encounters, with "Export research session" and "New research session" (with a confirmation).
+  - Presets, seed and physics controls apply to 01 and are shown only while 01 is active.
+- Version 5.0.0-alpha.1; the tab shows "· V5". Tests: 36 (7 new).
+- **Known issues, deferred** (tracked as D1–D3 in PROJECT_HANDOFF.md):
+  - rapid switching creates very short encounters;
+  - locked conditions are visibly greyed out;
+  - session data is lost if the tab closes before export.
+
 ## 4.2.0 — 12 Nov · canonical project (this folder)
 
 This release is a consolidation only. **The interaction and visual behaviour are identical to the previous single-file build.** This was verified by the test suite and by a headless-Chrome run.

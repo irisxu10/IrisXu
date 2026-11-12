@@ -4,7 +4,16 @@ An interactive MFA thesis research prototype. It shows one unfamiliar, transluce
 
 **This folder is the canonical project.** Edit files here. Everything else in `iris_workz/mdp/` that relates to this work is an archived earlier version (see [CHANGELOG.md](CHANGELOG.md)).
 
-Current version: **4.2.0**. The tab title shows "· V4.2", and exports record `appVersion: "4.2.0"`.
+Current version: **5.0.0-alpha.1** ("V5 — Same Form, Different Materialities", Phase 02 framework). The tab title shows "· V5".
+
+**Four conditions** share the same initial form. Participants see only **01 / 02 / 03 / 04**, in a narrow selector on the left:
+
+| ID | Name (researchers only) | Status |
+|---|---|---|
+| 01 | Structural / Memory | Full system (V4.2 physics, memory, adaptation, filaments, sound) |
+| 02 | Gel / Flow | Placeholder: static texture, pointer logging, no physics yet |
+| 03 | Plastic / Crease | Placeholder |
+| 04 | Silicone / Elasticity | Placeholder |
 
 ---
 
@@ -38,7 +47,7 @@ Tests need Node 18 or later:
 
 ```bash
 cd iris_workz/mdp/one-object
-npm test            # 29 tests: physics, memory, adaptation, sweep, filaments, Stage-1 proximity/dwell, logging, export
+npm test            # 36 tests: physics, memory, adaptation, sweep, filaments, proximity/dwell, shared form, research session, logging, export
 npm run example     # regenerates examples/session-example.json (deterministic)
 ```
 
@@ -59,14 +68,23 @@ one-object/
 │   │   ├── AdaptationSystem.js   memory → reduced sensitivity, stiffer, wider contact
 │   │   └── ImmediateResponse.js  temporary proximity + dwell response (writes no memory)
 │   ├── simulation/Simulation.js  orchestrates physics, gestures, memory, adaptation, logging hooks
+│   ├── materials/
+│   │   ├── Material.js           the material interface every condition implements
+│   │   ├── registry.js           conditions 01–04 (researcher-only names, lazy module loaders)
+│   │   ├── sharedForm.js         shared outline, centre, diameter, body fill (identical for all four)
+│   │   ├── StructuralMaterial.js 01 — adapter around Simulation + FilamentRenderer (unchanged)
+│   │   ├── PlaceholderMaterial.js  base for 02–04: shared form + static texture + pointer logging
+│   │   ├── GelMaterial.js · PlasticMaterial.js · SiliconeMaterial.js   02 / 03 / 04 textures
+│   │   └── PointerTracker.js     pointer event logging for materials without their own physics
 │   ├── rendering/
 │   │   ├── FilamentNetwork.js    seeded filament anchors/edges mapped through the deformation
 │   │   └── FilamentRenderer.js   Canvas 2D: membrane, folds, filaments, tension, memory traces
 │   ├── interaction/PointerController.js   Pointer Events (mouse/touch/pen) → object units
 │   ├── audio/AudioEngine.js      procedural Web Audio (off by default)
 │   ├── research/
-│   │   ├── SessionLogger.js      in-memory event log
-│   │   └── Exporter.js           JSON export (schema v2)
+│   │   ├── SessionLogger.js      in-memory event log (one per encounter)
+│   │   ├── ResearchSession.js    every encounter in order, condition order and lock, export (schema v3)
+│   │   └── Exporter.js           encounter payloads (schema v2) + download
 │   ├── ui/
 │   │   ├── translations.js       every interface string (English / 简体中文)
 │   │   ├── ExhibitionUI.js       hints, INFO, reflection, language, sound button
@@ -92,7 +110,11 @@ The code is split into **material behaviour** (physics, behaviour, simulation), 
 | Repeat contact on one region | That region gradually responds less (stiffer and broader), and its fibres change. Other regions keep their original behaviour. |
 | Wait | Motion settles and memory decays, so the region recovers. |
 
-**Conditions** (in Researcher Mode):
+**Encounters and export.** A *research session* holds every encounter in order. Switching condition, RESET, applying a preset, or changing the seed closes the current encounter (its record is kept) and starts a new one. Use **Researcher Mode → Export research session** to download all of them in one JSON file. Data lives only in the tab, so export before closing.
+
+**Condition order.** In Researcher Mode, set an order such as `03, 01, 04, 02`, or shuffle it. Then optionally lock it: participants can then choose only the current condition and the next one in the order.
+
+**Behaviour presets for condition 01** (in Researcher Mode):
 
 - **A — Stable material:** memory and adaptation off.
 - **B — Adaptive material:** both on. This is the default.

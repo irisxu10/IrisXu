@@ -22,7 +22,7 @@ export default class PlasticMaterial extends PlaceholderMaterial {
       c.lineTo(bx - tx * L + k.nx * L, by - ty * L + k.ny * L);
       c.lineTo(bx + tx * L + k.nx * L, by + ty * L + k.ny * L);
       c.closePath();
-      c.fillStyle = rgba(P.main, 0.022 + rng() * 0.02);
+      c.fillStyle = rgba(P.main, 0.013 + rng() * 0.01);
       c.fill();
     }
     // crease lines: crisp, straight, with a faint parallel highlight
