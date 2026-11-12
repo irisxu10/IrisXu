@@ -1,0 +1,5 @@
+# macOS Finder metadata
+.DS_Store
+
+# Participant data exported from One Object Researcher Mode — never commit real study data
+research-session-*.json
