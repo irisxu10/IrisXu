@@ -1,0 +1,45 @@
+/* ==========================================================================
+   TOKENS — colour, type, motion
+   ========================================================================== */
+
+:root {
+  /* Substrate */
+  --ivory:   #FBF8F0;   /* bright warm ivory — never pure white */
+  --ivory-2: #F3EEE2;
+  --ivory-3: #E7DFCC;
+  --ivory-rgb: 251, 248, 240;
+
+  /* Ink */
+  --navy:     #0E2238;   /* major titles */
+  --ink:      #17283A;   /* primary text */
+  --ink-soft: #445260;   /* supporting text — lighter, never faded */
+  --muted:    #6B6E70;   /* quiet UI */
+
+  /* Secondary tones */
+  --teal:   #0F5560;
+  --cyan:   #3B98A8;
+  --violet: #5D4E8C;
+  --gold:   #A88A4E;
+  --gold-soft: #CBB27C;
+  --amber:  #C98E42;     /* orange-gold, micro accents only */
+  --aqua:   #48ACA8;
+  --lavender: #968AC4;
+
+  /* Hairlines */
+  --hair:        rgba(19, 40, 64, 0.16);
+  --hair-strong: rgba(19, 40, 64, 0.34);
+
+  /* Type */
+  --serif: 'Cormorant Garamond', 'Cormorant', 'Iowan Old Style', Georgia, serif;
+  --sans:  'Jost', 'Futura', 'Helvetica Neue', Arial, sans-serif;
+  --mono:  'IBM Plex Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+
+  /* Motion — ease-out and ease-in-out only. No overshoot anywhere. */
+  --ease:    cubic-bezier(0.22, 0.61, 0.36, 1);
+  --ease-io: cubic-bezier(0.65, 0, 0.35, 1);
+  --t-reveal: 1400ms;
+
+  /* Layout */
+  --gutter: 6vw;
+  --controls-h: 64px;
+}

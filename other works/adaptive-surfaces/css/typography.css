@@ -1,0 +1,43 @@
+/* ==========================================================================
+   TYPOGRAPHY
+   ========================================================================== */
+
+body {
+  font-family: var(--sans);
+  font-weight: 400;
+  color: var(--ink);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+p { margin: 0; }
+
+/* Serif display — titles, numerals, statements */
+.display {
+  font-family: var(--serif);
+  font-weight: 400;
+  line-height: 1.05;
+  letter-spacing: 0.02em;
+  margin: 0;
+  color: var(--navy);
+}
+
+/* Small institutional capitals */
+.caps {
+  font-family: var(--sans);
+  font-size: 11px;
+  font-weight: 400;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+}
+
+/* Spoken lines / quotations */
+.quote {
+  font-family: var(--serif);
+  font-style: italic;
+  font-weight: 400;
+  color: var(--navy);
+}
+
+em { font-style: italic; }

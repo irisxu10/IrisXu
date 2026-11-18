@@ -1,0 +1,338 @@
+/* ==========================================================================
+   ZONES: opening, concept, biology → security, closing
+   (the five-column zone lives in columns.css, the security demo in banknote.css)
+   ========================================================================== */
+
+/* ==========================================================================
+   ZONE 01 — OPENING
+   ========================================================================== */
+.opening {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 0 var(--gutter) 4vh;
+}
+
+.opening__title {
+  font-weight: 500;
+  font-size: clamp(44px, 7.6vw, 128px);
+  text-transform: uppercase;
+  letter-spacing: 0.22em;
+  padding-left: 0.22em;              /* optically recentre tracked capitals */
+  line-height: 1;
+  transition:
+    opacity 2200ms var(--ease),
+    translate 2200ms var(--ease),
+    letter-spacing 3600ms var(--ease),
+    padding 3600ms var(--ease);
+}
+.opening__title.is-in { letter-spacing: 0.14em; padding-left: 0.14em; }
+
+.opening__subtitle {
+  margin-top: 30px;
+  font-size: 12px;
+  letter-spacing: 0.36em;
+  color: var(--teal);
+}
+
+.opening__rule {
+  --reveal-y: 0px;
+  display: block;
+  width: 56px;
+  height: 1px;
+  margin: 46px 0 34px;
+  background: var(--gold);
+  scale: 0 1;
+  transition: opacity 1000ms var(--ease), scale 1800ms var(--ease-io);
+}
+.opening__rule.is-in { scale: 1 1; }
+
+.opening__line {
+  font-size: clamp(20px, 2vw, 30px);
+  color: var(--ink);
+}
+
+.begin {
+  position: absolute;
+  left: 50%;
+  bottom: 13vh;
+  margin-left: -60px;
+  width: 120px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 0;
+  color: var(--navy);
+}
+.begin .caps { letter-spacing: 0.42em; padding-left: 0.42em; }
+.begin__line {
+  width: 28px;
+  height: 1px;
+  background: var(--navy);
+  transition: width 900ms var(--ease);
+}
+.begin:hover .begin__line { width: 72px; }
+
+/* ==========================================================================
+   ZONE 02 — CONCEPT  (130vw: main content in the first 100vw, the question beyond)
+   ========================================================================== */
+.scene--idea { --main-r: calc(var(--w) * 100vw - 100vw + var(--gutter)); }
+.idea__statement {
+  font-weight: 500;
+  position: absolute;
+  top: 19vh;
+  left: var(--gutter);
+  right: var(--main-r);
+  text-align: center;
+  font-size: clamp(34px, 4.4vw, 70px);
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+}
+
+.idea__words {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  position: absolute;
+  top: 38vh;
+  left: var(--gutter);
+  right: var(--main-r);
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+}
+.idea__word {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  padding: 8px 0 10px;
+  border-left: 1px solid var(--hair);
+  color: var(--ink);
+}
+.idea__word:first-child { border-left-color: transparent; }
+.idea__glyph { width: 56px; height: 56px; color: var(--accent); }
+.idea__verb { font-size: 13px; font-weight: 500; letter-spacing: 0.36em; padding-left: 0.36em; color: var(--navy); }
+
+.idea__sentence {
+  position: absolute;
+  top: 66vh;
+  left: 14vw;
+  width: 72vw;
+  text-align: center;
+  font-family: var(--serif);
+  font-size: clamp(20px, 1.9vw, 28px);
+  line-height: 1.4;
+  color: var(--ink-soft);
+}
+/* The question leads on toward the animals */
+.idea__question {
+  position: absolute;
+  top: 44vh;
+  left: 100vw;
+  width: 50vw;
+  text-align: center;
+  font-size: clamp(26px, 2.6vw, 42px);
+  line-height: 1.2;
+}
+
+/* Glyph strokes draw in (shared by the concept and biology → security zones) */
+.glyph { width: 100%; height: 100%; overflow: visible; }
+.glyph * {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  transition: stroke-dashoffset 2400ms var(--ease-io);
+}
+.is-in .glyph * { stroke-dashoffset: 0; }
+.is-in .glyph *:nth-child(2n) { transition-delay: 150ms; }
+.is-in .glyph *:nth-child(3n) { transition-delay: 300ms; }
+
+/* ==========================================================================
+   ZONE 07 — BIOLOGY → SECURITY
+   ========================================================================== */
+.translate {
+  --cols: 36px minmax(190px, 1fr) minmax(110px, 0.95fr) minmax(250px, 1.5fr);
+  position: absolute;
+  top: 14vh;
+  left: 50%;
+  width: min(1100px, 86vw);
+  margin-left: calc(min(1100px, 86vw) / -2);
+}
+
+.translate__head {
+  display: grid;
+  grid-template-columns: var(--cols);
+  column-gap: 28px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--hair-strong);
+  color: var(--ink-soft);
+}
+.translate__left { grid-column: 1 / 3; }
+.translate__right { grid-column: 4; }
+
+.translate__rows { list-style: none; margin: 0; padding: 0; }
+
+/* Each row reads as one pathway: glyph · strategy ——— response */
+.row {
+  --reveal-y: 0px;
+  display: grid;
+  grid-template-columns: var(--cols);
+  column-gap: 28px;
+  align-items: center;
+  height: max(54px, 8vh);
+  border-bottom: 1px solid rgba(19, 40, 64, 0.1);
+}
+.row__glyph { width: 30px; height: 30px; color: var(--accent); }
+.row__bio {
+  font-family: var(--serif);
+  font-weight: 500;
+  font-size: clamp(19px, 1.8vw, 27px);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--navy);
+}
+
+/* The connecting line draws left → right, then a fine pulse travels along it */
+.row__link { position: relative; height: 1px; }
+.row__link b {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, var(--accent), var(--gold));
+  opacity: 0.85;
+  transform-origin: left;
+  scale: 0 1;
+  transition: scale 1400ms var(--ease-io) 350ms;
+}
+.row__link .dot {
+  position: absolute;
+  top: -2.5px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--accent);
+  opacity: 0;
+  transition: opacity 600ms var(--ease);
+}
+.row__link .dot--a { left: -3px; transition-delay: 250ms; }
+.row__link .dot--b { right: -3px; background: var(--gold); transition-delay: 1650ms; }
+.row__link::after {
+  content: '';
+  position: absolute;
+  top: -0.5px;
+  left: 0;
+  width: 40px;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--gold-soft), transparent);
+  opacity: 0;
+}
+.row.is-in .row__link b { scale: 1 1; }
+.row.is-in .row__link .dot { opacity: 1; }
+.row.is-in .row__link::after { animation: travel 5200ms var(--ease-io) 2200ms infinite; }
+@keyframes travel {
+  0%   { left: 0; opacity: 0; }
+  15%  { opacity: 0.9; }
+  85%  { opacity: 0.9; }
+  100% { left: calc(100% - 40px); opacity: 0; }
+}
+
+.row__resp {
+  font-size: clamp(15px, 1.2vw, 18px);
+  letter-spacing: 0.015em;
+  line-height: 1.35;
+  color: var(--ink);
+  opacity: 0;
+  translate: -8px 0;
+  transition: opacity 1000ms var(--ease) 1500ms, translate 1000ms var(--ease) 1500ms;
+}
+.row.is-in .row__resp { opacity: 1; translate: 0 0; }
+
+/* The closing statement supports the diagram rather than competing with it:
+   smaller, lower, set off by a short gold rule. The diagram stays readable. */
+.translate__statement {
+  position: absolute;
+  left: var(--gutter);
+  right: var(--gutter);
+  bottom: 10vh;
+  text-align: center;
+  font-size: clamp(22px, 2.2vw, 34px);
+  line-height: 1.25;
+}
+.translate__statement::before {
+  content: '';
+  display: block;
+  width: 44px;
+  height: 1px;
+  margin: 0 auto 3.2vh;
+  background: var(--gold);
+}
+.translate__statement em { color: var(--teal); }
+
+/* ==========================================================================
+   ZONE 08 — CLOSING
+   ========================================================================== */
+.final {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 0 var(--gutter) 4vh;
+}
+.final__title {
+  font-weight: 500;
+  font-size: clamp(34px, 4.4vw, 68px);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  padding-left: 0.14em;
+}
+.final__lines {
+  margin-top: 20px;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--teal);
+}
+.final__lines .sep {
+  display: inline-block;
+  width: 22px;
+  height: 1px;
+  margin: 0 16px;
+  vertical-align: middle;
+  background: var(--hair-strong);
+}
+.final__rule {
+  --reveal-y: 0px;
+  display: block;
+  width: 56px;
+  height: 1px;
+  margin: 6vh 0 5vh;
+  background: var(--gold);
+  scale: 0 1;
+  transition: opacity 1000ms var(--ease), scale 1800ms var(--ease-io);
+}
+.final__rule.is-in { scale: 1 1; }
+.final__quote {
+  font-size: clamp(26px, 2.8vw, 44px);
+  line-height: 1.3;
+  transition: opacity 2400ms var(--ease), translate 2400ms var(--ease);
+}
+
+/* ---------- Narrow screens (rehearsal on a tablet / phone) ---------- */
+@media (max-width: 760px) {
+  :root { --gutter: 16px; }
+  .idea__words { grid-template-columns: repeat(3, 1fr); row-gap: 28px; }
+  .translate { --cols: 22px 1fr 32px 1.4fr; }
+  .translate__head { column-gap: 12px; }
+  .row { column-gap: 12px; }
+  .row__resp { font-size: 12px; }
+  .final__lines .sep { margin: 0 8px; width: 10px; }
+}

@@ -1,0 +1,150 @@
+/* ==========================================================================
+   THE WORLD — persistent surface layers, the track, reveals
+   ========================================================================== */
+
+/* ---------- Persistent surface (behind everything, never resets) ---------- */
+.surface {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  /* luminous banknote paper: warm ivory with faint cream, blue-grey and mint */
+  background:
+    radial-gradient(ellipse 70% 60% at 50% 48%, rgba(255, 253, 247, 0.9), rgba(255, 253, 247, 0) 75%),
+    radial-gradient(ellipse 55% 50% at 8% 12%, rgba(226, 236, 242, 0.7), rgba(226, 236, 242, 0) 70%),
+    radial-gradient(ellipse 50% 45% at 94% 90%, rgba(226, 242, 234, 0.6), rgba(226, 242, 234, 0) 70%),
+    radial-gradient(ellipse 40% 40% at 90% 8%, rgba(250, 240, 220, 0.6), rgba(250, 240, 220, 0) 70%),
+    var(--ivory);
+  pointer-events: none;
+}
+
+/* Layer 1 — paper substrate: fine grain + faint engraved horizontal lines */
+.surface__paper {
+  position: absolute;
+  inset: 0;
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.45  0 0 0 0 0.38  0 0 0 0 0.25  0 0 0 0.55 0'/%3E%3C/filter%3E%3Crect width='240' height='240' filter='url(%23n)'/%3E%3C/svg%3E"),
+    repeating-linear-gradient(0deg, rgba(19, 40, 64, 0.012) 0 1px, transparent 1px 5px);
+  background-size: 240px 240px, auto;
+  opacity: 0.22;              /* paper texture stays extremely subtle */
+  mix-blend-mode: multiply;
+}
+
+/* Layer 2 — flowing curves (js/curves.js) */
+.surface__curves {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+/* Layer 3 — midground: reptile micro-patterns + thread motifs (js/patterns.js) */
+.surface__mid {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 1px;
+  height: 100%;
+  will-change: transform;
+}
+
+.mid-pattern {
+  position: absolute;
+  top: 0;
+  left: calc(var(--x) * 100vw);
+  width: calc(var(--w) * 100vw);
+  height: 100%;
+  color: color-mix(in srgb, var(--accent) 70%, transparent);
+  opacity: 0.18;
+  /* emerge from the curves and dissolve back: soft in both directions */
+  -webkit-mask-image:
+    linear-gradient(90deg, transparent 0%, #000 38%, #000 62%, transparent 100%),
+    linear-gradient(180deg, transparent 4%, #000 26%, #000 74%, transparent 96%);
+  -webkit-mask-composite: source-in;
+          mask-image:
+    linear-gradient(90deg, transparent 0%, #000 38%, #000 62%, transparent 100%),
+    linear-gradient(180deg, transparent 4%, #000 26%, #000 74%, transparent 96%);
+          mask-composite: intersect;
+}
+.pattern-svg { display: block; }
+.pattern-svg path {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 0.8;
+  vector-effect: non-scaling-stroke;
+}
+
+/* Recurring security-thread motif — thin, windowed, iridescent */
+.mid-thread {
+  position: absolute;
+  top: 0;
+  left: calc(var(--x) * 100vw);
+  width: 3px;
+  height: 100%;
+  opacity: 0.38;
+  background: linear-gradient(180deg, #3B98A8, #8E7CC3, #CBB27C, #0F5560, #9FC6D8, #3B98A8);
+  background-size: 100% 300%;
+  animation: thread-shift 16s linear infinite;
+  animation-delay: var(--d, 0s);
+  -webkit-mask-image:
+    linear-gradient(180deg, transparent 6%, #000 28%, #000 72%, transparent 94%),
+    repeating-linear-gradient(180deg, #000 0 16px, transparent 16px 22px);
+  -webkit-mask-composite: source-in;
+          mask-image:
+    linear-gradient(180deg, transparent 6%, #000 28%, #000 72%, transparent 94%),
+    repeating-linear-gradient(180deg, #000 0 16px, transparent 16px 22px);
+          mask-composite: intersect;
+}
+@keyframes thread-shift { to { background-position: 0 300%; } }
+
+/* ---------- The track: one long horizontal world ---------- */
+.viewport {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+}
+.track {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 1px;
+  height: 100%;
+  will-change: transform;
+}
+.frame {
+  position: absolute;
+  top: 0;
+  left: calc(var(--x) * 100vw);
+  width: calc(var(--w, 1) * 100vw);
+  height: 100vh;
+}
+.scene--columns { will-change: transform; }
+
+/* ---------- Reveals: data-reveal="ms" → .is-in when it comes into view ----------
+   The delay is applied by js/world.js only on the way in. */
+[data-reveal] {
+  opacity: 0;
+  translate: 0 var(--reveal-y, 12px);
+  transition:
+    opacity var(--t-reveal) var(--ease),
+    translate var(--t-reveal) var(--ease);
+}
+[data-reveal].is-in {
+  opacity: 1;
+  translate: 0 0;
+}
+
+/* Wipe — a horizontal mask, like a printing pass */
+.reveal-wipe[data-reveal] {
+  opacity: 1;
+  translate: none;
+  clip-path: inset(-20% 100% -20% 0);
+  transition: clip-path 1900ms var(--ease-io);
+}
+.reveal-wipe[data-reveal].is-in { clip-path: inset(-20% -2% -20% -2%); }
+
+/* ---------- Reduced motion ---------- */
+@media (prefers-reduced-motion: reduce) {
+  :root { --t-reveal: 500ms; }
+  .reveal-wipe[data-reveal] { transition-duration: 500ms; }
+  .mid-thread { animation: none; }
+}

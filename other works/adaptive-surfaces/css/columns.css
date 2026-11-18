@@ -1,0 +1,308 @@
+/* ==========================================================================
+   ZONES 03–05 — FIVE ANIMALS → FIVE BANKNOTES → ONE FAMILY   (js/columns.js)
+   The frame is pinned while the camera travels; js/columns.js writes these
+   per-strip variables from the camera position (all 0–1):
+     --photo-s / --photo-o   photo zoom and opacity
+     --pattern               reptile micro-pattern surfacing
+     --word / --lines        strategy word and guilloché passing through
+     --note                  banknote opening
+     --meta / --label        captions under the strips / family labels
+   Frame classes: .is-notes  .is-complete  .is-releasing  .is-family
+   ========================================================================== */
+
+.scene--columns {
+  --gap: clamp(8px, 0.9vw, 14px);
+  /* Strip width: five across the screen, but never taller than the screen allows.
+     The image area is 1 : 2.1 — exactly an upright banknote. */
+  --colw: min(calc((88vw - 4 * var(--gap)) / 5), calc((100vh - 340px) / 2.1));
+  --roww: calc(var(--colw) * 5 + var(--gap) * 4);
+  --release: 0;
+}
+
+/* Header swaps: Five Animal Strategies → Animal → Banknote → The Banknote Family */
+.scene-head__swap { display: grid; }
+.scene-head__swap > span { grid-area: 1 / 1; opacity: 0; transition: opacity 700ms var(--ease); }
+.scene--columns:not(.is-notes):not(.is-family) .when-animals,
+.scene--columns.is-notes .when-notes,
+.scene--columns.is-family .when-family { opacity: 1; }
+
+/* ---------- The row of five strips ---------- */
+.strips {
+  position: absolute;
+  top: 12.5vh;
+  left: 50%;
+  width: var(--roww);
+  margin-left: calc(var(--roww) / -2);
+  display: flex;
+  gap: var(--gap);
+  align-items: flex-start;
+}
+
+.strip {
+  --reveal-y: 24px;
+  flex: none;
+  width: var(--colw);
+  transform: translateY(var(--shift, 0));
+  transition:
+    opacity 900ms var(--ease),
+    translate 1600ms var(--ease),
+    filter 900ms var(--ease);
+}
+.strip.is-note { cursor: zoom-in; }
+
+.strip__move { transform-origin: 50% 50%; will-change: transform; }
+
+.strip__media {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1 / 2.1;
+  overflow: hidden;
+  background: var(--ivory-2);
+  transition: transform 1000ms var(--ease), box-shadow 1000ms var(--ease);
+}
+.scene--columns.is-releasing .strip__media {
+  box-shadow: 0 30px 40px -32px rgba(19, 40, 64, calc(var(--release) * 0.4));
+}
+
+/* Layers inside each strip: photo → pattern → banknote → guilloché → word */
+.strip__photo,
+.strip__pattern,
+.strip__note,
+.strip__lines { position: absolute; inset: 0; pointer-events: none; }
+
+/* ARTWORK: animal photograph — zooms toward the animal's focus point */
+.strip__photo {
+  transform-origin: var(--focus);
+  scale: var(--photo-s, 1);
+  opacity: var(--photo-o, 1);
+}
+
+/* Reptile micro-pattern (same structures as the background surface) */
+.strip__pattern {
+  color: var(--accent);
+  opacity: calc(var(--pattern, 0) * 0.75);
+  background: rgba(var(--ivory-rgb), 0.8);   /* veils the photo while the pattern surfaces */
+}
+
+/* ARTWORK: banknote front, turned upright. Opens from the centre like an aperture. */
+.strip__note {
+  opacity: min(1, calc(var(--note, 0) * 2));
+  clip-path: inset(calc((1 - var(--note, 0)) * 50%) 0);
+}
+.strip__note .as-image__label { font-size: 10.5px; letter-spacing: 0.22em; }
+
+.strip__lines { opacity: calc(var(--lines, 0) * 0.85); color: var(--accent); }
+.strip__lines svg { width: 100%; height: 100%; }
+.strip__lines path {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 0.8;
+  vector-effect: non-scaling-stroke;
+}
+
+.strip__word {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  margin-top: -0.6em;
+  text-align: center;
+  font-size: 11px;
+  letter-spacing: calc(0.3em + var(--word, 0) * 0.12em);
+  color: var(--navy);
+  opacity: var(--word, 0);
+  pointer-events: none;
+}
+
+/* ---------- Captions under each strip ---------- */
+.strip__meta {
+  margin-top: 18px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+  opacity: var(--meta, 1);
+}
+.strip__value {
+  font-family: var(--serif);
+  font-size: 22px;
+  line-height: 1;
+  letter-spacing: 0.04em;
+  color: var(--navy);
+  transition: color 1200ms var(--ease);
+}
+.strip__name {
+  font-family: var(--serif);
+  font-size: clamp(15px, 1.35vw, 20px);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--navy);
+}
+.strip__strategy {
+  font-size: 10px;
+  letter-spacing: 0.32em;
+  color: var(--ink-soft);
+  opacity: 0.95;
+  transition: color 900ms var(--ease), opacity 900ms var(--ease), letter-spacing 900ms var(--ease);
+}
+.strip__line {
+  margin-top: 4px;
+  min-height: 2.6em;
+  font-size: clamp(13px, 1.05vw, 16px);
+  line-height: 1.3;
+  opacity: 0;
+  translate: 0 4px;
+  transition: opacity 900ms var(--ease), translate 900ms var(--ease);
+}
+
+/* ---------- Hover: an exhibition wall, not an accordion ---------- */
+.scene--columns:not(.is-releasing) .strip:hover .strip__media {
+  transform: scale(1.035);
+  box-shadow: 0 34px 44px -34px rgba(19, 40, 64, 0.45);
+}
+.scene--columns:not(.is-releasing) .strip:hover .strip__strategy { color: var(--accent); opacity: 1; letter-spacing: 0.42em; }
+.scene--columns:not(.is-releasing) .strip:hover .strip__line { opacity: 1; translate: 0 0; }
+.scene--columns:not(.is-releasing) .strips:has(.strip:hover) .strip:not(:hover) { opacity: 0.45; filter: saturate(0.4); }
+
+/* ---------- Caption row + the moment the family is complete ---------- */
+.strips__caption {
+  position: absolute;
+  left: 50%;
+  width: var(--roww);
+  margin-left: calc(var(--roww) / -2);
+  bottom: calc(var(--controls-h) + 2.4vh);
+  display: grid;
+  justify-items: center;
+}
+.strips__caption.is-in { opacity: calc(1 - var(--release) * 3); }
+.strips__caption > * { grid-area: 1 / 1; }
+.strips__caption .quote {
+  font-size: clamp(20px, 1.9vw, 28px);
+  transition: opacity 1000ms var(--ease);
+}
+.caption-notes { opacity: 0; }
+.scene--columns.is-notes .caption-animals,
+.scene--columns.is-complete .caption-animals { opacity: 0; }
+.scene--columns.is-complete .caption-notes { opacity: 1; transition-delay: 500ms; }
+
+.strips__rule {
+  align-self: start;
+  width: 100%;
+  height: 1px;
+  margin-top: -2vh;
+  background: var(--gold);
+  transform-origin: left;
+  scale: 0 1;
+  transition: scale 1800ms var(--ease-io);
+}
+.scene--columns.is-complete .strips__rule { scale: 1 1; }
+.scene--columns.is-complete .strip__value,
+.scene--columns.is-releasing .strip__value { color: var(--gold); }
+
+/* ---------- Labels of the released family ---------- */
+.family-labels { position: absolute; inset: 0; pointer-events: none; }
+.family-label {
+  position: absolute;
+  font-size: 10px;
+  color: var(--ink-soft);
+  white-space: nowrap;
+  opacity: 0;
+}
+.family-label b {
+  font-family: var(--serif);
+  font-size: 16px;
+  font-weight: 400;
+  letter-spacing: 0.04em;
+  color: var(--navy);
+}
+
+/* ==========================================================================
+   FOCUSED VIEW — optional close look at one banknote, with FLIP
+   ========================================================================== */
+.focus {
+  --nw: min(64vw, calc((100vh - 320px) * 2.1));
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4.5vh;
+  padding-bottom: var(--controls-h);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 700ms var(--ease), visibility 0s linear 700ms;
+}
+.focus.is-open {
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 900ms var(--ease), visibility 0s;
+}
+.focus__veil {
+  position: absolute;
+  inset: 0;
+  background: rgba(var(--ivory-rgb), 0.985);
+  cursor: zoom-out;
+}
+
+.focus__note {
+  position: relative;
+  width: var(--nw);
+  aspect-ratio: 2.1;
+  perspective: 2600px;
+  scale: 0.96;
+  transition: scale 1100ms var(--ease);
+}
+.focus.is-open .focus__note { scale: 1; }
+.focus__card {
+  position: absolute;
+  inset: 0;
+  transform-style: preserve-3d;
+  transition: transform 1700ms var(--ease-io);
+  cursor: pointer;
+}
+.focus.is-flipped .focus__card { transform: rotateY(180deg); }
+.focus__face {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  box-shadow: 0 34px 50px -40px rgba(19, 40, 64, 0.45);
+}
+.focus__back { transform: rotateY(180deg); }
+
+.focus__bar {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 28px;
+}
+.focus__value { font-family: var(--serif); font-size: 30px; line-height: 1; color: var(--navy); }
+.focus__names { display: flex; align-items: center; color: var(--ink-soft); }
+.focus__names .sep { width: 22px; height: 1px; margin: 0 16px; background: var(--hair-strong); }
+.focus__strategy { color: var(--accent); }
+.focus__actions { display: flex; gap: 22px; margin-left: 12px; }
+.focus__btn {
+  position: relative;
+  padding: 8px 0;
+  font-size: 10px;
+  letter-spacing: 0.34em;
+  color: var(--muted);
+  transition: color 600ms var(--ease);
+}
+.focus__btn::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0.34em;
+  bottom: 2px;
+  height: 1px;
+  background: currentColor;
+  transform-origin: left;
+  scale: 0 1;
+  transition: scale 700ms var(--ease);
+}
+.focus__btn:hover { color: var(--navy); }
+.focus__btn:hover::after { scale: 1 1; }

@@ -1,0 +1,417 @@
+/* ==========================================================================
+   SCENE 06 — THE BANKNOTE RESPONDS
+   State hooks set by js/banknote.js on .scene--respond:
+     [data-mode="touch|tilt|light|flip"]   active mode
+     --light (0–1)                          light intensity
+     .is-flipped / .has-flipped             flip state
+   ========================================================================== */
+
+.scene--respond {
+  --light: 0;
+  --nw: min(58vw, calc((100vh - 400px) * 2.1));   /* featured note width */
+}
+
+/* The recurring thread motif arrives here: a full-height thread that passes
+   exactly through the note's ANIMA thread. In TILT mode it comes forward —
+   revealing what the threads met along the way were. */
+.demo-thread {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  width: 3px;                                         /* a hairline, like the threads met along the way */
+  left: calc(50% - var(--nw) / 2 + var(--nw) * (var(--tx, 0.64) + var(--tw, 0.042) / 2) - 1.5px);
+  z-index: 1;
+  opacity: 0.35;
+  background: linear-gradient(180deg, #3B98A8, #8E7CC3, #CBB27C, #0F5560, #9FC6D8, #3B98A8);
+  background-size: 100% 300%;
+  animation: thread-shift 16s linear infinite;
+  -webkit-mask-image:
+    linear-gradient(180deg, transparent 2%, #000 22%, #000 78%, transparent 98%),
+    repeating-linear-gradient(180deg, #000 0 16px, transparent 16px 22px);
+  -webkit-mask-composite: source-in;
+          mask-image:
+    linear-gradient(180deg, transparent 2%, #000 22%, #000 78%, transparent 98%),
+    repeating-linear-gradient(180deg, #000 0 16px, transparent 16px 22px);
+          mask-composite: intersect;
+  transition: opacity 1200ms var(--ease), width 1200ms var(--ease-io), left 1200ms var(--ease-io);
+}
+/* TILT: the hairline opens to the full width of the note's ANIMA thread */
+.scene--respond[data-mode="tilt"] .demo-thread {
+  width: calc(var(--nw) * var(--tw, 0.042));
+  left: calc(50% - var(--nw) / 2 + var(--nw) * var(--tx, 0.64));
+  opacity: 0.45;
+  animation-duration: 5s;
+}
+
+/* Darken the surrounding interface slightly in LIGHT mode */
+.respond__veil {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  background: #0E1B28;
+  opacity: calc(var(--light) * 0.42);
+  pointer-events: none;
+}
+
+.respond {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2.8vh;
+  padding: 11vh var(--gutter) calc(var(--controls-h) + 3vh);
+}
+
+/* ---------- Featured note picker (top right) ---------- */
+.denoms {
+  position: absolute;
+  top: 5.5vh;
+  right: var(--gutter);
+  z-index: 6;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  color: var(--muted);
+}
+.denoms__label { font-size: 10px; }
+.denoms__list { display: flex; gap: 14px; }
+.denoms__list button {
+  position: relative;
+  font-family: var(--serif);
+  font-size: 19px;
+  color: var(--muted);
+  padding: 2px 2px 5px;
+  transition: color 500ms var(--ease);
+}
+.denoms__list button::after {
+  content: '';
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  height: 1px;
+  background: var(--gold);
+  scale: 0 1;
+  transition: scale 700ms var(--ease);
+}
+.denoms__list button:hover { color: var(--ink); }
+.denoms__list button[aria-pressed="true"] { color: var(--navy); }
+.denoms__list button[aria-pressed="true"]::after { scale: 1 1; }
+
+/* ==========================================================================
+   THE NOTE — perspective › tilt › card (flip) › faces
+   ========================================================================== */
+.note3d {
+  --accent: var(--navy);
+  position: relative;
+  z-index: 3;
+  flex: none;
+  width: var(--nw);
+  aspect-ratio: 2.1;
+  perspective: 2600px;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.note3d__tilt {
+  position: absolute;
+  inset: 0;
+  transform-style: preserve-3d;
+  transform: rotateY(calc(var(--tilt, 0) * 1deg));
+  transition: transform 700ms var(--ease);
+}
+
+.note3d__card {
+  position: absolute;
+  inset: 0;
+  transform-style: preserve-3d;
+  transition: transform 1800ms var(--ease-io);
+}
+.is-flipped .note3d__card { transform: rotateY(180deg); }
+
+.note3d__face {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  background: var(--ivory-2);
+  outline: 1px solid rgba(14, 34, 56, 0.16);   /* crisp edge against the bright paper */
+  box-shadow:
+    0 2px 6px rgba(14, 34, 56, 0.06),
+    0 40px 64px -34px rgba(14, 34, 56, 0.5),
+    0 0 calc(var(--light) * 90px) calc(var(--light) * 12px) rgba(255, 244, 214, calc(var(--light) * 0.5));
+}
+.note3d__face--back { transform: rotateY(180deg); }
+
+.slot { position: absolute; inset: 0; }
+
+/* Backlight: the substrate becomes luminous as the printed layer thins */
+.backlight {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at 50% 50%, #FFFDF7 0%, #FBF5E5 55%, #F0E5CB 100%);
+  opacity: var(--light);
+}
+.slot--front {
+  opacity: calc(1 - var(--light) * 0.62);
+  filter: brightness(calc(1 + var(--light) * 0.18));
+}
+
+/* Mode layers */
+.layer {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 900ms var(--ease), visibility 0s linear 900ms;
+}
+.scene--respond[data-mode="touch"] .layer--touch,
+.scene--respond[data-mode="tilt"]  .layer--tilt,
+.scene--respond[data-mode="light"] .layer--light {
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 900ms var(--ease), visibility 0s;
+}
+.scene--respond[data-mode="touch"] .layer--touch { pointer-events: auto; }
+
+.scene--respond[data-mode="light"] .note3d { cursor: pointer; }
+.scene--respond[data-mode="flip"]  .note3d { cursor: pointer; }
+.scene--respond[data-mode="touch"] .note3d { cursor: none; }
+.scene--respond[data-mode="tilt"]  .note3d { cursor: ew-resize; }
+
+/* ==========================================================================
+   TOUCH — tactile zones with slow contour pulses
+   ========================================================================== */
+.tzone {
+  position: absolute;
+  color: var(--teal);
+  border: 1px solid rgba(15, 85, 96, 0.55);
+  transition: background-color 700ms var(--ease), border-color 700ms var(--ease);
+}
+.tzone::before,
+.tzone::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border: 1px solid currentColor;
+  opacity: 0;
+  animation: contour 3600ms var(--ease) infinite;
+  animation-delay: calc(var(--i) * 450ms);
+}
+.tzone::after { animation-delay: calc(var(--i) * 450ms + 1800ms); }
+@keyframes contour {
+  0%   { inset: 0;     opacity: 0.55; }
+  100% { inset: -16px; opacity: 0; }
+}
+.tzone:hover {
+  background-color: rgba(15, 85, 96, 0.06);
+  border-color: var(--teal);
+}
+
+.tzone__label {
+  position: absolute;
+  left: 0;
+  bottom: calc(100% + 7px);
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: var(--teal);
+  opacity: 0.75;
+}
+
+.touch-ring {
+  position: absolute;
+  left: -17px;
+  top: -17px;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 1px solid var(--navy);
+  background: rgba(19, 40, 64, 0.04);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 400ms var(--ease);
+  z-index: 5;
+}
+.touch-ring.is-on { opacity: 0.6; }
+
+/* ==========================================================================
+   TILT — Anima motion thread, five discrete frames (no morphing)
+   ========================================================================== */
+.thread {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  height: 100%;
+  box-shadow: -1px 0 0 rgba(19, 40, 64, 0.12), 1px 0 0 rgba(19, 40, 64, 0.12);
+}
+.thread__frame {
+  position: absolute;
+  inset: 0;
+  visibility: hidden;                   /* instant optical switch */
+}
+.thread__frame.is-current { visibility: visible; }
+
+/* Placeholder frames: a band that occupies a different position per frame,
+   so the discrete steps are visible before the real PNGs exist. */
+.thread .thread__frame.is-placeholder {
+  background:
+    linear-gradient(to bottom,
+      transparent calc(var(--f) * 18% + 2%),
+      rgba(15, 85, 96, 0.30) calc(var(--f) * 18% + 2%),
+      rgba(93, 78, 140, 0.30) calc(var(--f) * 18% + 16%),
+      transparent calc(var(--f) * 18% + 16%)),
+    repeating-linear-gradient(to bottom, rgba(19, 40, 64, 0.10) 0 1px, transparent 1px 6px),
+    #E6DECB;
+  box-shadow: none;
+}
+.thread .thread__frame .as-image__ph::before { display: none; }
+
+/* ==========================================================================
+   LIGHT — watermark window + see-through register
+   ========================================================================== */
+.wm-window {
+  position: absolute;
+  border-radius: 50%;
+  outline: 1px dashed rgba(19, 40, 64, calc(0.22 - var(--light) * 0.18));
+  outline-offset: -1px;
+  background: radial-gradient(closest-side, rgba(255, 253, 247, calc(var(--light) * 0.95)), rgba(255, 253, 247, 0));
+}
+.wm-window .as-image.is-placeholder { background: none; box-shadow: none; }
+.wm-window .as-image .as-image__ph::before { display: none; }
+.wm-window .as-image {
+  opacity: calc(var(--light) * 0.9);
+  filter: blur(calc((1 - var(--light)) * 3px));
+  mix-blend-mode: multiply;            /* tonal, like paper density — not a glow */
+}
+
+.register { position: absolute; }
+.register__half { position: absolute; inset: 0; }
+.register__half--a { translate: calc((1 - var(--light)) * -24px) 0; }
+.register__half--b { translate: calc((1 - var(--light)) * 24px) 0; }
+.register .as-image.is-placeholder { background: none; box-shadow: none; }
+.register .as-image .as-image__ph { padding: 0; }
+.register .as-image .as-image__ph::before { display: none; }
+.register .as-image { opacity: calc(0.25 + var(--light) * 0.75); mix-blend-mode: multiply; }
+.register__svg { width: 100%; height: 100%; }
+.register__half--a .register__svg path { fill: var(--teal); }
+.register__half--b .register__svg path { fill: var(--violet); }
+.register__svg path.cut { fill: var(--ivory-2); }
+
+/* ==========================================================================
+   MODES + CAPTION
+   ========================================================================== */
+.modes {
+  position: relative;
+  z-index: 3;
+  display: flex;
+  gap: clamp(28px, 5vw, 76px);
+}
+.mode {
+  position: relative;
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  padding: 10px 0 12px;
+  color: var(--ink-soft);            /* inactive: quiet muted navy */
+  transition: color 600ms var(--ease);
+}
+.mode .caps { font-size: 13px; font-weight: 500; letter-spacing: 0.36em; }
+.mode__key { font-family: var(--mono); font-size: 9px; opacity: 0.7; transition: color 600ms var(--ease); }
+.mode::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0.38em;
+  bottom: 0;
+  height: 1px;
+  background: linear-gradient(90deg, var(--cyan), var(--teal));
+  transform-origin: left;
+  scale: 0 1;
+  transition: scale 900ms var(--ease);
+}
+.mode:hover { color: var(--navy); }
+/* active: teal text, cyan → teal rule, a small orange-gold key */
+.mode[aria-pressed="true"] { color: var(--teal); }
+.mode[aria-pressed="true"] .mode__key { color: var(--amber); opacity: 1; }
+.mode[aria-pressed="true"]::after { scale: 1 1; }
+
+.mode-caption {
+  position: relative;
+  z-index: 3;
+  min-height: 132px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+.mode-caption > p,
+.mode-caption > .mode-extra { transition: opacity 320ms var(--ease); }
+.mode-caption.is-swapping > p { opacity: 0; }
+
+.mode-caption__title { color: var(--gold); font-size: 11px; letter-spacing: 0.34em; transition: color 600ms var(--ease); }
+.scene--respond[data-mode="light"] .mode-caption__title { color: var(--navy); }
+.scene--respond[data-mode="light"] .light-hint { color: var(--ink-soft); }
+.mode-caption__sub { margin-top: 6px; color: var(--ink-soft); font-size: 10px; }
+.mode-caption__text { margin-top: 14px; font-size: clamp(20px, 1.8vw, 27px); color: var(--navy); }
+
+.mode-extra { display: none; margin-top: 16px; align-items: center; gap: 18px; color: var(--ink-soft); }
+.scene--respond[data-mode="tilt"]  .mode-extra--tilt,
+.scene--respond[data-mode="light"] .mode-extra--light,
+.scene--respond[data-mode="flip"]  .mode-extra--flip { display: flex; }
+
+/* Tilt: frame indicator */
+.frames { display: flex; gap: 6px; }
+.frames i {
+  width: 18px;
+  height: 2px;
+  background: var(--hair-strong);
+}
+.frames i.is-current { background: var(--navy); }
+.frames__label { font-size: 10px; min-width: 70px; text-align: left; }
+
+/* Light: hairline slider */
+.light-ctl { display: flex; align-items: center; gap: 14px; }
+.light-ctl .caps { font-size: 10px; }
+.light-hint { font-size: 9px; color: var(--muted); }
+#light-range {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 180px;
+  height: 18px;
+  background: transparent;
+  cursor: pointer;
+}
+#light-range::-webkit-slider-runnable-track { height: 1px; background: var(--hair-strong); }
+#light-range::-moz-range-track { height: 1px; background: var(--hair-strong); }
+#light-range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 9px;
+  height: 9px;
+  margin-top: -4px;
+  background: var(--gold);
+  border: 0;
+}
+#light-range::-moz-range-thumb { width: 9px; height: 9px; background: var(--gold); border: 0; border-radius: 0; }
+#light-range:focus { outline: none; }
+#light-range:focus-visible { outline: 1px solid var(--gold); outline-offset: 4px; }
+
+/* Flip: FRONT / BACK — shown once the note has turned */
+.flip-sides {
+  display: flex;
+  align-items: center;
+  gap: 30px;
+  opacity: 0;
+  transition: opacity 900ms var(--ease);
+}
+.scene--respond.has-flipped .flip-sides { opacity: 1; }
+.side { display: flex; flex-direction: column; align-items: center; gap: 4px; opacity: 0.4; transition: opacity 900ms var(--ease); }
+.side__name { font-family: var(--serif); font-size: 22px; color: var(--navy); letter-spacing: 0.06em; }
+.side__desc { font-size: 9.5px; }
+.side__rule { width: 40px; height: 1px; background: var(--hair-strong); }
+.scene--respond:not(.is-flipped) .side--front,
+.scene--respond.is-flipped .side--back { opacity: 1; }

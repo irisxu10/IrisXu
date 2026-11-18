@@ -1,0 +1,252 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Adaptive Surfaces</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400&family=Jost:wght@300;400;500&family=IBM+Plex+Mono:wght@400&display=swap" rel="stylesheet">
+
+  <!-- Styles: tokens → typography → layout → world → placeholders → zones -->
+  <link rel="stylesheet" href="css/tokens.css">
+  <link rel="stylesheet" href="css/typography.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/world.css">
+  <link rel="stylesheet" href="css/placeholders.css">
+  <link rel="stylesheet" href="css/scenes.css">
+  <link rel="stylesheet" href="css/columns.css">
+  <link rel="stylesheet" href="css/banknote.css">
+</head>
+
+<body>
+
+  <!-- ==================================================================
+       PERSISTENT SURFACE — one continuous environment behind everything.
+       Each layer travels at its own speed (parallax), set in js/world.js.
+       ================================================================== -->
+  <div class="surface" aria-hidden="true">
+    <div class="surface__paper" id="paper"></div>            <!-- base: paper grain       (0.4×) -->
+    <canvas class="surface__curves" id="curves"></canvas>     <!-- background: flowing curves (0.6×) -->
+    <div class="surface__mid" id="mid"></div>                 <!-- midground: reptile micro-patterns + threads (0.85×) -->
+  </div>
+
+  <!-- ==================================================================
+       THE TRACK — one long horizontal world (foreground, 1×).
+       Each .frame is a zone placed along the track; positions live in
+       WORLD (js/world.js). data-reveal="ms" = delay after it comes into view.
+       ================================================================== -->
+  <main class="viewport">
+    <div class="track" id="track">
+
+      <!-- ZONE 01 — OPENING -->
+      <section class="frame scene--opening" id="z-opening" aria-label="Opening">
+        <div class="opening">
+          <h1 class="display opening__title" data-haze="0.55" data-reveal="200" data-copy="opening.title"></h1>
+          <p class="caps opening__subtitle" data-haze="0.7" data-reveal="1300" data-copy="opening.subtitle"></p>
+          <span class="opening__rule" data-reveal="2300"></span>
+          <p class="quote opening__line" data-haze data-reveal="2700" data-copy="opening.line"></p>
+        </div>
+        <button class="begin" data-reveal="3800" data-action="next">
+          <span class="caps" data-copy="opening.begin"></span>
+          <span class="begin__line"></span>
+        </button>
+      </section>
+
+      <!-- ZONE 02 — CONCEPT  (130vw: the question sits at the right edge, leading on) -->
+      <section class="frame scene--idea" id="z-concept" aria-label="Concept">
+        <header data-haze="0.7" class="scene-head" data-reveal="0"><span class="caps" data-copy="idea.kicker"></span></header>
+        <h2 data-haze class="display idea__statement reveal-wipe" data-reveal="100" data-copy="idea.statement"></h2>
+        <!-- Five words: built from AS.notes in js/scenes.js -->
+        <ol data-haze="0.7" class="idea__words" id="idea-words"></ol>
+        <p data-haze class="idea__sentence" data-reveal="3400" data-copy="idea.sentence"></p>
+        <p data-haze class="quote idea__question" data-reveal="200" data-copy="idea.question"></p>
+      </section>
+
+      <!-- ZONES 03–05 — FIVE ANIMALS → FIVE BANKNOTES → FAMILY  (js/columns.js)
+           This frame is held in place (pinned) while the camera keeps moving,
+           so travelling forward drives the transformation. -->
+      <section class="frame scene--columns" id="z-columns" aria-label="Five animal strategies">
+        <header data-haze="0.7" class="scene-head" data-reveal="0">
+          <span class="caps scene-head__swap">
+            <span class="when-animals" data-copy="columns.kicker"></span>
+            <span class="when-notes" data-copy="columns.kickerNotes"></span>
+            <span class="when-family" data-copy="family.kicker"></span>
+          </span>
+        </header>
+
+        <!-- ARTWORK: five strips built from AS.notes[].photo / .front -->
+        <div class="strips" id="strips"></div>
+        <!-- Labels for the released family composition -->
+        <div class="family-labels" id="family-labels"></div>
+
+        <div data-haze class="strips__caption" data-reveal="600">
+          <span class="strips__rule"></span>
+          <p class="quote caption-animals" data-copy="columns.captionAnimals"></p>
+          <p class="quote caption-notes" data-copy="columns.captionNotes"></p>
+        </div>
+      </section>
+
+      <!-- ZONE 06 — INTERACTIVE SECURITY  (js/banknote.js) -->
+      <section class="frame scene--respond" id="z-respond" aria-label="The banknote responds">
+        <!-- The recurring thread motif arrives here and passes through the note's ANIMA thread -->
+        <span class="demo-thread" id="demo-thread" aria-hidden="true"></span>
+
+        <header data-haze="0.7" class="scene-head" data-reveal="0"><span class="caps" data-copy="respond.kicker"></span></header>
+
+        <div data-haze="0.6" class="denoms" data-reveal="500">
+          <span class="caps denoms__label" data-copy="respond.featuredLabel"></span>
+          <div class="denoms__list" id="denom-picker"></div>
+        </div>
+
+        <div class="respond__veil" aria-hidden="true"></div>
+
+        <div class="respond">
+          <div class="note3d" id="note3d" data-haze="0.7" data-reveal="100">
+            <div class="note3d__tilt" id="note-tilt">
+              <div class="note3d__card" id="note-card">
+
+                <div class="note3d__face note3d__face--front">
+                  <div class="backlight"></div>
+                  <!-- ARTWORK: featured front (AS.notes[].front) -->
+                  <div class="slot slot--front" id="slot-front"></div>
+
+                  <!-- LIGHT: watermark window + see-through register -->
+                  <div class="layer layer--light">
+                    <div class="wm-window" id="wm-window"></div>
+                    <div class="register" id="register">
+                      <div class="register__half register__half--a" id="reg-a"></div>
+                      <div class="register__half register__half--b" id="reg-b"></div>
+                    </div>
+                  </div>
+
+                  <!-- TILT: security thread with five discrete frames -->
+                  <div class="layer layer--tilt">
+                    <div class="thread" id="thread"></div>
+                  </div>
+
+                  <!-- TOUCH: tactile zones (positions in AS.featureLayout) -->
+                  <div class="layer layer--touch" id="touch-layer">
+                    <span class="touch-ring" id="touch-ring"></span>
+                  </div>
+                </div>
+
+                <div class="note3d__face note3d__face--back">
+                  <!-- ARTWORK: featured back (AS.notes[].back) -->
+                  <div class="slot" id="slot-back"></div>
+                </div>
+
+              </div>
+            </div>
+          </div>
+
+          <nav data-haze class="modes" id="modes" data-reveal="500" aria-label="Interaction modes"></nav>
+
+          <div data-haze class="mode-caption" id="mode-caption" data-reveal="700" aria-live="polite">
+            <p class="caps mode-caption__title" id="mode-title"></p>
+            <p class="caps mode-caption__sub" id="mode-sub"></p>
+            <p class="quote mode-caption__text" id="mode-text"></p>
+
+            <div class="mode-extra mode-extra--tilt">
+              <div class="frames" id="frames"></div>
+              <span class="caps frames__label" id="frames-label"></span>
+            </div>
+
+            <div class="mode-extra mode-extra--light">
+              <label class="light-ctl">
+                <span class="caps" data-copy="respond.lightLabel"></span>
+                <input type="range" min="0" max="100" value="0" id="light-range">
+              </label>
+              <span class="caps light-hint" data-copy="respond.lightHint"></span>
+            </div>
+
+            <div class="mode-extra mode-extra--flip">
+              <div class="flip-sides">
+                <div class="side side--front">
+                  <span class="side__name" data-copy="respond.flipSides.front.name"></span>
+                  <span class="caps side__desc" data-copy="respond.flipSides.front.desc"></span>
+                </div>
+                <span class="side__rule"></span>
+                <div class="side side--back">
+                  <span class="side__name" data-copy="respond.flipSides.back.name"></span>
+                  <span class="caps side__desc" data-copy="respond.flipSides.back.desc"></span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ZONE 07 — BIOLOGY → SECURITY -->
+      <section class="frame scene--translate" id="z-translate" aria-label="From biology to security">
+        <header data-haze="0.7" class="scene-head" data-reveal="0"><span class="caps" data-copy="translate.kicker"></span></header>
+        <div class="translate">
+          <div data-haze class="translate__head caps" data-reveal="100">
+            <span class="translate__left" data-copy="translate.left"></span>
+            <span class="translate__right" data-copy="translate.right"></span>
+          </div>
+          <!-- Rows built from AS.notes in js/scenes.js -->
+          <ol class="translate__rows" id="rows"></ol>
+        </div>
+        <p data-haze class="display translate__statement reveal-wipe" data-reveal="5200" data-copy="translate.statement"></p>
+      </section>
+
+      <!-- ZONE 08 — CLOSING -->
+      <section class="frame scene--final" id="z-closing" aria-label="Closing">
+        <div class="final">
+          <h2 class="display final__title" data-haze data-reveal="200" data-copy="final.title"></h2>
+          <p class="caps final__lines" data-haze data-reveal="1200" data-copy="final.lines"></p>
+          <span class="final__rule" data-reveal="2200"></span>
+          <p class="quote final__quote" data-haze data-reveal="2700" data-copy="final.quote"></p>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <!-- Optional focused view of one banknote (click a note in Zones 04–05) -->
+  <div class="focus" id="focus" aria-hidden="true">
+    <div class="focus__veil" data-focus-close></div>
+    <div class="focus__note">
+      <div class="focus__card" id="focus-card">
+        <div class="focus__face focus__front" id="focus-front"></div>
+        <div class="focus__face focus__back" id="focus-back"></div>
+      </div>
+    </div>
+    <div class="focus__bar">
+      <span class="focus__value" id="focus-value"></span>
+      <span class="caps focus__names" id="focus-names"></span>
+      <span class="focus__actions">
+        <button class="caps focus__btn" id="focus-flip" type="button" data-copy="columns.flip"></button>
+        <button class="caps focus__btn" type="button" data-focus-close data-copy="columns.close"></button>
+      </span>
+    </div>
+  </div>
+
+  <!-- Presentation controls -->
+  <footer class="controls" id="controls">
+    <!-- HOME: the project title returns to the beginning of the surface -->
+    <button class="caps controls__mark" data-action="home" title="Back to the beginning (Home / Esc)" data-copy="mark"></button>
+    <span class="caps controls__chapter" id="chapter"></span>
+    <span class="controls__nav">
+      <button class="controls__btn" data-action="prev" aria-label="Back" title="Back (←)">←</button>
+      <button class="controls__btn" data-action="next" aria-label="Next" title="Next (→)">→</button>
+    </span>
+    <span class="controls__progress"><span id="progress-bar"></span></span>
+  </footer>
+
+  <noscript><p class="noscript">This presentation needs JavaScript.</p></noscript>
+
+  <!-- Scripts: content → components → builders → surface → interactions → camera -->
+  <script src="js/content.js"></script>
+  <script src="js/image.js"></script>
+  <script src="js/glyphs.js"></script>
+  <script src="js/patterns.js"></script>
+  <script src="js/scenes.js"></script>
+  <script src="js/columns.js"></script>
+  <script src="js/banknote.js"></script>
+  <script src="js/curves.js"></script>
+  <script src="js/world.js"></script>
+</body>
+</html>

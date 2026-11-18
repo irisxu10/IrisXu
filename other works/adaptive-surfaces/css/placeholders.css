@@ -1,0 +1,112 @@
+/* ==========================================================================
+   IMAGE COMPONENT + PLACEHOLDERS  (see js/image.js)
+   Placeholder = ivory-2 field, fine diagonal hatch, inner frame line,
+   accent corner marks, a "[ LABEL ]" and the expected file path.
+   Disappears automatically once the real PNG loads.
+   ========================================================================== */
+
+.as-image {
+  --accent: var(--teal);
+  position: relative;
+  margin: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.as-image.is-placeholder {
+  --tick: 14px;
+  background:
+    linear-gradient(var(--accent) 0 0) 0 0 / var(--tick) 1px no-repeat,
+    linear-gradient(var(--accent) 0 0) 0 0 / 1px var(--tick) no-repeat,
+    linear-gradient(var(--accent) 0 0) 100% 0 / var(--tick) 1px no-repeat,
+    linear-gradient(var(--accent) 0 0) 100% 0 / 1px var(--tick) no-repeat,
+    linear-gradient(var(--accent) 0 0) 0 100% / var(--tick) 1px no-repeat,
+    linear-gradient(var(--accent) 0 0) 0 100% / 1px var(--tick) no-repeat,
+    linear-gradient(var(--accent) 0 0) 100% 100% / var(--tick) 1px no-repeat,
+    linear-gradient(var(--accent) 0 0) 100% 100% / 1px var(--tick) no-repeat,
+    repeating-linear-gradient(135deg, rgba(19, 40, 64, 0.035) 0 1px, transparent 1px 9px),
+    var(--ivory-2);
+  box-shadow: inset 0 0 0 1px var(--hair);
+}
+
+.as-image__ph {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px;
+  text-align: center;
+  pointer-events: none;
+}
+.as-image.is-placeholder .as-image__ph::before {
+  content: '';
+  position: absolute;
+  inset: 9px;
+  border: 1px solid var(--hair);
+  pointer-events: none;
+}
+.as-image.is-loaded .as-image__ph { display: none; }
+
+.as-image__label {
+  font-family: var(--mono);
+  font-size: 10.5px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  line-height: 1.6;
+}
+.as-image__path {
+  font-family: var(--mono);
+  font-size: 9.5px;
+  letter-spacing: 0.02em;
+  color: var(--muted);
+  word-break: break-all;
+}
+
+/* Photo placeholders (animal photography) — a deeper, accent-tinted tone so
+   they read as "image" rather than "paper", and so the animal → banknote
+   transition is visible before real photos exist. */
+.as-image--photo.is-placeholder {
+  background:
+    repeating-linear-gradient(115deg, color-mix(in srgb, var(--accent) 9%, transparent) 0 1px, transparent 1px 5px),
+    radial-gradient(ellipse at 55% 45%, color-mix(in srgb, var(--accent) 7%, var(--ivory-3)), color-mix(in srgb, var(--accent) 16%, var(--ivory-3)));
+  box-shadow: none;
+}
+.as-image--photo .as-image__ph::before { display: none; }
+.as-image--photo .as-image__label { font-size: 11px; letter-spacing: 0.22em; color: var(--ink); }
+
+/* Real artwork */
+.as-image__img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  transition: opacity 900ms var(--ease);
+  user-select: none;
+}
+.as-image.is-loaded .as-image__img { opacity: 1; }
+
+/* Landscape artwork in an upright frame */
+.as-image--rotate { container-type: size; }
+.as-image--rotate .as-image__img {
+  inset: auto;
+  left: 50%;
+  top: 50%;
+  width: 100cqh;
+  height: 100cqw;
+  translate: -50% -50%;
+  rotate: 90deg;
+}
+
+/* Tall, narrow slots (security thread) */
+.as-image--vertical .as-image__ph { padding: 6px 0; }
+.as-image--vertical .as-image__label {
+  writing-mode: vertical-rl;
+  font-size: 9px;
+  letter-spacing: 0.22em;
+}
